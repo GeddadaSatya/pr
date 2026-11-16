@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sovereign Wealth & Expense Command Suite (₹0 Free Tier)
 
-## Getting Started
+An executive expense tracker and personal wealth command center built with **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, and **Supabase (PostgreSQL + Auth + Storage)**.
 
-First, run the development server:
+---
 
+## ⚡ Features Built to Match Your UI
+
+1. **Executive Financial Dashboard**
+   - **Command Strip**: Personalized greeting, status indicators, and quick action launchpad (*Add Expense*, *Add Debt/Bill*, *Lend Money*).
+   - **Key Wealth Indicators Carousel**: Real-time asset allocation bar (48% investments, 28% banks, 16% bullion, 8% cash), outstanding debts alert with countdown, loan yield ticker (+₹1,425/mo), and monthly budget tracker with progress gauge.
+   - **Category Analytics**: Interactive SVG donut chart with central balance readout, category sector bars, and time filter with custom dual-month calendar popover.
+   - **Recent Daily Expenses Notebook**: Filterable transaction table by text, category, and date, with one-click **CSV Ledger Export**.
+   - **Immediate Action Center (Payables & Dues)**: Upcoming bills with urgency badges (*Due in 3d*, *Scheduled ACH*), and one-click "Record Payout" action.
+   - **Active Loans & Interest Flow**: Money lent to others with APR rates, monthly interest accrual, and borrower initials avatar badges.
+2. **Camera & Receipt Attachment**
+   - Direct mobile camera capture (`capture="environment"`) or desktop drag-and-drop file upload.
+   - Live image preview with delete/replace option.
+   - Ready to stream into Supabase Free 1GB bucket.
+3. **One-Click Privacy Mode**
+   - Instant eye toggle in the sidebar masks all currency figures (`₹••••••`) to prevent shoulder surfing.
+4. **Free Authentication (No SMS Costs)**
+   - Supabase Email OTP / Magic Link flow (50,000 free monthly active users).
+
+---
+
+## 🚀 Getting Started
+
+### 1. Run Locally
+The project dependencies are already installed. Start the local development server:
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🗄️ Setting Up Supabase (100% Free Forever)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Go to [supabase.com](https://supabase.com) and create a free project.
+2. Open the **SQL Editor** in your Supabase dashboard.
+3. Copy and run the entire SQL script from [`supabase/schema.sql`](./supabase/schema.sql).
+   - This automatically creates the `profiles`, `expenses`, `payables`, `loans` tables, storage bucket for receipts, and PostgreSQL Row Level Security (RLS) policies.
+4. Go to **Project Settings → API** in Supabase:
+   - Copy **Project URL** and **anon / public** key.
+   - Paste them into your `.env.local` file:
+     ```env
+     NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+     NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+     ```
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## ☁️ Deploying to Vercel (₹0 Hosting)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push this repository to your GitHub account:
+   ```bash
+   git add .
+   git commit -m "Initial commit of Wealth Command expense tracker"
+   git push origin main
+   ```
+2. Log in to [vercel.com](https://vercel.com) and click **"Add New Project"**.
+3. Import your GitHub repository.
+4. Under **Environment Variables**, add:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Click **Deploy**. Your app will be live on an HTTPS custom domain or `*.vercel.app` in under 60 seconds!
