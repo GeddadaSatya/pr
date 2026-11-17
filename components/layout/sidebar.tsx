@@ -27,12 +27,46 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     >
       <div className="flex flex-col w-full overflow-hidden">
         {/* Top Brand Header Row */}
-        <div className="px-3.5 mb-4 flex items-center justify-between overflow-hidden min-h-[44px]">
+        <div className="px-3.5 mb-6 flex items-center justify-between overflow-hidden min-h-[44px]">
           <div className="flex items-center min-w-0">
-            <div className="w-11 h-11 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center text-[#d4af37] shadow-xs shrink-0">
-              <span className="material-symbols-outlined text-2xl font-semibold">account_balance</span>
+            {/* Logo Icon - When collapsed, hovering reveals the expand icon and clicking toggles sidebar */}
+            <div
+              onClick={isCollapsed ? toggleSidebar : undefined}
+              className={`w-11 h-11 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center text-[#d4af37] shadow-xs shrink-0 relative group transition-all duration-300 ${
+                isCollapsed
+                  ? 'cursor-pointer hover:border-[#d4af37]/70 hover:shadow-[0_0_12px_rgba(212,175,55,0.3)]'
+                  : ''
+              }`}
+              title={isCollapsed ? 'Click to expand sidebar' : 'Personal Tracker'}
+            >
+              {/* Default Bank Emblem */}
+              <span
+                className={`material-symbols-outlined text-2xl font-semibold transition-all duration-200 ${
+                  isCollapsed ? 'group-hover:opacity-0 group-hover:scale-75' : 'opacity-100'
+                }`}
+              >
+                account_balance
+              </span>
+
+              {/* Reveal Expand Icon on Hover (Only when collapsed) */}
+              {isCollapsed && (
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:scale-100 scale-75 transition-all duration-200 text-[#d4af37]">
+                  <svg
+                    className="w-5 h-5 text-[#d4af37]"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="m9 18 6-6-6-6" />
+                  </svg>
+                </div>
+              )}
             </div>
-            
+
+            {/* Brand Title (when expanded) */}
             <div
               className={`flex flex-col ml-3 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
                 isCollapsed
@@ -49,7 +83,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
             </div>
           </div>
 
-          {/* Sleek Collapse Toggle Button (when expanded) */}
+          {/* Collapse Toggle Button (when expanded) */}
           <div
             className={`overflow-hidden transition-all duration-300 ease-in-out ${
               isCollapsed ? 'opacity-0 max-w-0 pointer-events-none' : 'opacity-100 max-w-8'
@@ -61,51 +95,19 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
               title="Collapse sidebar"
               type="button"
             >
-              {/* Modern Panel Collapse Icon */}
               <svg
                 className="w-4 h-4 text-slate-600"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="2.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <rect width="18" height="18" x="3" y="3" rx="3" />
-                <path d="M9 3v18" />
-                <path d="m14 9-3 3 3 3" />
+                <path d="m15 18-6-6 6-6" />
               </svg>
             </button>
           </div>
-        </div>
-
-        {/* Dedicated Sleek Expand Button (when collapsed) */}
-        <div
-          className={`overflow-hidden transition-all duration-300 ease-in-out flex justify-center ${
-            isCollapsed ? 'max-h-12 opacity-100 mb-4' : 'max-h-0 opacity-0 mb-0 pointer-events-none'
-          }`}
-        >
-          <button
-            onClick={toggleSidebar}
-            className="w-11 h-10 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors shadow-xs cursor-pointer"
-            title="Expand sidebar"
-            type="button"
-          >
-            {/* Modern Panel Expand Icon */}
-            <svg
-              className="w-4 h-4 text-slate-600"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect width="18" height="18" x="3" y="3" rx="3" />
-              <path d="M9 3v18" />
-              <path d="m13 15 3-3-3-3" />
-            </svg>
-          </button>
         </div>
 
         {/* Butter-Smooth Add Transaction Button */}
@@ -175,7 +177,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                 >
                   {item.icon}
                 </span>
-                
+
                 <span
                   className={`text-sm whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${
                     isCollapsed
