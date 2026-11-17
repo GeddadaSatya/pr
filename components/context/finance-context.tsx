@@ -18,6 +18,9 @@ interface FinanceContextType {
   isAuthModalOpen: boolean;
   openAuthModal: () => void;
   closeAuthModal: () => void;
+  isCollapsed: boolean;
+  setIsCollapsed: (collapsed: boolean) => void;
+  toggleSidebar: () => void;
   addExpense: (expense: Omit<ExpenseItem, 'id' | 'dateTime'>) => void;
   addPayable: (payable: Omit<PayableItem, 'id' | 'status'>) => void;
   addLoan: (loan: Omit<LoanItem, 'id' | 'monthlyInterest' | 'status'>) => void;
@@ -36,6 +39,35 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<LedgerType>('expense');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+
+  // Auto collapse below 1000px screen width and support saved state
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1000) {
+        setIsCollapsed(true);
+      } else {
+        const saved = localStorage.getItem('wt_sidebar_collapsed');
+        if (saved !== null) {
+          setIsCollapsed(saved === 'true');
+        } else {
+          setIsCollapsed(false);
+        }
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const toggleSidebar = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem('wt_sidebar_collapsed', String(next));
+      return next;
+    });
+  };
 
   // Load from localStorage if present for local persistence
   useEffect(() => {
@@ -114,6 +146,9 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         isAuthModalOpen,
         openAuthModal,
         closeAuthModal,
+        isCollapsed,
+        setIsCollapsed,
+        toggleSidebar,
         addExpense,
         addPayable,
         addLoan,

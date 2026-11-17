@@ -14,8 +14,11 @@ import { PayablesLoansHub } from '@/components/dashboard/payables-loans-hub';
 import { TransactionModal } from '@/components/modals/transaction-modal';
 import { AuthModal } from '@/components/modals/auth-modal';
 
+import { useFinance } from '@/components/context/finance-context';
+
 function DashboardContent() {
   const [activeTab, setActiveTab] = useState('overview');
+  const { isCollapsed } = useFinance();
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
@@ -26,7 +29,7 @@ function DashboardContent() {
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Main Content Area */}
-      <div className="pl-0 md:pl-72">
+      <div className={`pl-0 transition-all duration-300 ease-in-out ${isCollapsed ? 'md:pl-20' : 'md:pl-72'}`}>
         {/* Top Floating Glass Header (>= 780px) */}
         <Header />
 

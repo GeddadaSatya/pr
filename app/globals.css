@@ -5,11 +5,14 @@
 }
 
 @layer base {
-  html, body {
+
+  html,
+  body {
     margin: 0;
     padding: 0;
     width: 100%;
   }
+
   body {
     overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
@@ -20,6 +23,7 @@
   .pt-safe {
     padding-top: env(safe-area-inset-top, 0px);
   }
+
   ::-webkit-scrollbar {
     display: none;
   }
