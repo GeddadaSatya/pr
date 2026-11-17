@@ -48,7 +48,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                 account_balance
               </span>
 
-              {/* Reveal Expand Icon on Hover (Only when collapsed) */}
+              {/* Reveal Expand Icon on Hover (Only when collapsed) - Option 3 Dual Chevron */}
               {isCollapsed && (
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:scale-100 scale-75 transition-all duration-200 text-[#d4af37]">
                   <svg
@@ -60,7 +60,8 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="m9 18 6-6-6-6" />
+                    <path d="m6 17 5-5-5-5" />
+                    <path d="m13 17 5-5-5-5" />
                   </svg>
                 </div>
               )}
@@ -95,6 +96,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
               title="Collapse sidebar"
               type="button"
             >
+              {/* Option 3: Dual Chevron (pointing left) */}
               <svg
                 className="w-4 h-4 text-slate-600"
                 viewBox="0 0 24 24"
@@ -104,7 +106,8 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <path d="m15 18-6-6 6-6" />
+                <path d="m11 17-5-5 5-5" />
+                <path d="m18 17-5-5 5-5" />
               </svg>
             </button>
           </div>
