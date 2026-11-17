@@ -26,7 +26,7 @@ function DashboardContent() {
         <Header />
 
         {/* Dashboard Main Canvas */}
-        <main className="w-full px-8 pb-12 pt-20 bg-[#f8fafc] min-h-[calc(100vh-4rem)]">
+        <main className="w-full pb-12 pt-20 bg-[#f8fafc] min-h-[calc(100vh-4rem)]">
           <div className="flex flex-col w-[95%] mx-auto gap-6">
             {/* Top Command Strip & Greeting */}
             <CommandStrip />

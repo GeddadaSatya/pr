@@ -74,9 +74,8 @@ export function Header() {
                 </div>
               </div>
               <span
-                className={`material-symbols-outlined text-slate-400 hover:text-slate-700 transition-transform text-lg ml-0.5 duration-200 ${
-                  dropdownOpen ? 'rotate-180' : ''
-                }`}
+                className={`material-symbols-outlined text-slate-400 hover:text-slate-700 transition-transform text-lg ml-0.5 duration-200 ${dropdownOpen ? 'rotate-180' : ''
+                  }`}
               >
                 expand_more
               </span>
