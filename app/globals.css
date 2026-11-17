@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --breakpoint-md: 780px;
+  --breakpoint-md: 975px;
 }
 
 @layer base {

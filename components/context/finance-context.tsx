@@ -41,10 +41,10 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
-  // Auto collapse below 1000px screen width and support saved state
+  // Auto collapse below 1100px screen width and support saved state
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 1000) {
+      if (window.innerWidth < 1100) {
         setIsCollapsed(true);
       } else {
         const saved = localStorage.getItem('wt_sidebar_collapsed');
