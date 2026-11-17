@@ -20,7 +20,7 @@ export function Header() {
   }, []);
 
   return (
-    <header className="fixed top-0 left-72 right-0 h-16 bg-white/90 backdrop-blur-md z-40 border-b border-slate-200">
+    <header className="fixed top-0 left-72 right-0 h-16 bg-white/90 backdrop-blur-md z-40 border-b border-slate-200 hidden md:block">
       <div className="w-[88%] mx-auto h-16 flex items-center justify-between">
         <div className="flex items-center gap-4">
           {/* Left spacing/slot */}

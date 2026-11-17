@@ -20,7 +20,7 @@ export function KpiCarousel() {
     }
   };
 
-  // Calculate dynamic totals from state
+  // Dynamic calculations
   const totalPayables = payables
     .filter((p) => p.status === 'pending')
     .reduce((sum, p) => sum + p.amount, 0);
@@ -39,16 +39,16 @@ export function KpiCarousel() {
   const remainingBudget = Math.max(monthlyBudget - totalExpenses, 0);
 
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col gap-2">
       {/* Carousel Header Controls */}
-      <div className="flex items-center justify-between mb-3 w-full">
+      <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-[#d4af37]"></span>
-          <span className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">
+          <span className="font-label-caps text-xs text-slate-500 uppercase tracking-wider font-semibold">
             Key Wealth Indicators
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2">
           <button
             onClick={scrollLeft}
             aria-label="Scroll left"
@@ -71,105 +71,121 @@ export function KpiCarousel() {
       {/* Cards Carousel */}
       <div
         ref={carouselRef}
-        className="flex overflow-x-auto gap-4 pb-3 scroll-smooth snap-x snap-mandatory"
+        className="flex overflow-x-auto gap-4 py-1 -mx-4 px-4 md:mx-0 md:px-0 scroll-smooth snap-x snap-mandatory no-scrollbar"
         style={{ scrollbarWidth: 'none' }}
       >
         {/* Card 1: Total Property & Assets */}
-        <div
-          className="rounded-xl bg-white border border-slate-200 p-5 flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors shrink-0 snap-start"
-          style={{ width: 'calc(50% - 0.5rem)', minWidth: '320px' }}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">
-              Total Property &amp; Assets
-            </span>
-            <span className="material-symbols-outlined text-slate-400 text-xl">account_balance</span>
-          </div>
-          <div className="my-3">
-            <div className="font-headline-lg text-slate-900 font-semibold tracking-tight">
-              {formatCurrency(620000, privacyMode)}
+        <div className="min-w-[280px] w-[82vw] max-w-[340px] md:w-[calc(50%-0.5rem)] md:max-w-none md:min-w-[320px] shrink-0 snap-start bg-white p-4 md:p-5 rounded-xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-4 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-[#fed65b]"></div>
+          <div className="flex justify-between items-start">
+            <div className="flex flex-col">
+              <span className="font-label-caps text-[11px] uppercase text-slate-500">Total Property &amp; Assets</span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="font-headline-lg-mobile md:font-headline-lg text-slate-900 font-semibold tracking-tight">
+                  {privacyMode ? '••••••' : '₹6,20,000'}
+                </span>
+                <span className="font-label-numeric text-xs text-slate-500">{privacyMode ? '' : '.00'}</span>
+              </div>
             </div>
-            <span className="text-xs text-slate-500">Bank accounts, gold, property &amp; investments</span>
+            <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-[#735c00]">
+              <span className="material-symbols-outlined text-lg">domain</span>
+            </div>
           </div>
-          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden flex border border-slate-200/60">
-            <div className="bg-slate-900 h-full" style={{ width: '48%' }} title="Investments: 48%"></div>
-            <div className="bg-[#d4af37] h-full" style={{ width: '28%' }} title="Banks: 28%"></div>
-            <div className="bg-amber-600 h-full" style={{ width: '16%' }} title="Bullion: 16%"></div>
-            <div className="bg-slate-300 h-full" style={{ width: '8%' }} title="Cash: 8%"></div>
+          <div className="flex flex-col gap-2">
+            <div className="flex justify-between text-xs">
+              <span className="text-slate-500">Liquidity Reserve</span>
+              <span className="font-label-numeric font-semibold text-slate-800">74.2%</span>
+            </div>
+            {/* Fine Breakdown Bar */}
+            <div className="w-full h-1.5 rounded-full bg-slate-100 flex overflow-hidden">
+              <div className="h-full bg-[#fed65b]" style={{ width: '58%' }} title="Investments: 58%"></div>
+              <div className="h-full bg-[#131b2e]" style={{ width: '24%' }} title="Banks: 24%"></div>
+              <div className="h-full bg-[#735c00]" style={{ width: '18%' }} title="Bullion: 18%"></div>
+            </div>
           </div>
         </div>
 
-        {/* Card 2: Outstanding Payables */}
-        <div
-          className="rounded-xl bg-white border border-slate-200 p-5 flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors shrink-0 snap-start"
-          style={{ width: 'calc(50% - 0.5rem)', minWidth: '320px' }}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">
-              Money You Owe (Debts)
-            </span>
-            <span className="px-2 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-700 text-[10px] font-bold flex items-center gap-1">
-              <span className="material-symbols-outlined text-xs">notifications_active</span>{' '}
-              {payables.length} Due Soon
-            </span>
-          </div>
-          <div className="my-3">
-            <div className="font-headline-lg text-red-700 font-semibold tracking-tight">
-              {formatCurrency(totalPayables, privacyMode)}
+        {/* Card 2: Money You Owe (Debts) */}
+        <div className="min-w-[280px] w-[82vw] max-w-[340px] md:w-[calc(50%-0.5rem)] md:max-w-none md:min-w-[320px] shrink-0 snap-start bg-white p-4 md:p-5 rounded-xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-4 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-red-600"></div>
+          <div className="flex justify-between items-start">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <span className="font-label-caps text-[11px] uppercase text-slate-500">Money You Owe (Debts)</span>
+                <span className="px-2 py-0.5 rounded-full bg-red-50 text-red-700 font-label-caps text-[10px] font-bold">
+                  {payables.length} Due Soon
+                </span>
+              </div>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="font-headline-lg-mobile md:font-headline-lg text-red-700 font-semibold tracking-tight">
+                  {privacyMode ? '••••••' : `₹${totalPayables.toLocaleString('en-IN')}`}
+                </span>
+                <span className="font-label-numeric text-xs text-slate-500">{privacyMode ? '' : '.00'}</span>
+              </div>
             </div>
-            <span className="text-xs text-slate-500">Pending bills, borrowed money &amp; payments</span>
+            <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-600">
+              <span className="material-symbols-outlined text-lg">credit_card_off</span>
+            </div>
           </div>
-          <div className="flex items-center justify-between text-xs text-slate-600">
-            <span>Upcoming: {payables[0]?.creditorName || 'Marcus Vance'}</span>
-            <span className="font-semibold text-red-700">
-              {privacyMode ? '••••' : `₹${payables[0]?.amount?.toLocaleString('en-IN') || '2,500'} due soon`}
-            </span>
+          <div className="flex flex-col gap-1.5 bg-slate-50 p-2.5 rounded-lg">
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-slate-800 font-medium truncate">
+                Upcoming: {payables[0]?.creditorName || 'Marcus Vance'}
+              </span>
+              <span className="font-label-numeric text-red-700 font-semibold">
+                {privacyMode ? '••••' : `₹${payables[0]?.amount?.toLocaleString('en-IN') || '2,500'}`}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+              <span className="material-symbols-outlined text-xs text-red-600">schedule</span>
+              <span>Final reconciliation due in 3 days</span>
+            </div>
           </div>
         </div>
 
         {/* Card 3: Money Lent to Others */}
-        <div
-          className="rounded-xl bg-white border border-slate-200 p-5 flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors shrink-0 snap-start"
-          style={{ width: 'calc(50% - 0.5rem)', minWidth: '320px' }}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">
-              Money Lent to Others
-            </span>
-            <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-bold">
-              +{privacyMode ? '••••' : `₹${Math.round(totalYield).toLocaleString('en-IN')}`}/mo Yield
-            </span>
-          </div>
-          <div className="my-3">
-            <div className="font-headline-lg text-slate-900 font-semibold tracking-tight">
-              {formatCurrency(totalLoans, privacyMode)}
+        <div className="min-w-[280px] w-[82vw] max-w-[340px] md:w-[calc(50%-0.5rem)] md:max-w-none md:min-w-[320px] shrink-0 snap-start bg-white p-4 md:p-5 rounded-xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-4 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500"></div>
+          <div className="flex justify-between items-start">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2">
+                <span className="font-label-caps text-[11px] uppercase text-slate-500">Money Lent to Others</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-label-caps text-[10px] font-bold">
+                  +{privacyMode ? '••••' : `₹${Math.round(totalYield).toLocaleString('en-IN')}`}/mo
+                </span>
+              </div>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="font-headline-lg-mobile md:font-headline-lg text-slate-900 font-semibold tracking-tight">
+                  {privacyMode ? '••••••' : `₹${totalLoans.toLocaleString('en-IN')}`}
+                </span>
+                <span className="font-label-numeric text-xs text-slate-500">{privacyMode ? '' : '.00'}</span>
+              </div>
             </div>
-            <span className="text-xs text-slate-500">Total money lent to friends and partners</span>
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-700">
+              <span className="material-symbols-outlined text-lg">trending_up</span>
+            </div>
           </div>
           <div className="flex items-center justify-between text-xs text-slate-600">
             <span>Average Interest Rate</span>
-            <span className="font-semibold text-slate-900">18.0% p.a.</span>
+            <span className="font-semibold text-slate-900 font-label-numeric">18.0% p.a.</span>
           </div>
         </div>
 
-        {/* Card 4: Expense Notebook Status */}
-        <div
-          className="rounded-xl bg-white border border-slate-200 p-5 flex flex-col justify-between shadow-xs hover:border-slate-300 transition-colors shrink-0 snap-start"
-          style={{ width: 'calc(50% - 0.5rem)', minWidth: '320px' }}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold">
-              This Month&apos;s Expenses
-            </span>
-            <span className="text-xs text-slate-500 font-medium">Budget: ₹9,500</span>
-          </div>
-          <div className="my-3">
-            <div className="font-headline-lg text-slate-900 font-semibold tracking-tight">
-              {formatCurrency(totalExpenses, privacyMode)}
+        {/* Card 4: Expense Budget Status */}
+        <div className="min-w-[280px] w-[82vw] max-w-[340px] md:w-[calc(50%-0.5rem)] md:max-w-none md:min-w-[320px] shrink-0 snap-start bg-white p-4 md:p-5 rounded-xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-4 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-[#d4af37]"></div>
+          <div className="flex justify-between items-start">
+            <div className="flex flex-col">
+              <span className="font-label-caps text-[11px] uppercase text-slate-500">This Month&apos;s Expenses</span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="font-headline-lg-mobile md:font-headline-lg text-slate-900 font-semibold tracking-tight">
+                  {formatCurrency(totalExpenses, privacyMode)}
+                </span>
+              </div>
             </div>
-            <span className="text-xs text-slate-500">
-              {expensePercentage}% of your monthly expense budget used
-            </span>
+            <div className="w-8 h-8 rounded-lg bg-[#fef9e7] flex items-center justify-center text-[#b48e28]">
+              <span className="material-symbols-outlined text-lg">account_balance_wallet</span>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200/60">
@@ -178,7 +194,7 @@ export function KpiCarousel() {
                 style={{ width: `${expensePercentage}%` }}
               ></div>
             </div>
-            <span className="text-xs text-slate-700 font-bold">
+            <span className="text-xs text-slate-700 font-bold font-label-numeric">
               {privacyMode ? '••••' : `₹${remainingBudget.toLocaleString('en-IN')} rem`}
             </span>
           </div>

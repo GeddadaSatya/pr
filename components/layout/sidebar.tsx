@@ -20,7 +20,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-72 bg-white border-r border-slate-200 z-50 flex flex-col justify-between py-6 shadow-sm">
+    <aside className="fixed left-0 top-0 h-full w-72 bg-white border-r border-slate-200 z-50 hidden md:flex flex-col justify-between py-6 shadow-sm">
       <div className="flex flex-col">
         {/* Logo and Brand */}
         <div className="px-6 mb-8 flex items-center gap-3">
