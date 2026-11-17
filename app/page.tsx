@@ -42,14 +42,14 @@ function DashboardContent() {
             {/* Key Wealth Indicators (Carousel of 4 KPI cards) */}
             <KpiCarousel />
 
+            {/* Recent Daily Expenses Table (Filterable & Exportable) */}
+            <ExpenseTable />
+
             {/* Spending Breakdown by Category (Donut chart & Sector list) */}
             <CategoryAnalytics />
 
             {/* Operational Grid: Payables (Action Center) & Loans Ledger */}
             <PayablesLoansHub />
-
-            {/* Recent Daily Expenses Table (Filterable & Exportable) */}
-            <ExpenseTable />
           </div>
         </main>
       </div>
