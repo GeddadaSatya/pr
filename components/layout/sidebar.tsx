@@ -32,25 +32,25 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
             {/* Logo Icon - When collapsed, hovering reveals the expand icon and clicking toggles sidebar */}
             <div
               onClick={isCollapsed ? toggleSidebar : undefined}
-              className={`w-11 h-11 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center text-[#d4af37] shadow-xs shrink-0 relative group transition-all duration-300 ${
+              className={`w-11 h-11 rounded-2xl bg-[#020b1e] border border-slate-800 flex items-center justify-center shadow-xs shrink-0 relative group transition-all duration-300 overflow-hidden ${
                 isCollapsed
                   ? 'cursor-pointer hover:border-[#d4af37]/70 hover:shadow-[0_0_12px_rgba(212,175,55,0.3)]'
                   : ''
               }`}
               title={isCollapsed ? 'Click to expand sidebar' : 'Personal Tracker'}
             >
-              {/* Default Bank Emblem */}
-              <span
-                className={`material-symbols-outlined text-2xl font-semibold transition-all duration-200 ${
+              {/* Custom Gold PR Brand Logo */}
+              <img
+                src="/brand-logo.png"
+                alt="PR Brand Emblem"
+                className={`w-full h-full object-cover scale-105 transition-all duration-200 ${
                   isCollapsed ? 'group-hover:opacity-0 group-hover:scale-75' : 'opacity-100'
                 }`}
-              >
-                account_balance
-              </span>
+              />
 
               {/* Reveal Expand Icon on Hover (Only when collapsed) - Option 3 Dual Chevron */}
               {isCollapsed && (
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:scale-100 scale-75 transition-all duration-200 text-[#d4af37]">
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:scale-100 scale-75 transition-all duration-200 text-[#d4af37] bg-[#020b1e]">
                   <svg
                     className="w-5 h-5 text-[#d4af37]"
                     viewBox="0 0 24 24"

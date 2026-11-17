@@ -9,7 +9,10 @@ export function MobileHeader() {
   return (
     <header className="fixed top-0 w-full z-40 bg-[#f7f9fb]/90 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.03)] border-b border-slate-200/40 md:hidden">
       <div className="h-16 px-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-[#020b1e] border border-slate-800 overflow-hidden flex items-center justify-center shadow-xs shrink-0">
+            <img src="/brand-logo.png" alt="PR Logo" className="w-full h-full object-cover scale-105" />
+          </div>
           <div className="flex flex-col">
             <span className="font-label-caps text-xs text-[#735c00] tracking-widest uppercase font-bold">
               PERSONAL TRACKER
