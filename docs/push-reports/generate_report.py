@@ -22,12 +22,14 @@ def get_git_info():
         "stat": stat
     }
 
-def get_timeline_filename(branch, summary_slug):
+def get_timeline_filename(branch, summary_slug, include_ampm=False):
     now = datetime.datetime.now()
-    # Format: oct24on102332 (lowercase month + day + 'on' + HHMMSS)
-    timeline = now.strftime("%b%don%H%M%S").lower()
+    # 12-hour format (%I = 01-12, %M = minutes, %S = seconds)
+    # e.g., nov17on102519_dev_feature.html or nov17on102519am_dev_feature.html
+    time_fmt = "%b%don%I%M%S%p" if include_ampm else "%b%don%I%M%S"
+    timeline = now.strftime(time_fmt).lower()
     clean_slug = "".join(c if c.isalnum() else "_" for c in summary_slug).strip("_").lower()
     return f"{timeline}_{branch}_{clean_slug}.html"
 
 if __name__ == "__main__":
-    print("HTML Report generator ready. Timeline convention enforced.")
+    print("HTML Report generator updated to 12-hour format.")

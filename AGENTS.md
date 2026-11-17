@@ -15,7 +15,8 @@ For EVERY git push operation to any branch:
 2. **Code & Architecture Breakdown (What):** Detail every modified or added file, explaining what code was introduced, functions added, and architectural significance.
 3. **Artifact Deliverable & File Naming Convention:**
    - All reports MUST be saved in one dedicated folder: `docs/push-reports/`
-   - All reports MUST follow this timeline-based filename format:
+   - All reports MUST follow this 12-hour timeline format based on the actual push time:
      `docs/push-reports/<month><day>on<hhmmss>_<branch>_<commit_title>.html`
-     *(Example: `nov17on102332_dev_native_mobile_setup.html`)*
+     *(Where `<hhmmss>` is 12-hour time format, e.g. 10:25:19 AM becomes `102519`)*
+     *(Example: `nov17on102519_dev_native_mobile_setup.html`)*
    - Provide a direct clickable link to the HTML report in chat along with key highlights.
