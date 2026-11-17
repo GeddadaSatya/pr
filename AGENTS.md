@@ -13,6 +13,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 For EVERY git push operation to any branch:
 1. **Rationale (Why):** Clearly state the business objective and technical necessity for pushing these changes.
 2. **Code & Architecture Breakdown (What):** Detail every modified or added file, explaining what code was introduced, functions added, and architectural significance.
-3. **Artifact Deliverable:**
-   - Generate a self-contained, interactive **HTML Report** saved in `docs/push-reports/<TIMESTAMP>_<BRANCH>_<COMMIT_TITLE>.html`.
+3. **Artifact Deliverable & File Naming Convention:**
+   - All reports MUST be saved in one dedicated folder: `docs/push-reports/`
+   - All reports MUST follow this timeline-based filename format:
+     `docs/push-reports/<month><day>on<hhmmss>_<branch>_<commit_title>.html`
+     *(Example: `nov17on102332_dev_native_mobile_setup.html`)*
    - Provide a direct clickable link to the HTML report in chat along with key highlights.

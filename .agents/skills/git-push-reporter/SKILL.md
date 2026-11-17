@@ -1,6 +1,6 @@
 ---
 name: git-push-reporter
-description: Automated audit, documentation, and standalone interactive HTML report generator for every Git push.
+description: Automated audit, documentation, and standalone interactive HTML report generator for every Git push with timeline-based naming.
 ---
 
 # Git Push HTML Reporter Skill
@@ -16,5 +16,6 @@ This skill documents and audits code changes before and during git push actions.
    - Code deep dive into primary files.
    - Security, dependencies, and build verification.
 3. Generate the push audit report:
-   - Save standalone **HTML Report** in `docs/push-reports/` using the Wealth Command luxury styling (Tailwind CSS, dark slate, gold accents, responsive cards).
+   - Save standalone **HTML Report** in `docs/push-reports/` using the Wealth Command luxury styling.
+   - **Enforce naming convention:** `<month><day>on<hhmmss>_<branch>_<commit_summary>.html` (e.g., `nov17on003228_dev_native_mobile_setup.html`).
 4. Present the report and file link to the user.
