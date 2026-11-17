@@ -71,7 +71,7 @@ export function KpiCarousel() {
       {/* Cards Carousel */}
       <div
         ref={carouselRef}
-        className="flex overflow-x-auto gap-4 py-1 -mx-4 px-4 md:mx-0 md:px-0 scroll-smooth snap-x snap-mandatory no-scrollbar"
+        className="flex overflow-x-auto gap-4 py-1 -mx-4 px-4 md:mx-0 md:px-0 scroll-smooth snap-x snap-mandatory scroll-pl-4 scroll-pr-4 md:scroll-pl-0 md:scroll-pr-0 no-scrollbar"
         style={{ scrollbarWidth: 'none' }}
       >
         {/* Card 1: Total Property & Assets */}
