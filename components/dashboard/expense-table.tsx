@@ -57,21 +57,13 @@ export function ExpenseTable() {
       <div className="flex flex-col gap-3 md:hidden">
         {/* Ledger Header Controls */}
         <div className="flex items-center justify-between pt-1">
-          <div className="flex items-center gap-2">
-            <span className="font-title-md text-base font-semibold text-slate-900">Recent Ledger</span>
-            <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 text-slate-600 text-xs">
-              <span>Month (October)</span>
-              <span className="material-symbols-outlined text-xs">expand_more</span>
-            </div>
+          <span className="font-title-md text-base font-semibold text-slate-900 whitespace-nowrap">
+            Recent Ledger
+          </span>
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-200/80 text-slate-700 text-xs font-medium shadow-xs cursor-pointer">
+            <span>Month (October)</span>
+            <span className="material-symbols-outlined text-sm text-slate-400">expand_more</span>
           </div>
-          <button
-            onClick={exportToCSV}
-            className="flex items-center gap-1 text-xs font-semibold text-[#735c00] hover:underline cursor-pointer"
-            type="button"
-          >
-            <span className="material-symbols-outlined text-sm">ios_share</span>
-            <span>Export Ledger</span>
-          </button>
         </div>
 
         {/* Transaction List Stack */}
@@ -123,6 +115,16 @@ export function ExpenseTable() {
             </div>
           ))}
         </div>
+
+        {/* Export Ledger Button (Mobile - Positioned at bottom) */}
+        <button
+          onClick={exportToCSV}
+          className="w-full h-10 rounded-xl bg-white border border-slate-200/80 text-slate-700 text-xs font-semibold flex items-center justify-center gap-2 shadow-xs hover:bg-slate-50 active:scale-[0.98] transition-all cursor-pointer"
+          type="button"
+        >
+          <span className="material-symbols-outlined text-base text-[#b48e28]">ios_share</span>
+          <span>Export Ledger (CSV)</span>
+        </button>
 
         {/* Stewardship Confidence Marker */}
         <div className="p-3.5 rounded-xl bg-slate-100/70 border border-slate-200/50 flex items-center gap-3">
