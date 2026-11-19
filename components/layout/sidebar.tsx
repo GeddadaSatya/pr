@@ -27,8 +27,12 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     >
       <div className="flex flex-col w-full overflow-hidden">
         {/* Top Brand Header Row */}
-        <div className="px-3 mb-5 flex items-center justify-between overflow-hidden min-h-[40px]">
-          <div className="flex items-center min-w-0">
+        <div
+          className={`mb-5 flex items-center overflow-hidden min-h-[40px] transition-all duration-300 ${
+            isCollapsed ? 'justify-center px-0' : 'justify-between px-3'
+          }`}
+        >
+          <div className={`flex items-center min-w-0 ${isCollapsed ? 'justify-center' : ''}`}>
             {/* Logo Icon - When collapsed, hovering reveals the expand icon and clicking toggles sidebar */}
             <div
               onClick={isCollapsed ? toggleSidebar : undefined}
@@ -69,10 +73,10 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
             {/* Brand Title (when expanded) */}
             <div
-              className={`flex flex-col ml-2.5 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
+              className={`flex flex-col overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
                 isCollapsed
-                  ? 'opacity-0 max-w-0 -translate-x-3 pointer-events-none'
-                  : 'opacity-100 max-w-[145px] translate-x-0'
+                  ? 'opacity-0 max-w-0 ml-0 -translate-x-3 pointer-events-none'
+                  : 'opacity-100 max-w-[145px] ml-2.5 translate-x-0'
               }`}
             >
               <span className="text-xs text-slate-900 tracking-wider leading-tight uppercase font-bold truncate">
@@ -114,13 +118,13 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         </div>
 
         {/* Butter-Smooth Add Transaction Button */}
-        <div className="px-3 mb-5 flex justify-center overflow-hidden">
+        <div className={`mb-5 flex justify-center overflow-hidden ${isCollapsed ? 'px-0' : 'px-3'}`}>
           <button
             onClick={() => openModal('expense')}
             className={`h-10 rounded-xl flex items-center bg-[#d4af37] text-slate-950 font-semibold transition-all duration-300 ease-in-out cursor-pointer hover:brightness-105 active:scale-[0.98] overflow-hidden whitespace-nowrap shadow-xs ${
               isCollapsed
-                ? 'w-10 justify-center px-0 rounded-xl'
-                : 'w-full justify-start px-3 gap-2.5 rounded-xl'
+                ? 'w-10 justify-center px-0'
+                : 'w-full justify-start px-3 gap-2.5'
             }`}
             title="Add Transaction"
             type="button"
@@ -155,7 +159,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         </div>
 
         {/* Navigation Items List */}
-        <nav className="flex flex-col gap-1 px-2.5 w-full overflow-hidden">
+        <nav className={`flex flex-col gap-1.5 w-full overflow-hidden ${isCollapsed ? 'px-0 items-center' : 'px-2.5'}`}>
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
             return (
@@ -164,11 +168,13 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                 onClick={() => setActiveTab(item.id)}
                 title={item.label}
                 type="button"
-                className={`w-full h-10 rounded-xl flex items-center transition-all duration-200 cursor-pointer overflow-hidden whitespace-nowrap relative ${
-                  isCollapsed ? 'justify-center px-0' : 'justify-start px-2.5 gap-2.5'
+                className={`h-10 rounded-xl flex items-center transition-all duration-200 cursor-pointer overflow-hidden whitespace-nowrap relative ${
+                  isCollapsed ? 'w-10 justify-center px-0' : 'w-full justify-start px-2.5 gap-2.5'
                 } ${
                   isActive
-                    ? 'bg-slate-100/90 text-slate-900 font-semibold border-l-[3px] border-[#d4af37] shadow-xs'
+                    ? isCollapsed
+                      ? 'bg-slate-100 text-[#b48e28] font-semibold ring-1 ring-[#d4af37]/50 shadow-xs'
+                      : 'bg-slate-100/90 text-slate-900 font-semibold border-l-[3px] border-[#d4af37] shadow-xs'
                     : 'text-slate-600 hover:bg-slate-50 font-medium'
                 }`}
               >
@@ -197,10 +203,10 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
       </div>
 
       {/* Footer Controls: Privacy Mode & Version */}
-      <div className="px-3 pt-4 flex flex-col gap-2.5 overflow-hidden w-full">
+      <div className={`pt-4 flex flex-col gap-2.5 overflow-hidden w-full ${isCollapsed ? 'px-0 items-center' : 'px-3'}`}>
         <div
           className={`rounded-xl bg-slate-50 border border-slate-200/80 flex items-center transition-all duration-300 overflow-hidden ${
-            isCollapsed ? 'p-1.5 justify-center' : 'p-3 justify-between'
+            isCollapsed ? 'w-10 h-10 p-0 justify-center' : 'p-3 justify-between'
           }`}
         >
           <div
