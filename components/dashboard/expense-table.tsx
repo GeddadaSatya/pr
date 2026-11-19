@@ -305,11 +305,11 @@ export function ExpenseTable() {
           </div>
 
           {/* Action Buttons: Import Statement & Export Ledger */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <button
               onClick={() => fileInputRef.current?.click()}
               type="button"
-              className="h-9 px-3.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200/80 text-slate-700 text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+              className="h-9 w-[150px] rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200/80 text-slate-700 text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
               title="Import CSV or bank statement"
             >
               <span className="material-symbols-outlined text-base text-slate-600">upload_file</span>
@@ -320,7 +320,7 @@ export function ExpenseTable() {
               onClick={exportToCSV}
               disabled={expenses.length === 0}
               type="button"
-              className={`h-9 px-3.5 rounded-xl border border-slate-200/80 text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors ${
+              className={`h-9 w-[150px] rounded-xl border border-slate-200/80 text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs transition-colors ${
                 expenses.length === 0
                   ? 'bg-slate-50 text-slate-400 cursor-not-allowed border-slate-200'
                   : 'bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer'
@@ -352,7 +352,7 @@ export function ExpenseTable() {
               <button
                 onClick={() => openModal('expense')}
                 type="button"
-                className="h-10 px-5 rounded-xl bg-[#111c2d] hover:bg-[#1a2942] text-white text-xs font-semibold flex items-center gap-2 shadow-xs transition-colors cursor-pointer"
+                className="h-10 w-[200px] rounded-xl bg-[#111c2d] hover:bg-[#1a2942] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
               >
                 <span className="material-symbols-outlined text-base">edit_note</span>
                 <span>Add Journal Entry</span>
@@ -360,10 +360,10 @@ export function ExpenseTable() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 type="button"
-                className="h-10 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200/80 text-slate-700 text-xs font-semibold flex items-center gap-2 shadow-xs transition-colors cursor-pointer"
+                className="h-10 w-[200px] rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200/80 text-slate-700 text-xs font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
               >
                 <span className="material-symbols-outlined text-base text-slate-600">upload_file</span>
-                <span>Import CSV / Bank Statement</span>
+                <span>Import Statement</span>
               </button>
             </div>
           </div>
@@ -384,7 +384,7 @@ export function ExpenseTable() {
                 />
               </div>
 
-              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+              <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
                 <div className="relative flex items-center flex-1 sm:flex-initial">
                   <span className="material-symbols-outlined absolute left-2.5 text-slate-500 text-sm pointer-events-none">
                     filter_list
@@ -392,7 +392,7 @@ export function ExpenseTable() {
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="h-9 pl-8 pr-7 text-xs font-semibold bg-white border border-slate-200 rounded-lg text-slate-800 hover:border-[#d4af37] focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all shadow-xs cursor-pointer w-full sm:w-auto"
+                    className="h-9 w-[145px] pl-8 pr-7 text-xs font-semibold bg-white border border-slate-200 rounded-lg text-slate-800 hover:border-[#d4af37] focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all shadow-xs cursor-pointer"
                   >
                     <option value="all">All Categories</option>
                     <option value="travel">Travel &amp; Logistics</option>
@@ -405,12 +405,12 @@ export function ExpenseTable() {
 
                 <button
                   onClick={clearFilters}
-                  className="h-9 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-semibold transition-colors flex items-center gap-1 shadow-xs shrink-0 cursor-pointer"
+                  className="h-9 w-[145px] rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
                   title="Clear filters"
                   type="button"
                 >
                   <span className="material-symbols-outlined text-sm">restart_alt</span>
-                  <span>Clear</span>
+                  <span>Clear Filters</span>
                 </button>
               </div>
             </div>
