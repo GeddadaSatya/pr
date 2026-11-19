@@ -149,30 +149,13 @@ export function ExpenseTable() {
       <div className="flex flex-col gap-3 md:hidden">
         {/* Ledger Header Controls */}
         <div className="flex items-center justify-between pt-1">
-          <div className="flex items-center gap-2">
-            <span className="font-title-md text-base font-semibold text-slate-900 whitespace-nowrap">
-              Recent Ledger
-            </span>
-            <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-200/80 text-slate-700 text-xs font-medium shadow-xs cursor-pointer">
-              <span>October 2025</span>
-              <span className="material-symbols-outlined text-sm text-slate-400">expand_more</span>
-            </div>
+          <span className="font-title-md text-base font-semibold text-slate-900 whitespace-nowrap">
+            Recent Ledger
+          </span>
+          <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-200/80 text-slate-700 text-xs font-medium shadow-xs cursor-pointer">
+            <span>October 2025</span>
+            <span className="material-symbols-outlined text-sm text-slate-400">expand_more</span>
           </div>
-
-          <button
-            onClick={exportToCSV}
-            disabled={expenses.length === 0}
-            type="button"
-            className={`flex items-center gap-1 text-xs font-medium transition-colors ${
-              expenses.length === 0
-                ? 'text-slate-300 cursor-not-allowed'
-                : 'text-slate-500 hover:text-slate-900 cursor-pointer'
-            }`}
-            title="Export CSV"
-          >
-            <span className="material-symbols-outlined text-sm">download</span>
-            <span className="text-[11px]">Export</span>
-          </button>
         </div>
 
         {/* Empty State vs Expense List */}
