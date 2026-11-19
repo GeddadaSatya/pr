@@ -12,14 +12,23 @@ import { DailyFlowKpi } from '@/components/dashboard/daily-flow-kpi';
 import { CategoryAnalytics } from '@/components/dashboard/category-analytics';
 import { ExpenseTable } from '@/components/dashboard/expense-table';
 import { PayablesLoansHub } from '@/components/dashboard/payables-loans-hub';
+import { ExpenseNotebookView } from '@/components/dashboard/expense-notebook-view';
 import { TransactionModal } from '@/components/modals/transaction-modal';
 import { AuthModal } from '@/components/modals/auth-modal';
+import { DayLedgerModal } from '@/components/modals/day-ledger-modal';
 
 import { useFinance } from '@/components/context/finance-context';
 
 function DashboardContent() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [isDayLedgerOpen, setIsDayLedgerOpen] = useState(false);
+  const [selectedDateKey, setSelectedDateKey] = useState('2026-10-28');
   const { isCollapsed } = useFinance();
+
+  const handleOpenDayLedger = (dateKey: string = '2026-10-28') => {
+    setSelectedDateKey(dateKey);
+    setIsDayLedgerOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
@@ -37,23 +46,29 @@ function DashboardContent() {
         {/* Dashboard Main Canvas */}
         <main className="w-full pt-20 pb-28 md:pt-20 md:pb-12 bg-[#f8fafc] min-h-[calc(100vh-4rem)]">
           <div className="flex flex-col w-full px-4 md:px-0 md:w-[88%] mx-auto gap-5 md:gap-6">
-            {/* Top Command Strip & Greeting */}
-            <CommandStrip />
+            {activeTab === 'expenses' ? (
+              <ExpenseNotebookView onOpenDayLedger={handleOpenDayLedger} />
+            ) : (
+              <>
+                {/* Top Command Strip & Greeting */}
+                <CommandStrip />
 
-            {/* Key Wealth Indicators (Carousel of 4 KPI cards) */}
-            <KpiCarousel />
+                {/* Key Wealth Indicators (Carousel of 4 KPI cards) */}
+                <KpiCarousel />
 
-            {/* Daily Inflow & Outflow Pulse */}
-            <DailyFlowKpi />
+                {/* Daily Inflow & Outflow Pulse */}
+                <DailyFlowKpi onOpenDayLedger={() => handleOpenDayLedger('2026-10-28')} />
 
-            {/* Recent Daily Expenses Table (Filterable & Exportable) */}
-            <ExpenseTable />
+                {/* Recent Daily Expenses Table (Filterable & Exportable) */}
+                <ExpenseTable />
 
-            {/* Spending Breakdown by Category (Donut chart & Sector list) */}
-            <CategoryAnalytics />
+                {/* Spending Breakdown by Category (Donut chart & Sector list) */}
+                <CategoryAnalytics />
 
-            {/* Operational Grid: Payables (Action Center) & Loans Ledger */}
-            <PayablesLoansHub />
+                {/* Operational Grid: Payables (Action Center) & Loans Ledger */}
+                <PayablesLoansHub />
+              </>
+            )}
           </div>
         </main>
       </div>
@@ -64,6 +79,11 @@ function DashboardContent() {
       {/* Interactive Modals */}
       <TransactionModal />
       <AuthModal />
+      <DayLedgerModal
+        isOpen={isDayLedgerOpen}
+        onClose={() => setIsDayLedgerOpen(false)}
+        selectedDateKey={selectedDateKey}
+      />
     </div>
   );
 }

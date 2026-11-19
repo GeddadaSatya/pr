@@ -4,7 +4,11 @@ import React from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { formatCurrency } from '@/lib/utils';
 
-export function DailyFlowKpi() {
+interface DailyFlowKpiProps {
+  onOpenDayLedger?: () => void;
+}
+
+export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
   const { expenses, privacyMode } = useFinance();
 
   // Dynamic calculations based on active expenses
@@ -54,23 +58,38 @@ export function DailyFlowKpi() {
         </div>
 
         {!isZeroData && (
-          <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-medium text-slate-500 hidden sm:inline">
-              Net 24h Velocity:
-            </span>
-            <span
-              className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-tight shadow-xs transition-colors ${
-                netDaily >= 0
-                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/80'
-                  : 'bg-amber-50 text-amber-800 border border-amber-200/80'
-              }`}
-            >
-              {privacyMode
-                ? '••••••'
-                : `${netDaily >= 0 ? '+' : '-'}₹${Math.abs(netDaily).toLocaleString('en-IN')}.00 Net ${
-                    netDaily >= 0 ? 'Surplus' : 'Deficit'
-                  }`}
-            </span>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] font-medium text-slate-500 hidden sm:inline">
+                Net 24h Velocity:
+              </span>
+              <span
+                className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-tight shadow-xs transition-colors ${
+                  netDaily >= 0
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/80'
+                    : 'bg-amber-50 text-amber-800 border border-amber-200/80'
+                }`}
+              >
+                {privacyMode
+                  ? '••••••'
+                  : `${netDaily >= 0 ? '+' : '-'}₹${Math.abs(netDaily).toLocaleString('en-IN')}.00 Net ${
+                      netDaily >= 0 ? 'Surplus' : 'Deficit'
+                    }`}
+              </span>
+            </div>
+
+            {onOpenDayLedger && (
+              <button
+                type="button"
+                onClick={onOpenDayLedger}
+                className="text-xs font-semibold text-[#b48e28] hover:text-[#8c6b12] flex items-center gap-0.5 transition-colors cursor-pointer ml-1"
+                title="Open Day Ledger"
+              >
+                <span className="hidden sm:inline">View Day Ledger</span>
+                <span className="sm:hidden">Day Ledger</span>
+                <span className="material-symbols-outlined text-sm">chevron_right</span>
+              </button>
+            )}
           </div>
         )}
       </div>

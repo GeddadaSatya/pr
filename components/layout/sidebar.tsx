@@ -169,11 +169,11 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                 title={item.label}
                 type="button"
                 className={`h-10 rounded-xl flex items-center transition-all duration-200 cursor-pointer overflow-hidden whitespace-nowrap relative ${
-                  isCollapsed ? 'w-10 justify-center px-0' : 'w-full justify-start px-2.5 gap-2.5'
+                  isCollapsed ? 'w-11 justify-center px-0' : 'w-full justify-start px-2.5 gap-2.5'
                 } ${
                   isActive
                     ? isCollapsed
-                      ? 'bg-slate-100 text-[#b48e28] font-semibold ring-1 ring-[#d4af37]/50 shadow-xs'
+                      ? 'bg-[#f1f5f9] text-[#b48e28] font-semibold border-l-[3.5px] border-[#d4af37] shadow-xs'
                       : 'bg-slate-100/90 text-slate-900 font-semibold border-l-[3px] border-[#d4af37] shadow-xs'
                     : 'text-slate-600 hover:bg-slate-50 font-medium'
                 }`}

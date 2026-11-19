@@ -10,6 +10,10 @@ export interface ExpenseItem {
   dateTime: string;
   amount: number;
   receiptUrl?: string;
+  tag?: string;
+  statusBadge?: string;
+  icon?: string;
+  dateGroup?: string;
 }
 
 export interface PayableItem {
