@@ -21,18 +21,18 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-full bg-white border-r border-slate-200 z-50 hidden md:flex flex-col justify-between py-6 shadow-sm overflow-hidden select-none transition-all duration-300 ease-in-out ${
-        isCollapsed ? 'w-20' : 'w-72'
+      className={`fixed left-0 top-0 h-full bg-white border-r border-slate-200 z-50 hidden md:flex flex-col justify-between py-5 shadow-sm overflow-hidden select-none transition-all duration-300 ease-in-out ${
+        isCollapsed ? 'w-20' : 'w-60'
       }`}
     >
       <div className="flex flex-col w-full overflow-hidden">
         {/* Top Brand Header Row */}
-        <div className="px-3.5 mb-6 flex items-center justify-between overflow-hidden min-h-[44px]">
+        <div className="px-3 mb-5 flex items-center justify-between overflow-hidden min-h-[40px]">
           <div className="flex items-center min-w-0">
             {/* Logo Icon - When collapsed, hovering reveals the expand icon and clicking toggles sidebar */}
             <div
               onClick={isCollapsed ? toggleSidebar : undefined}
-              className={`w-11 h-11 rounded-2xl bg-[#020b1e] border border-slate-800 flex items-center justify-center shadow-xs shrink-0 relative group transition-all duration-300 overflow-hidden ${
+              className={`w-10 h-10 rounded-xl bg-[#020b1e] border border-slate-800 flex items-center justify-center shadow-xs shrink-0 relative group transition-all duration-300 overflow-hidden ${
                 isCollapsed
                   ? 'cursor-pointer hover:border-[#d4af37]/70 hover:shadow-[0_0_12px_rgba(212,175,55,0.3)]'
                   : ''
@@ -52,7 +52,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
               {isCollapsed && (
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:scale-100 scale-75 transition-all duration-200 text-[#d4af37] bg-[#020b1e]">
                   <svg
-                    className="w-5 h-5 text-[#d4af37]"
+                    className="w-4.5 h-4.5 text-[#d4af37]"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -69,13 +69,13 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
             {/* Brand Title (when expanded) */}
             <div
-              className={`flex flex-col ml-3 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
+              className={`flex flex-col ml-2.5 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
                 isCollapsed
                   ? 'opacity-0 max-w-0 -translate-x-3 pointer-events-none'
-                  : 'opacity-100 max-w-[185px] translate-x-0'
+                  : 'opacity-100 max-w-[145px] translate-x-0'
               }`}
             >
-              <span className="font-title-md text-base text-slate-900 tracking-tight leading-tight uppercase font-bold truncate">
+              <span className="text-xs text-slate-900 tracking-wider leading-tight uppercase font-bold truncate">
                 Personal Tracker
               </span>
               <span className="font-label-sm text-[10px] text-[#b48e28] tracking-widest uppercase font-bold truncate">
@@ -87,18 +87,18 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           {/* Collapse Toggle Button (when expanded) */}
           <div
             className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              isCollapsed ? 'opacity-0 max-w-0 pointer-events-none' : 'opacity-100 max-w-8'
+              isCollapsed ? 'opacity-0 max-w-0 pointer-events-none' : 'opacity-100 max-w-7'
             }`}
           >
             <button
               onClick={toggleSidebar}
-              className="w-8 h-8 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors shadow-xs cursor-pointer ml-auto shrink-0"
+              className="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors shadow-xs cursor-pointer ml-auto shrink-0"
               title="Collapse sidebar"
               type="button"
             >
               {/* Option 3: Dual Chevron (pointing left) */}
               <svg
-                className="w-4 h-4 text-slate-600"
+                className="w-3.5 h-3.5 text-slate-600"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -114,28 +114,28 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         </div>
 
         {/* Butter-Smooth Add Transaction Button */}
-        <div className="px-3.5 mb-5 flex justify-center overflow-hidden">
+        <div className="px-3 mb-5 flex justify-center overflow-hidden">
           <button
             onClick={() => openModal('expense')}
-            className={`h-11 rounded-xl flex items-center bg-[#d4af37] text-slate-950 font-semibold transition-all duration-300 ease-in-out cursor-pointer hover:brightness-105 active:scale-[0.98] overflow-hidden whitespace-nowrap shadow-xs ${
+            className={`h-10 rounded-xl flex items-center bg-[#d4af37] text-slate-950 font-semibold transition-all duration-300 ease-in-out cursor-pointer hover:brightness-105 active:scale-[0.98] overflow-hidden whitespace-nowrap shadow-xs ${
               isCollapsed
-                ? 'w-11 justify-center px-0 rounded-2xl'
-                : 'w-full justify-start px-3.5 gap-2.5 rounded-xl'
+                ? 'w-10 justify-center px-0 rounded-xl'
+                : 'w-full justify-start px-3 gap-2.5 rounded-xl'
             }`}
             title="Add Transaction"
             type="button"
           >
             <span
-              className="material-symbols-outlined text-xl shrink-0 leading-none"
+              className="material-symbols-outlined text-lg shrink-0 leading-none"
               style={{ fontVariationSettings: "'FILL' 1" }}
             >
               add_circle
             </span>
             <span
-              className={`text-sm font-semibold whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${
+              className={`text-[13px] font-semibold whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${
                 isCollapsed
                   ? 'opacity-0 max-w-0 -translate-x-3 pointer-events-none'
-                  : 'opacity-100 max-w-[160px] translate-x-0'
+                  : 'opacity-100 max-w-[140px] translate-x-0'
               }`}
             >
               Add Transaction
@@ -145,17 +145,17 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
         {/* Navigation Category Header */}
         <div
-          className={`px-4 mb-2 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
+          className={`px-3 mb-2 overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out ${
             isCollapsed ? 'opacity-0 max-h-0 mb-0 pointer-events-none' : 'opacity-100 max-h-6'
           }`}
         >
-          <span className="text-[11px] tracking-wider text-slate-400 font-bold uppercase">
+          <span className="text-[10px] tracking-wider text-slate-400 font-bold uppercase">
             Navigation
           </span>
         </div>
 
         {/* Navigation Items List */}
-        <nav className="flex flex-col gap-1.5 px-3 w-full overflow-hidden">
+        <nav className="flex flex-col gap-1 px-2.5 w-full overflow-hidden">
           {navItems.map((item) => {
             const isActive = activeTab === item.id;
             return (
@@ -164,8 +164,8 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                 onClick={() => setActiveTab(item.id)}
                 title={item.label}
                 type="button"
-                className={`w-full h-11 rounded-xl flex items-center transition-all duration-200 cursor-pointer overflow-hidden whitespace-nowrap relative ${
-                  isCollapsed ? 'justify-center px-0' : 'justify-start px-3 gap-3'
+                className={`w-full h-10 rounded-xl flex items-center transition-all duration-200 cursor-pointer overflow-hidden whitespace-nowrap relative ${
+                  isCollapsed ? 'justify-center px-0' : 'justify-start px-2.5 gap-2.5'
                 } ${
                   isActive
                     ? 'bg-slate-100/90 text-slate-900 font-semibold border-l-[3px] border-[#d4af37] shadow-xs'
@@ -173,7 +173,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                 }`}
               >
                 <span
-                  className="material-symbols-outlined text-xl shrink-0 leading-none"
+                  className="material-symbols-outlined text-lg shrink-0 leading-none"
                   style={{
                     color: isActive ? '#b48e28' : 'rgb(100, 116, 139)',
                   }}
@@ -182,10 +182,10 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                 </span>
 
                 <span
-                  className={`text-sm whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${
+                  className={`text-[13px] whitespace-nowrap overflow-hidden transition-all duration-300 ease-in-out ${
                     isCollapsed
                       ? 'opacity-0 max-w-0 -translate-x-3 pointer-events-none'
-                      : 'opacity-100 max-w-[170px] translate-x-0'
+                      : 'opacity-100 max-w-[155px] translate-x-0'
                   }`}
                 >
                   {item.label}

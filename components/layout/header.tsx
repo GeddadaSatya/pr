@@ -22,7 +22,7 @@ export function Header() {
   return (
     <header
       className={`fixed top-0 right-0 h-16 bg-white/90 backdrop-blur-md z-40 border-b border-slate-200 hidden md:block transition-all duration-300 ease-in-out ${
-        isCollapsed ? 'left-20' : 'left-72'
+        isCollapsed ? 'left-20' : 'left-60'
       }`}
     >
       <div className="w-[88%] mx-auto h-16 flex items-center justify-between">

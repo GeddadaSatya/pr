@@ -29,7 +29,7 @@ function DashboardContent() {
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Main Content Area */}
-      <div className={`pl-0 transition-all duration-300 ease-in-out ${isCollapsed ? 'md:pl-20' : 'md:pl-72'}`}>
+      <div className={`pl-0 transition-all duration-300 ease-in-out ${isCollapsed ? 'md:pl-20' : 'md:pl-60'}`}>
         {/* Top Floating Glass Header (>= 780px) */}
         <Header />
 
