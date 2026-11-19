@@ -22,6 +22,9 @@ interface FinanceContextType {
   setIsCollapsed: (collapsed: boolean) => void;
   toggleSidebar: () => void;
   addExpense: (expense: Omit<ExpenseItem, 'id' | 'dateTime'>) => void;
+  importExpenses: (items: ExpenseItem[]) => void;
+  clearAllData: () => void;
+  resetDefaultData: () => void;
   addPayable: (payable: Omit<PayableItem, 'id' | 'status'>) => void;
   addLoan: (loan: Omit<LoanItem, 'id' | 'monthlyInterest' | 'status'>) => void;
   recordPayout: (id: string) => void;
@@ -106,6 +109,34 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     setExpenses((prev) => [newExpense, ...prev]);
   };
 
+  const importExpenses = (items: ExpenseItem[]) => {
+    setExpenses((prev) => [...items, ...prev]);
+  };
+
+  const clearAllData = () => {
+    setExpenses([]);
+    setPayables([]);
+    setLoans([]);
+  };
+
+  const resetDefaultData = () => {
+    setExpenses(INITIAL_EXPENSES);
+    setPayables(INITIAL_PAYABLES);
+    setLoans(INITIAL_LOANS);
+  };
+
+  // Expose global helper for testing and demonstration
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__finance = {
+        clearAllData,
+        resetDefaultData,
+        importExpenses,
+        getExpenses: () => expenses,
+      };
+    }
+  }, [expenses]);
+
   const addPayable = (item: Omit<PayableItem, 'id' | 'status'>) => {
     const newPayable: PayableItem = {
       ...item,
@@ -150,6 +181,9 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         setIsCollapsed,
         toggleSidebar,
         addExpense,
+        importExpenses,
+        clearAllData,
+        resetDefaultData,
         addPayable,
         addLoan,
         recordPayout,
