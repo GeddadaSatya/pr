@@ -466,12 +466,11 @@ export function ExpenseTable() {
 
                       <td className="py-3 px-4">
                         <span
-                          className="inline-flex items-center justify-center text-center px-3 py-1 rounded-lg text-[11px] font-semibold transition-colors shadow-xs"
+                          className="inline-flex items-center justify-center text-center px-3 h-7 rounded-lg text-[11px] font-semibold transition-colors shadow-xs w-[185px]"
                           style={{
                             backgroundColor: exp.category.includes('Travel') ? '#fef9e7' : '#f1f5f9',
                             color: exp.category.includes('Travel') ? '#b48e28' : '#334155',
                             border: exp.category.includes('Travel') ? '1px solid rgba(212, 175, 55, 0.3)' : '1px solid #e2e8f0',
-                            minWidth: '130px',
                           }}
                         >
                           {exp.category}
