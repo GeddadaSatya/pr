@@ -8,6 +8,7 @@ import { MobileHeader } from '@/components/layout/mobile-header';
 import { MobileNav } from '@/components/layout/mobile-nav';
 import { CommandStrip } from '@/components/dashboard/command-strip';
 import { KpiCarousel } from '@/components/dashboard/kpi-carousel';
+import { DailyFlowKpi } from '@/components/dashboard/daily-flow-kpi';
 import { CategoryAnalytics } from '@/components/dashboard/category-analytics';
 import { ExpenseTable } from '@/components/dashboard/expense-table';
 import { PayablesLoansHub } from '@/components/dashboard/payables-loans-hub';
@@ -41,6 +42,9 @@ function DashboardContent() {
 
             {/* Key Wealth Indicators (Carousel of 4 KPI cards) */}
             <KpiCarousel />
+
+            {/* Daily Inflow & Outflow Pulse */}
+            <DailyFlowKpi />
 
             {/* Recent Daily Expenses Table (Filterable & Exportable) */}
             <ExpenseTable />
