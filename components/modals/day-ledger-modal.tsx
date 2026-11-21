@@ -23,7 +23,6 @@ export function DayLedgerModal({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const [selectedFolio, setSelectedFolio] = useState<string | null>(null);
 
   const categoryDropdownRef = useRef<HTMLDivElement>(null);
   const datePickerRef = useRef<HTMLDivElement>(null);
@@ -450,19 +449,11 @@ export function DayLedgerModal({
                     </div>
                   </div>
 
-                  {/* Right Side: Amount & View Folio */}
+                  {/* Right Side: Amount */}
                   <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
                     <span className="text-base font-bold text-slate-900 tracking-tight">
                       {privacyMode ? '••••••' : `₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedFolio(item.title)}
-                      className="text-[11px] font-medium text-[#b48e28] hover:text-[#8c6b12] flex items-center gap-1 mt-0.5 cursor-pointer"
-                    >
-                      <span className="material-symbols-outlined text-xs">description</span>
-                      <span>View Folio</span>
-                    </button>
                   </div>
                 </div>
               ))
@@ -501,28 +492,6 @@ export function DayLedgerModal({
         </div>
       </div>
 
-      {/* Folio Preview Toast/Overlay */}
-      {selectedFolio && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-xs">
-          <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-sm w-full border border-slate-200 flex flex-col gap-4 text-center">
-            <div className="w-12 h-12 rounded-xl bg-[#fef9e7] text-[#b48e28] mx-auto flex items-center justify-center">
-              <span className="material-symbols-outlined text-2xl">verified</span>
-            </div>
-            <div>
-              <h4 className="font-semibold text-slate-900 text-sm">Folio Verified by Vault Protocol</h4>
-              <p className="text-xs text-slate-500 mt-1">
-                Receipt and tax ledger for <span className="font-medium text-slate-700">{selectedFolio}</span> has been cryptographic verified and stored in your offline-first encrypted vault.
-              </p>
-            </div>
-            <button
-              onClick={() => setSelectedFolio(null)}
-              className="h-9 px-4 rounded-xl bg-[#111c2d] text-white text-xs font-semibold hover:bg-[#1a283e] transition-colors"
-            >
-              Close Folio
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
