@@ -149,13 +149,13 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
                       -{privacyMode ? '•••' : `₹${Math.abs(inflowDiff).toLocaleString('en-IN')}`} ({inflowPercent}%)
                     </span>
                   )}
-                  <span className="text-[10px] md:text-[11px] text-slate-500 font-medium">
-                    vs yesterday
+                  <span className="text-[10px] md:text-[11px] text-slate-500 font-medium inline-flex items-center gap-1 whitespace-nowrap">
+                    <span>vs yesterday:</span>
+                    <span className="font-semibold text-slate-700 font-label-numeric">
+                      {privacyMode ? '••••' : `₹${yesterdayInflow.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                    </span>
                   </span>
                 </div>
-                <span className="text-[10px] md:text-[11px] text-slate-500 truncate hidden sm:inline">
-                  Yesterday: {privacyMode ? '••••' : `₹${yesterdayInflow.toLocaleString('en-IN')}.00`} • Consulting tranche &amp; Yield
-                </span>
               </>
             )}
           </div>
@@ -217,8 +217,11 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
                       Equal to yesterday
                     </span>
                   )}
-                  <span className="text-[10px] md:text-[11px] text-slate-500 font-medium">
-                    vs yesterday
+                  <span className="text-[10px] md:text-[11px] text-slate-500 font-medium inline-flex items-center gap-1 whitespace-nowrap">
+                    <span>vs yesterday:</span>
+                    <span className="font-semibold text-slate-700 font-label-numeric">
+                      {privacyMode ? '••••' : `₹${yesterdayOutflow.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                    </span>
                   </span>
                 </div>
 

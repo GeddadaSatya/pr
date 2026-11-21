@@ -200,11 +200,10 @@ export function DayLedgerModal({
                         setCurrentDateKey(d.key);
                         setIsDatePickerOpen(false);
                       }}
-                      className={`w-full px-3 py-2 text-left text-xs font-medium flex items-center justify-between cursor-pointer ${
-                        currentDateKey === d.key
-                          ? 'bg-[#fef9e7] text-[#b48e28] font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50'
-                      }`}
+                      className={`w-full px-3 py-2 text-left text-xs font-medium flex items-center justify-between cursor-pointer ${currentDateKey === d.key
+                        ? 'bg-[#fef9e7] text-[#b48e28] font-semibold'
+                        : 'text-slate-700 hover:bg-slate-50'
+                        }`}
                     >
                       <span>{d.label}</span>
                       {currentDateKey === d.key && (
@@ -264,20 +263,18 @@ export function DayLedgerModal({
                 Net 24h Velocity:
               </span>
               <span
-                className={`inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[11px] font-bold shadow-xs ${
-                  dayConfig.netVelocity >= 0
-                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/80'
-                    : 'bg-red-50 text-red-700 border border-red-200/80'
-                }`}
+                className={`inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[11px] font-bold shadow-xs ${dayConfig.netVelocity >= 0
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/80'
+                  : 'bg-red-50 text-red-700 border border-red-200/80'
+                  }`}
               >
                 <span className="material-symbols-outlined text-xs">
                   {dayConfig.netVelocity >= 0 ? 'trending_up' : 'trending_down'}
                 </span>
                 {privacyMode
                   ? '••••••'
-                  : `${dayConfig.netVelocity >= 0 ? '+' : '-'}₹${Math.abs(dayConfig.netVelocity).toLocaleString('en-IN')}.00 Net ${
-                      dayConfig.netVelocity >= 0 ? 'Surplus' : 'Deficit'
-                    }`}
+                  : `${dayConfig.netVelocity >= 0 ? '+' : '-'}₹${Math.abs(dayConfig.netVelocity).toLocaleString('en-IN')}.00 Net ${dayConfig.netVelocity >= 0 ? 'Surplus' : 'Deficit'
+                  }`}
               </span>
             </div>
           </div>
@@ -316,8 +313,12 @@ export function DayLedgerModal({
               </div>
 
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-                <span className="truncate">{dayConfig.inflowNote}</span>
-                <span className="text-[11px] text-slate-400 shrink-0">vs yesterday</span>
+                <span className="text-[11px] text-slate-500 font-medium inline-flex items-center gap-1">
+                  <span>vs yesterday:</span>
+                  <span className="font-semibold text-slate-700 font-label-numeric">
+                    {privacyMode ? '••••' : `₹${dayConfig.yesterdayInflow.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                  </span>
+                </span>
               </div>
             </div>
 
@@ -340,9 +341,8 @@ export function DayLedgerModal({
                 </div>
 
                 {/* Corner Indicator Badge */}
-                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
-                  dayConfig.outflowDelta >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'
-                }`}>
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${dayConfig.outflowDelta >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'
+                  }`}>
                   <span className="material-symbols-outlined text-base">
                     {dayConfig.outflowDelta >= 0 ? 'trending_up' : 'trending_down'}
                   </span>
@@ -361,7 +361,12 @@ export function DayLedgerModal({
                     <span>-₹{Math.abs(dayConfig.outflowDelta).toLocaleString('en-IN')} ({dayConfig.outflowPercent}%)</span>
                   </span>
                 )}
-                <span className="text-[11px] text-slate-400">vs yesterday</span>
+                <span className="text-[11px] text-slate-500 font-medium inline-flex items-center gap-1 whitespace-nowrap">
+                  <span>vs yesterday:</span>
+                  <span className="font-semibold text-slate-700 font-label-numeric">
+                    {privacyMode ? '••••' : `₹${dayConfig.yesterdayOutflow.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                  </span>
+                </span>
               </div>
 
               {/* Target Ceiling & Progress Bar */}
@@ -414,15 +419,14 @@ export function DayLedgerModal({
                   <div className="flex items-start sm:items-center gap-3 min-w-0">
                     {/* Category Icon */}
                     <div
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                        item.category === 'Dining'
-                          ? 'bg-[#fef9e7] text-[#b48e28]'
-                          : item.category === 'Travel'
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${item.category === 'Dining'
+                        ? 'bg-[#fef9e7] text-[#b48e28]'
+                        : item.category === 'Travel'
                           ? 'bg-blue-50 text-blue-600'
                           : item.category === 'Hardware'
-                          ? 'bg-amber-50 text-amber-700'
-                          : 'bg-purple-50 text-purple-600'
-                      }`}
+                            ? 'bg-amber-50 text-amber-700'
+                            : 'bg-purple-50 text-purple-600'
+                        }`}
                     >
                       <span className="material-symbols-outlined text-lg">{item.icon}</span>
                     </div>
