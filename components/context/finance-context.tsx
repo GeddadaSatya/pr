@@ -4,6 +4,13 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { ExpenseItem, PayableItem, LoanItem, LedgerType, UserProfile } from '@/lib/types';
 import { INITIAL_EXPENSES, INITIAL_PAYABLES, INITIAL_LOANS, INITIAL_USER } from '@/lib/mock-data';
 
+export interface ModalInitialData {
+  title?: string;
+  amount?: string;
+  category?: string;
+  source?: 'quick-add' | 'header';
+}
+
 interface FinanceContextType {
   expenses: ExpenseItem[];
   payables: PayableItem[];
@@ -13,7 +20,8 @@ interface FinanceContextType {
   togglePrivacyMode: () => void;
   isModalOpen: boolean;
   modalType: LedgerType;
-  openModal: (type?: LedgerType) => void;
+  modalInitialData: ModalInitialData | null;
+  openModal: (type?: LedgerType, initialData?: ModalInitialData) => void;
   closeModal: () => void;
   isAuthModalOpen: boolean;
   openAuthModal: () => void;
@@ -21,7 +29,7 @@ interface FinanceContextType {
   isCollapsed: boolean;
   setIsCollapsed: (collapsed: boolean) => void;
   toggleSidebar: () => void;
-  addExpense: (expense: Omit<ExpenseItem, 'id' | 'dateTime'>) => void;
+  addExpense: (expense: Omit<ExpenseItem, 'id' | 'dateTime'> & { id?: string }) => void;
   importExpenses: (items: ExpenseItem[]) => void;
   clearAllData: () => void;
   resetDefaultData: () => void;
@@ -41,6 +49,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<LedgerType>('expense');
+  const [modalInitialData, setModalInitialData] = useState<ModalInitialData | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
@@ -88,22 +97,24 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const openModal = (type: LedgerType = 'expense') => {
+  const openModal = (type: LedgerType = 'expense', initialData?: ModalInitialData) => {
     setModalType(type);
+    setModalInitialData(initialData || null);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setModalInitialData(null);
   };
 
   const openAuthModal = () => setIsAuthModalOpen(true);
   const closeAuthModal = () => setIsAuthModalOpen(false);
 
-  const addExpense = (item: Omit<ExpenseItem, 'id' | 'dateTime'>) => {
+  const addExpense = (item: Omit<ExpenseItem, 'id' | 'dateTime'> & { id?: string }) => {
     const newExpense: ExpenseItem = {
       ...item,
-      id: `exp-${Date.now()}`,
+      id: item.id || `exp-${Date.now()}`,
       dateTime: 'Just now',
     };
     setExpenses((prev) => [newExpense, ...prev]);
@@ -172,6 +183,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         togglePrivacyMode,
         isModalOpen,
         modalType,
+        modalInitialData,
         openModal,
         closeModal,
         isAuthModalOpen,

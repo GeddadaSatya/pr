@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { NotebookEntry, INITIAL_NOTEBOOK_ENTRIES } from '@/lib/notebook-data';
 
@@ -8,14 +8,65 @@ interface ExpenseNotebookViewProps {
   onOpenDayLedger: (dateKey: string) => void;
 }
 
+const QUICK_CATEGORIES = [
+  { name: 'Dining', tag: '#Dining', icon: 'restaurant' },
+  { name: 'Travel', tag: '#Travel', icon: 'directions_car' },
+  { name: 'Hardware', tag: '#Hardware', icon: 'laptop_mac' },
+  { name: 'Wellness', tag: '#Wellness', icon: 'fitness_center' },
+];
+
 export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProps) {
-  const { privacyMode, openModal, addExpense } = useFinance();
+  const { privacyMode, openModal, addExpense, expenses } = useFinance();
   const [entries, setEntries] = useState<NotebookEntry[]>(INITIAL_NOTEBOOK_ENTRIES);
   const [quickInput, setQuickInput] = useState('');
+  const [selectedQuickCategory, setSelectedQuickCategory] = useState<string | null>(null);
+  const [showCategoryConfirmModal, setShowCategoryConfirmModal] = useState(false);
+  const [categoryHighlight, setCategoryHighlight] = useState(false);
+  const [parsedQuickEntry, setParsedQuickEntry] = useState<{ title: string; amount: string } | null>(null);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [notification, setNotification] = useState<string | null>(null);
+
+  // Sync any newly added expenses from FinanceContext into notebook entries
+  useEffect(() => {
+    if (expenses && expenses.length > 0) {
+      const existingIds = new Set(entries.map((e) => e.id));
+      const newItems: NotebookEntry[] = [];
+      for (const exp of expenses) {
+        if (exp.dateTime === 'Just now' && !existingIds.has(exp.id)) {
+          const catLower = exp.category.toLowerCase();
+          const icon = catLower.includes('dining')
+            ? 'restaurant'
+            : catLower.includes('travel')
+            ? 'directions_car'
+            : catLower.includes('hardware') || catLower.includes('tech')
+            ? 'laptop_mac'
+            : catLower.includes('wellness')
+            ? 'fitness_center'
+            : 'receipt_long';
+          newItems.push({
+            id: exp.id,
+            title: exp.title,
+            subtitle: exp.subtitle || `Manual ledger entry • ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+            tag: `#${exp.category.split(' ')[0]}`,
+            category: exp.category,
+            statusBadge: 'Verified Receipt',
+            paidWith: exp.paidWith || 'Direct Payment',
+            dateTime: 'Today, Just now',
+            amount: exp.amount,
+            icon,
+            dateGroup: 'Today, October 28',
+            dateKey: '2026-10-28',
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          });
+        }
+      }
+      if (newItems.length > 0) {
+        setEntries((prev) => [...newItems, ...prev]);
+      }
+    }
+  }, [expenses]);
 
   // Group entries by date
   const filteredEntries = entries.filter((item) => {
@@ -50,41 +101,71 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
     },
   ];
 
+  const handleCategoryChipClick = (catName: string) => {
+    if (selectedQuickCategory === catName) {
+      setSelectedQuickCategory(null);
+    } else {
+      setSelectedQuickCategory(catName);
+      setCategoryHighlight(false);
+    }
+  };
+
   const handleQuickAdd = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!quickInput.trim()) return;
-
-    // Natural Language Parsing
-    const text = quickInput.trim();
-    // Extract amount
-    const amountMatch = text.match(/(?:₹|rs\.?|inr)?\s*([0-9]+(?:\.[0-9]+)?)/i);
-    const amount = amountMatch ? parseFloat(amountMatch[1]) : 420;
-
-    // Detect category & tags
-    let category = 'Dining';
-    let tag = '#Dining';
-    let icon = 'restaurant';
-    const lower = text.toLowerCase();
-
-    if (lower.includes('uber') || lower.includes('flight') || lower.includes('cab') || lower.includes('transit') || lower.includes('travel')) {
-      category = 'Travel';
-      tag = '#Travel';
-      icon = 'directions_car';
-    } else if (lower.includes('apple') || lower.includes('laptop') || lower.includes('hardware') || lower.includes('monitor') || lower.includes('device')) {
-      category = 'Hardware';
-      tag = '#Hardware';
-      icon = 'laptop_mac';
-    } else if (lower.includes('gym') || lower.includes('cult') || lower.includes('fitness') || lower.includes('wellness') || lower.includes('health')) {
-      category = 'Wellness';
-      tag = '#Wellness';
-      icon = 'fitness_center';
+    if (!quickInput.trim()) {
+      setNotification('Please enter expense details first.');
+      setTimeout(() => setNotification(null), 3000);
+      return;
     }
 
-    const title = text.replace(/(?:₹|rs\.?|inr)?\s*[0-9]+(?:\.[0-9]+)?/gi, '').replace(/via\s+[a-z]+/gi, '').replace(/at\s+/i, '').trim() || 'Quick Journal Expense';
+    const text = quickInput.trim();
+    const amountMatch = text.match(/(?:₹|rs\.?|inr)?\s*([0-9]+(?:,[0-9]+)*(?:\.[0-9]+)?)/i);
+    const amountStr = amountMatch ? amountMatch[1].replace(/,/g, '') : '';
+    const amount = amountStr ? parseFloat(amountStr) : 0;
+
+    // Check if category is selected or specified in text
+    let category = selectedQuickCategory;
+    const lower = text.toLowerCase();
+    if (!category) {
+      if (lower.includes('#dining')) category = 'Dining';
+      else if (lower.includes('#travel')) category = 'Travel';
+      else if (lower.includes('#hardware')) category = 'Hardware';
+      else if (lower.includes('#wellness')) category = 'Wellness';
+    }
+
+    const title = text
+      .replace(/(?:₹|rs\.?|inr)?\s*[0-9]+(?:,[0-9]+)*(?:\.[0-9]+)?/gi, '')
+      .replace(/via\s+[a-z]+/gi, '')
+      .replace(/^[,\s\.\-—]+|[,\s\.\-—]+$/g, '')
+      .replace(/^(?:for|at)\s+/i, '')
+      .trim() || 'Quick Journal Expense';
+
+    const formattedTitle = title.charAt(0).toUpperCase() + title.slice(1);
+
+    // If NO category is selected: prompt user before saving!
+    if (!category) {
+      setParsedQuickEntry({
+        title: formattedTitle,
+        amount: amount > 0 ? String(amount) : '',
+      });
+      setShowCategoryConfirmModal(true);
+      return;
+    }
+
+    // Category IS selected: proceed to save directly!
+    saveExpenseDirectly(formattedTitle, amount > 0 ? amount : 420, category);
+  };
+
+  const saveExpenseDirectly = (title: string, amount: number, category: string) => {
+    let tag = `#${category}`;
+    let icon = 'restaurant';
+    if (category === 'Travel') icon = 'directions_car';
+    else if (category === 'Hardware') icon = 'laptop_mac';
+    else if (category === 'Wellness') icon = 'fitness_center';
 
     const newEntry: NotebookEntry = {
       id: `nb-${Date.now()}`,
-      title: title.charAt(0).toUpperCase() + title.slice(1),
+      title,
       subtitle: `Instant ledger sync via AI Assist • ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
       tag,
       category,
@@ -98,8 +179,9 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setEntries([newEntry, ...entries]);
+    setEntries((prev) => [newEntry, ...prev]);
     addExpense({
+      id: newEntry.id,
       title: newEntry.title,
       subtitle: newEntry.subtitle,
       category: newEntry.category,
@@ -112,12 +194,9 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
     });
 
     setQuickInput('');
+    setSelectedQuickCategory(null);
     setNotification(`Logged: ${newEntry.title} (₹${amount})`);
     setTimeout(() => setNotification(null), 3500);
-  };
-
-  const handleChipClick = (chip: string) => {
-    setQuickInput((prev) => (prev ? `${prev} ${chip}` : `₹250 at ${chip.replace('#', '')} with team`));
   };
 
   const handleExportCSV = () => {
@@ -299,21 +378,54 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           </button>
         </form>
 
-        {/* Suggested Tag Chips */}
-        <div className="flex flex-wrap items-center gap-2 pt-1">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">
-            SUGGESTED:
-          </span>
-          {['#Dining', '#Travel', '#Hardware', '#Wellness'].map((chip) => (
+        {/* Category Selection Chips (Required for Quick Add) */}
+        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-100/80">
+          <div className="flex items-center gap-1.5 mr-1">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              SUGGESTED CATEGORIES:
+            </span>
+            <span className="text-[10px] font-semibold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200/60">
+              Required
+            </span>
+          </div>
+
+          <div
+            className={`flex flex-wrap items-center gap-1.5 p-0.5 rounded-xl transition-all duration-300 ${
+              categoryHighlight ? 'ring-2 ring-amber-500 bg-amber-50/60 animate-pulse' : ''
+            }`}
+          >
+            {QUICK_CATEGORIES.map((cat) => {
+              const isSelected = selectedQuickCategory === cat.name;
+              return (
+                <button
+                  key={cat.name}
+                  type="button"
+                  onClick={() => handleCategoryChipClick(cat.name)}
+                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
+                    isSelected
+                      ? 'bg-[#111c2d] text-white shadow-xs ring-1 ring-[#fed65b]'
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200/60'
+                  }`}
+                >
+                  {isSelected && (
+                    <span className="material-symbols-outlined text-xs text-[#fed65b]">check</span>
+                  )}
+                  <span className="material-symbols-outlined text-xs">{cat.icon}</span>
+                  <span>{cat.tag}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {selectedQuickCategory && (
             <button
-              key={chip}
               type="button"
-              onClick={() => handleChipClick(chip)}
-              className="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200/80 text-slate-700 transition-colors cursor-pointer"
+              onClick={() => setSelectedQuickCategory(null)}
+              className="text-[11px] text-slate-400 hover:text-slate-600 ml-1 underline cursor-pointer"
             >
-              {chip}
+              Clear selection
             </button>
-          ))}
+          )}
         </div>
 
         {/* Success toast notification */}
@@ -521,6 +633,69 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
         </div>
       </div>
 
+      {/* Category Required Confirmation Dialog */}
+      {showCategoryConfirmModal && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-md w-full border border-slate-200 flex flex-col gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-2xl">category</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-slate-900 text-sm">
+                  Category Selection Required
+                </h3>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  Category is required to save your expense. Without selecting a category, would you like to choose one in Quick Add or finish the details in the New Entry form?
+                </p>
+              </div>
+            </div>
+
+            {/* Entry Preview */}
+            <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/80 flex items-center justify-between text-xs">
+              <span className="font-medium text-slate-800 truncate pr-2">
+                {parsedQuickEntry?.title || quickInput}
+              </span>
+              <span className="font-bold text-slate-900 shrink-0 font-mono">
+                {parsedQuickEntry?.amount ? `₹${parseFloat(parsedQuickEntry.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}` : '₹0.00'}
+              </span>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCategoryConfirmModal(false);
+                  setCategoryHighlight(true);
+                  setTimeout(() => setCategoryHighlight(false), 3000);
+                }}
+                className="w-full sm:w-auto h-9 px-3.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+              >
+                Pick Category in Quick Add
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCategoryConfirmModal(false);
+                  openModal('expense', {
+                    title: parsedQuickEntry?.title || '',
+                    amount: parsedQuickEntry?.amount || '',
+                    source: 'quick-add',
+                  });
+                  setQuickInput('');
+                  setSelectedQuickCategory(null);
+                }}
+                className="w-full sm:w-auto h-9 px-4 rounded-xl bg-[#111c2d] hover:bg-[#1a283e] text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <span>Open New Entry Form</span>
+                <span className="material-symbols-outlined text-xs">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

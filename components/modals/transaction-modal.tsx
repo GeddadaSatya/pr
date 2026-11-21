@@ -5,12 +5,12 @@ import { useFinance } from '@/components/context/finance-context';
 import { LedgerType } from '@/lib/types';
 
 export function TransactionModal() {
-  const { isModalOpen, modalType, closeModal, addExpense, addPayable, addLoan } = useFinance();
+  const { isModalOpen, modalType, closeModal, addExpense, addPayable, addLoan, modalInitialData } = useFinance();
 
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [type, setType] = useState<LedgerType>('expense');
-  const [category, setCategory] = useState('Travel & Logistics');
+  const [category, setCategory] = useState('Dining');
   const [paidWith, setPaidWith] = useState('HDFC Bank Regalia Gold');
   const [dueDate, setDueDate] = useState('');
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
@@ -23,12 +23,17 @@ export function TransactionModal() {
   useEffect(() => {
     if (isModalOpen) {
       setType(modalType);
-      setTitle('');
-      setAmount('');
+      setTitle(modalInitialData?.title || '');
+      setAmount(modalInitialData?.amount || '');
+      if (modalInitialData?.category) {
+        setCategory(modalInitialData.category);
+      } else {
+        setCategory('Dining');
+      }
       setReceiptPreview(null);
       setSavedFeedback(false);
     }
-  }, [isModalOpen, modalType]);
+  }, [isModalOpen, modalType, modalInitialData]);
 
   if (!isModalOpen) return null;
 
@@ -105,6 +110,16 @@ export function TransactionModal() {
           </button>
         </div>
 
+        {/* Quick Add Context Notice */}
+        {modalInitialData?.source === 'quick-add' && (
+          <div className="flex items-center gap-2 p-2.5 rounded-lg bg-amber-50 border border-amber-200/80 text-amber-900 text-xs animate-in fade-in">
+            <span className="material-symbols-outlined text-amber-600 text-base">category</span>
+            <span>
+              <strong>Category Required:</strong> Please choose a category below to finish saving your quick entry.
+            </span>
+          </div>
+        )}
+
         {/* Modal Form */}
         <form onSubmit={handleSave} className="flex flex-col gap-3">
           <div>
@@ -171,6 +186,10 @@ export function TransactionModal() {
                   onChange={(e) => setCategory(e.target.value)}
                   className="w-full h-11 px-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:bg-white transition-all cursor-pointer"
                 >
+                  <option value="Dining">Dining</option>
+                  <option value="Travel">Travel</option>
+                  <option value="Hardware">Hardware</option>
+                  <option value="Wellness">Wellness</option>
                   <option value="Travel & Logistics">Travel &amp; Logistics</option>
                   <option value="Tech & Infra">Tech &amp; Infra</option>
                   <option value="Executive Dining">Executive Dining</option>
