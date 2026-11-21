@@ -51,20 +51,11 @@ export function CommandStrip() {
 
           <button
             onClick={() => openModal('due')}
-            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-red-50/60 text-red-800 shadow-sm border border-red-200/80 hover:bg-red-100 active:scale-95 transition-all shrink-0 cursor-pointer"
+            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-white text-slate-800 shadow-sm border border-slate-200/80 hover:bg-slate-50 active:scale-95 transition-all shrink-0 cursor-pointer"
             type="button"
           >
             <span className="material-symbols-outlined text-base text-red-600">alarm_add</span>
-            <span className="font-body-md text-xs font-semibold">- To Give (Bill)</span>
-          </button>
-
-          <button
-            onClick={() => openModal('receive')}
-            className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-emerald-50/60 text-emerald-800 shadow-sm border border-emerald-200/80 hover:bg-emerald-100 active:scale-95 transition-all shrink-0 cursor-pointer"
-            type="button"
-          >
-            <span className="material-symbols-outlined text-base text-emerald-600">handshake</span>
-            <span className="font-body-md text-xs font-semibold">+ Given to Friend</span>
+            <span className="font-body-md text-xs font-medium">Debit/Credit</span>
           </button>
 
           <button
@@ -117,25 +108,16 @@ export function CommandStrip() {
               type="button"
             >
               <span className="material-symbols-outlined text-lg text-[#b48e28]">edit_note</span>
-              <span className="text-xs font-semibold">+ Add Expense</span>
+              <span className="text-xs font-semibold">Add Expense</span>
             </button>
 
             <button
               onClick={() => openModal('due')}
-              className="group relative px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 hover:border-red-300 hover:bg-red-50/60 hover:text-red-700 transition-all duration-200 flex items-center gap-1.5 shadow-xs cursor-pointer"
+              className="group relative px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 hover:border-red-200 hover:bg-red-50/50 hover:text-red-700 transition-all duration-200 flex items-center gap-1.5 shadow-xs cursor-pointer"
               type="button"
             >
               <span className="material-symbols-outlined text-lg text-red-600">alarm_add</span>
-              <span className="text-xs font-semibold">- To Give (Bill)</span>
-            </button>
-
-            <button
-              onClick={() => openModal('receive')}
-              className="group relative px-4 py-2 rounded-lg bg-white border border-slate-200 text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/60 hover:text-emerald-700 transition-all duration-200 flex items-center gap-1.5 shadow-xs cursor-pointer"
-              type="button"
-            >
-              <span className="material-symbols-outlined text-lg text-emerald-600">handshake</span>
-              <span className="text-xs font-semibold">+ Given to Friend</span>
+              <span className="text-xs font-semibold">Debit/Credit</span>
             </button>
 
             <button
