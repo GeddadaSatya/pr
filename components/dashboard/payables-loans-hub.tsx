@@ -204,8 +204,9 @@ export function PayablesLoansHub() {
                   </div>
                 </div>
               </div>
-              <span className="text-[11px] text-emerald-800 font-bold px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
-                +{privacyMode ? '••••' : `₹${Math.round(totalYield).toLocaleString('en-IN')}`}/mo Yield
+              <span className="inline-flex items-center gap-1 text-[11px] text-emerald-800 font-bold px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200">
+                <span className="material-symbols-outlined text-xs">trending_up</span>
+                <span>+{privacyMode ? '••••' : `₹${Math.round(totalYield).toLocaleString('en-IN')}`}/mo Yield</span>
               </span>
             </div>
 

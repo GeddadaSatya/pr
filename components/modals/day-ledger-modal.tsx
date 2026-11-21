@@ -264,10 +264,21 @@ export function DayLedgerModal({
               <span className="text-[11px] font-medium text-slate-500 hidden sm:inline">
                 Net 24h Velocity:
               </span>
-              <span className="px-3 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-xs">
+              <span
+                className={`inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[11px] font-bold shadow-xs ${
+                  dayConfig.netVelocity >= 0
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200/80'
+                    : 'bg-red-50 text-red-700 border border-red-200/80'
+                }`}
+              >
+                <span className="material-symbols-outlined text-xs">
+                  {dayConfig.netVelocity >= 0 ? 'trending_up' : 'trending_down'}
+                </span>
                 {privacyMode
                   ? '••••••'
-                  : `+₹${dayConfig.netVelocity.toLocaleString('en-IN')}.00 Net Surplus`}
+                  : `${dayConfig.netVelocity >= 0 ? '+' : '-'}₹${Math.abs(dayConfig.netVelocity).toLocaleString('en-IN')}.00 Net ${
+                      dayConfig.netVelocity >= 0 ? 'Surplus' : 'Deficit'
+                    }`}
               </span>
             </div>
           </div>
@@ -291,10 +302,17 @@ export function DayLedgerModal({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md">
-                  <span className="material-symbols-outlined text-xs">trending_up</span>
-                  <span>+₹{dayConfig.inflowDelta.toLocaleString('en-IN')} (+{dayConfig.inflowPercent}%)</span>
-                </div>
+                {dayConfig.inflowDelta >= 0 ? (
+                  <div className="flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md">
+                    <span className="material-symbols-outlined text-xs">trending_up</span>
+                    <span>+₹{dayConfig.inflowDelta.toLocaleString('en-IN')} (+{dayConfig.inflowPercent}%)</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-[11px] font-semibold text-red-700 bg-red-50 border border-red-200/80 px-2 py-0.5 rounded-md">
+                    <span className="material-symbols-outlined text-xs">trending_down</span>
+                    <span>-₹{Math.abs(dayConfig.inflowDelta).toLocaleString('en-IN')} ({dayConfig.inflowPercent}%)</span>
+                  </div>
+                )}
               </div>
 
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
@@ -320,16 +338,28 @@ export function DayLedgerModal({
                   </div>
                 </div>
 
-                {/* Orange/Gold Up Arrow Badge */}
-                <div className="w-7 h-7 rounded-lg bg-amber-50 text-[#b48e28] flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined text-base">north_east</span>
+                {/* Corner Indicator Badge */}
+                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                  dayConfig.outflowDelta >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'
+                }`}>
+                  <span className="material-symbols-outlined text-base">
+                    {dayConfig.outflowDelta >= 0 ? 'trending_up' : 'trending_down'}
+                  </span>
                 </div>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-900 bg-amber-50 border border-amber-200/80 px-2 py-0.5 rounded-md">
-                  <span>↑ +₹{dayConfig.outflowDelta.toLocaleString('en-IN')} (+{dayConfig.outflowPercent}%)</span>
-                </span>
+                {dayConfig.outflowDelta >= 0 ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-md">
+                    <span className="material-symbols-outlined text-xs">trending_up</span>
+                    <span>+₹{dayConfig.outflowDelta.toLocaleString('en-IN')} (+{dayConfig.outflowPercent}%)</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-red-700 bg-red-50 border border-red-200/80 px-2 py-0.5 rounded-md">
+                    <span className="material-symbols-outlined text-xs">trending_down</span>
+                    <span>-₹{Math.abs(dayConfig.outflowDelta).toLocaleString('en-IN')} ({dayConfig.outflowPercent}%)</span>
+                  </span>
+                )}
                 <span className="text-[11px] text-slate-400">vs yesterday</span>
               </div>
 

@@ -150,7 +150,8 @@ export function KpiCarousel() {
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
                 <span className="font-label-caps text-[11px] uppercase text-slate-500">Money Lent to Others</span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-label-caps text-[10px] font-bold">
+                <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/60 font-label-caps text-[10px] font-bold">
+                  <span className="material-symbols-outlined text-xs">trending_up</span>
                   +{privacyMode ? '••••' : `₹${Math.round(totalYield).toLocaleString('en-IN')}`}/mo
                 </span>
               </div>

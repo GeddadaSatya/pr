@@ -201,9 +201,12 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                 {privacyMode ? '••••••' : '₹7,068.40'}
               </span>
             </div>
-            <div className="flex items-center gap-1 mt-2 text-xs text-teal-800 font-medium">
-              <span className="material-symbols-outlined text-sm">south_east</span>
-              <span>-4.2% vs previous month</span>
+            <div className="flex items-center gap-1.5 mt-2">
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[11px] font-bold bg-red-50 text-red-700 border border-red-200/60">
+                <span className="material-symbols-outlined text-xs">trending_down</span>
+                <span>-4.2%</span>
+              </span>
+              <span className="text-xs text-slate-500 font-medium">vs previous month</span>
             </div>
           </div>
         </div>
