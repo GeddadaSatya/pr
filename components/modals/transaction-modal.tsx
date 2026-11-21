@@ -180,7 +180,7 @@ export function TransactionModal() {
               >
                 <option value="expense">Add Expense</option>
                 <option value="due">- To Give (Bill / Debt)</option>
-                <option value="receive">+ To Receive (Friend Advance)</option>
+                <option value="receive">+ Given to Friend (Advance)</option>
                 <option value="loan">Lend Money</option>
               </select>
             </div>

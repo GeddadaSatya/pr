@@ -34,7 +34,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
       const existingIds = new Set(entries.map((e) => e.id));
       const newItems: NotebookEntry[] = [];
       for (const exp of expenses) {
-        if (exp.dateTime === 'Just now' && !existingIds.has(exp.id)) {
+        if (!existingIds.has(exp.id)) {
           const catLower = exp.category.toLowerCase();
           const icon = catLower.includes('dining')
             ? 'restaurant'
@@ -44,6 +44,8 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
             ? 'laptop_mac'
             : catLower.includes('wellness')
             ? 'fitness_center'
+            : catLower.includes('friend') || catLower.includes('advance')
+            ? 'handshake'
             : 'receipt_long';
           newItems.push({
             id: exp.id,
@@ -74,32 +76,47 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
     return item.category.toLowerCase() === selectedCategoryFilter.toLowerCase();
   });
 
+  const todayItems = filteredEntries.filter((e) => e.dateGroup === 'Today, October 28');
+  const todayTotal = todayItems.reduce((sum, item) => sum + item.amount, 0);
+
+  const sundayItems = filteredEntries.filter((e) => e.dateGroup === 'Sunday, October 27');
+  const sundayTotal = sundayItems.reduce((sum, item) => sum + item.amount, 0);
+
+  const fridayItems = filteredEntries.filter((e) => e.dateGroup === 'Friday, October 25');
+  const fridayTotal = fridayItems.reduce((sum, item) => sum + item.amount, 0);
+
   const dateGroups = [
     {
       dateGroup: 'Today, October 28',
       dateKey: '2026-10-28',
-      badge: '2 ENTRIES',
+      badge: `${todayItems.length} ${todayItems.length === 1 ? 'ENTRY' : 'ENTRIES'}`,
       badgeColor: 'bg-amber-100/70 text-amber-900 border-amber-200/60',
-      total: 1240.0,
-      items: filteredEntries.filter((e) => e.dateGroup === 'Today, October 28'),
+      total: todayTotal,
+      items: todayItems,
     },
     {
       dateGroup: 'Sunday, October 27',
       dateKey: '2026-10-27',
-      badge: '1 ENTRY',
+      badge: `${sundayItems.length} ${sundayItems.length === 1 ? 'ENTRY' : 'ENTRIES'}`,
       badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
-      total: 3450.0,
-      items: filteredEntries.filter((e) => e.dateGroup === 'Sunday, October 27'),
+      total: sundayTotal,
+      items: sundayItems,
     },
     {
       dateGroup: 'Friday, October 25',
       dateKey: '2026-10-25',
-      badge: '2 ENTRIES',
+      badge: `${fridayItems.length} ${fridayItems.length === 1 ? 'ENTRY' : 'ENTRIES'}`,
       badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
-      total: 2378.4,
-      items: filteredEntries.filter((e) => e.dateGroup === 'Friday, October 25'),
+      total: fridayTotal,
+      items: fridayItems,
     },
   ];
+
+  const initialNotebookIds = new Set(INITIAL_NOTEBOOK_ENTRIES.map((e) => e.id));
+  const dynamicExpensesAdded = entries.filter((e) => !initialNotebookIds.has(e.id));
+  const dynamicTotalAdded = dynamicExpensesAdded.reduce((sum, e) => sum + e.amount, 0);
+  const totalSpentThisMonth = 7068.4 + dynamicTotalAdded;
+  const totalNotebookEntriesCount = 42 + dynamicExpensesAdded.length;
 
   const handleCategoryChipClick = (catName: string) => {
     if (selectedQuickCategory === catName) {
@@ -281,10 +298,10 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           <div>
             <div className="flex items-baseline gap-1 mt-1">
               <span className="font-kpi-val text-slate-900 tracking-tight">
-                {privacyMode ? '••••••' : '₹7,068'}
+                {privacyMode ? '••••••' : `₹${Math.floor(totalSpentThisMonth).toLocaleString('en-IN')}`}
               </span>
               <span className="font-label-numeric text-xs text-slate-500 font-medium">
-                {privacyMode ? '' : '.40'}
+                {privacyMode ? '' : `.${(totalSpentThisMonth % 1).toFixed(2).split('.')[1] || '40'}`}
               </span>
             </div>
           </div>
@@ -309,7 +326,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           <div>
             <div className="flex items-baseline gap-1 mt-1">
               <span className="font-kpi-val text-slate-900 tracking-tight">
-                42
+                {totalNotebookEntriesCount}
               </span>
               <span className="text-sm font-semibold text-slate-600 ml-1">Entries</span>
             </div>

@@ -17,7 +17,7 @@ export function DayLedgerModal({
   selectedDateKey = '2026-10-28',
   onAddTransaction,
 }: DayLedgerModalProps) {
-  const { privacyMode, openModal } = useFinance();
+  const { privacyMode, openModal, expenses } = useFinance();
   const [currentDateKey, setCurrentDateKey] = useState(selectedDateKey);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -66,8 +66,30 @@ export function DayLedgerModal({
   // Retrieve configuration for selected date
   const dayConfig = DAY_LEDGER_CONFIGS[currentDateKey] || DAY_LEDGER_CONFIGS['2026-10-28'];
 
-  // Retrieve entries for selected date
-  const dayEntries = INITIAL_NOTEBOOK_ENTRIES.filter((e) => e.dateKey === currentDateKey);
+  // Retrieve entries for selected date (including any dynamic advances or expenses logged today)
+  const initialIds = new Set(INITIAL_NOTEBOOK_ENTRIES.map((e) => e.id));
+  const dynamicTodayEntries: NotebookEntry[] = currentDateKey === '2026-10-28'
+    ? expenses
+        .filter((exp) => !initialIds.has(exp.id))
+        .map((exp) => ({
+          id: exp.id,
+          title: exp.title,
+          subtitle: exp.subtitle || 'Day-to-day cashflow entry',
+          tag: `#${exp.category.split(' ')[0]}`,
+          category: exp.category,
+          statusBadge: 'Verified Receipt',
+          paidWith: exp.paidWith || 'UPI Transfer',
+          dateTime: 'Today, Just now',
+          amount: exp.amount,
+          icon: exp.category.toLowerCase().includes('friend') ? 'handshake' : 'receipt_long',
+          dateGroup: 'Today, October 28',
+          dateKey: '2026-10-28',
+          time: 'Just now',
+        }))
+    : [];
+
+  const baseDayEntries = INITIAL_NOTEBOOK_ENTRIES.filter((e) => e.dateKey === currentDateKey);
+  const dayEntries = [...dynamicTodayEntries, ...baseDayEntries];
 
   // Filter entries
   const filteredEntries = dayEntries.filter((item) => {

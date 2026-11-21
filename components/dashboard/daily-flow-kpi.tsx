@@ -93,17 +93,6 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
             </div>
           )}
 
-          {/* Quick "+ To Receive" Action Button */}
-          <button
-            type="button"
-            onClick={() => openModal('receive')}
-            className="px-2.5 py-1 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
-            title="Record money given to a friend awaiting return"
-          >
-            <span className="material-symbols-outlined text-sm text-emerald-600">call_received</span>
-            <span>+ To Receive</span>
-          </button>
-
           {onOpenDayLedger && !isZeroData && (
             <button
               type="button"
@@ -118,124 +107,6 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
           )}
         </div>
       </div>
-
-      {/* MULTI-ADVANCE RECOVERABLE BANNER (When friends owe money) */}
-      {pendingReceivables.length > 0 && (
-        <div className="w-full bg-linear-to-r from-emerald-50/70 via-white to-amber-50/40 border border-emerald-200/80 rounded-xl p-3 md:p-3.5 shadow-xs flex flex-col gap-2.5 transition-all">
-          {/* Header Strip with Total Pending */}
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                <span className="material-symbols-outlined text-base">schedule</span>
-              </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-bold text-slate-800">
-                  {pendingReceivables.length} {pendingReceivables.length === 1 ? 'Friend Advance' : 'Advances'} Pending
-                </span>
-                <span className="text-xs text-slate-400">•</span>
-                <span className="text-xs text-slate-600 font-medium">Total to receive:</span>
-                <span className="text-xs font-bold font-kpi-val text-emerald-800">
-                  {privacyMode
-                    ? '••••••'
-                    : `₹${totalPendingReceivables.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {pendingReceivables.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setIsPendingExpanded(!isPendingExpanded)}
-                  className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-0.5 px-2.5 py-1 rounded-md bg-white border border-slate-200 shadow-2xs cursor-pointer transition-colors"
-                >
-                  <span>{isPendingExpanded ? 'Collapse' : `View All (${pendingReceivables.length})`}</span>
-                  <span
-                    className="material-symbols-outlined text-sm transition-transform duration-200"
-                    style={{ transform: isPendingExpanded ? 'rotate(180deg)' : 'none' }}
-                  >
-                    expand_more
-                  </span>
-                </button>
-              )}
-
-              {/* If only 1 pending advance, show the single clean [ Received ] button right in the header */}
-              {pendingReceivables.length === 1 && (
-                <button
-                  type="button"
-                  onClick={() => markReceivableReceived(pendingReceivables[0].id)}
-                  className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1 shadow-xs transition-all cursor-pointer"
-                  title={`Mark ₹${pendingReceivables[0].amount} from ${pendingReceivables[0].friendName} as received`}
-                >
-                  <span className="material-symbols-outlined text-sm">check</span>
-                  <span>Received</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Single Item Details Strip (Inline view) */}
-          {pendingReceivables.length === 1 && (
-            <div className="flex items-center justify-between text-xs text-slate-600 pt-1.5 border-t border-emerald-100/80 flex-wrap gap-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-semibold text-slate-900">{pendingReceivables[0].friendName}</span>
-                <span className="text-[11px] text-slate-400">•</span>
-                <span className="text-[11px] text-slate-500">
-                  Given {pendingReceivables[0].dateGiven} via {pendingReceivables[0].paymentMethod}
-                </span>
-                {pendingReceivables[0].note && (
-                  <>
-                    <span className="text-[11px] text-slate-400">•</span>
-                    <span className="text-[11px] text-slate-500 italic">{pendingReceivables[0].note}</span>
-                  </>
-                )}
-              </div>
-              <span className="font-bold font-kpi-val text-slate-900">
-                {privacyMode
-                  ? '••••'
-                  : `₹${pendingReceivables[0].amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-              </span>
-            </div>
-          )}
-
-          {/* Multi-Item List (Visible if expanded or on desktop) */}
-          {pendingReceivables.length > 1 && (
-            <div className={`flex flex-col divide-y divide-emerald-100/80 pt-1 border-t border-emerald-100/80 ${isPendingExpanded ? '' : 'hidden md:flex'}`}>
-              {pendingReceivables.map((item) => (
-                <div key={item.id} className="py-2.5 flex items-center justify-between gap-3 first:pt-1 last:pb-0">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
-                    <div className="flex flex-col min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-xs text-slate-900">{item.friendName}</span>
-                        <span className="text-[11px] text-slate-400">•</span>
-                        <span className="font-bold text-xs font-kpi-val text-slate-900">
-                          {privacyMode
-                            ? '••••'
-                            : `₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-                        </span>
-                      </div>
-                      <span className="text-[11px] text-slate-500 truncate">
-                        Given {item.dateGiven} via {item.paymentMethod} {item.note ? `• ${item.note}` : ''}
-                      </span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => markReceivableReceived(item.id)}
-                    className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1 shadow-xs transition-all shrink-0 cursor-pointer"
-                    title={`Mark ₹${item.amount} from ${item.friendName} as received`}
-                  >
-                    <span className="material-symbols-outlined text-sm">check</span>
-                    <span>Received</span>
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
 
       {/* 2-Card Grid: Desktop (gap-6) & Mobile (gap-3) */}
       <div className="grid grid-cols-2 gap-3 md:gap-6 w-full">
@@ -384,6 +255,103 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
             )}
           </div>
         </div>
+      </div>
+
+      {/* PENDING FRIEND ADVANCES (LOCATED BELOW KPI CARDS) */}
+      <div className="w-full bg-linear-to-r from-emerald-50/70 via-white to-amber-50/40 border border-emerald-200/80 rounded-xl p-3 md:p-3.5 shadow-xs flex flex-col gap-2.5 transition-all">
+        {/* Header Strip with Total Pending & Action Buttons */}
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-base">schedule</span>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold text-slate-800">
+                {pendingReceivables.length > 0
+                  ? `${pendingReceivables.length} ${pendingReceivables.length === 1 ? 'Friend Advance' : 'Advances'} Pending`
+                  : 'Friend Advances (Recoverable)'}
+              </span>
+              {pendingReceivables.length > 0 && (
+                <>
+                  <span className="text-xs text-slate-400">•</span>
+                  <span className="text-xs text-slate-600 font-medium">To get back:</span>
+                  <span className="text-xs font-bold font-kpi-val text-emerald-800">
+                    {privacyMode
+                      ? '••••••'
+                      : `₹${totalPendingReceivables.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Quick "+ Given to Friend" Button */}
+            <button
+              type="button"
+              onClick={() => openModal('receive')}
+              className="px-2.5 py-1 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+              title="Record money given to a friend awaiting return"
+            >
+              <span className="material-symbols-outlined text-sm text-emerald-600">handshake</span>
+              <span>+ Given to Friend</span>
+            </button>
+
+            {/* Collapse / Expand Toggle: By default COLLAPSED */}
+            {pendingReceivables.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setIsPendingExpanded(!isPendingExpanded)}
+                className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-0.5 px-2.5 py-1 rounded-md bg-white border border-slate-200 shadow-2xs cursor-pointer transition-colors"
+              >
+                <span>{isPendingExpanded ? 'Collapse' : `View All (${pendingReceivables.length})`}</span>
+                <span
+                  className="material-symbols-outlined text-sm transition-transform duration-200"
+                  style={{ transform: isPendingExpanded ? 'rotate(180deg)' : 'none' }}
+                >
+                  expand_more
+                </span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Detailed Advances List (ONLY shown when expanded - COLLAPSED BY DEFAULT ON ALL SCREENS) */}
+        {isPendingExpanded && pendingReceivables.length > 0 && (
+          <div className="flex flex-col divide-y divide-emerald-100/80 pt-2 border-t border-emerald-100/80 animate-fade-in">
+            {pendingReceivables.map((item) => (
+              <div key={item.id} className="py-2.5 flex items-center justify-between gap-3 first:pt-1 last:pb-0">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                  <div className="flex flex-col min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-xs text-slate-900">{item.friendName}</span>
+                      <span className="text-[11px] text-slate-400">•</span>
+                      <span className="font-bold text-xs font-kpi-val text-slate-900">
+                        {privacyMode
+                          ? '••••'
+                          : `₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-slate-500 truncate">
+                      Given {item.dateGiven} via {item.paymentMethod} {item.note ? `• ${item.note}` : ''}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => markReceivableReceived(item.id)}
+                  className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1 shadow-xs transition-all shrink-0 cursor-pointer"
+                  title={`Mark ₹${item.amount} from ${item.friendName} as received`}
+                >
+                  <span className="material-symbols-outlined text-sm">check</span>
+                  <span>Received</span>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
