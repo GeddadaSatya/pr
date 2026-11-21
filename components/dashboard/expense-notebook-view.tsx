@@ -234,9 +234,9 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
         <button
           type="button"
           onClick={() => openModal('expense')}
-          className="h-10 px-4 rounded-xl bg-[#111c2d] hover:bg-[#1a283e] text-white text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer self-start sm:self-auto"
+          className="h-10 px-4 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs shadow-xs hover:shadow transition-all flex items-center justify-center gap-1.5 cursor-pointer self-start sm:self-auto"
         >
-          <span className="material-symbols-outlined text-sm text-[#d4af37]">add</span>
+          <span className="material-symbols-outlined text-base">add</span>
           <span>New Entry</span>
         </button>
       </div>
@@ -371,7 +371,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
 
           <button
             type="submit"
-            className="h-11 px-5 rounded-xl bg-[#111c2d] hover:bg-[#1a283e] text-white text-xs md:text-sm font-semibold shadow-xs transition-colors flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+            className="h-11 px-5 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs md:text-sm shadow-xs hover:shadow transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
           >
             <span>Save Expense</span>
             <span className="material-symbols-outlined text-base">arrow_forward</span>
@@ -401,14 +401,14 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                   key={cat.name}
                   type="button"
                   onClick={() => handleCategoryChipClick(cat.name)}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
                     isSelected
-                      ? 'bg-[#111c2d] text-white shadow-xs ring-1 ring-[#fed65b]'
+                      ? 'bg-[#fed65b] text-slate-950 shadow-xs border border-[#d4af37]'
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200/60'
                   }`}
                 >
                   {isSelected && (
-                    <span className="material-symbols-outlined text-xs text-[#fed65b]">check</span>
+                    <span className="material-symbols-outlined text-xs text-[#745c00]">check</span>
                   )}
                   <span className="material-symbols-outlined text-xs">{cat.icon}</span>
                   <span>{cat.tag}</span>
@@ -690,7 +690,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                   setQuickInput('');
                   setSelectedQuickCategory(null);
                 }}
-                className="w-full sm:w-auto h-9 px-4 rounded-xl bg-[#111c2d] hover:bg-[#1a283e] text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                className="w-full sm:w-auto h-9 px-4 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <span>Open New Entry Form</span>
                 <span className="material-symbols-outlined text-xs">arrow_forward</span>

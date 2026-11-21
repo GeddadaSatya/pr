@@ -488,9 +488,9 @@ export function DayLedgerModal({
                 openModal('expense');
               }
             }}
-            className="w-full sm:w-auto h-10 px-4 rounded-xl bg-[#111c2d] hover:bg-[#1a283e] text-white text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+            className="w-full sm:w-auto h-10 px-4 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs shadow-xs hover:shadow transition-all flex items-center justify-center gap-1.5 cursor-pointer"
           >
-            <span className="material-symbols-outlined text-sm">add</span>
+            <span className="material-symbols-outlined text-base">add</span>
             <span>Add Transaction to Ledger</span>
           </button>
         </div>

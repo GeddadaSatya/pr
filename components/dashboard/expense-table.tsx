@@ -183,7 +183,7 @@ export function ExpenseTable() {
               <button
                 onClick={() => openModal('expense')}
                 type="button"
-                className="w-full h-11 rounded-xl bg-[#111c2d] hover:bg-[#1a2942] active:scale-[0.99] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
+                className="w-full h-11 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] active:scale-[0.99] text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
               >
                 <span className="material-symbols-outlined text-base">edit_note</span>
                 <span>Add Journal Entry</span>
@@ -352,7 +352,7 @@ export function ExpenseTable() {
               <button
                 onClick={() => openModal('expense')}
                 type="button"
-                className="h-10 w-[200px] rounded-xl bg-[#111c2d] hover:bg-[#1a2942] text-white text-xs font-semibold flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
+                className="h-10 w-[200px] rounded-xl bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors cursor-pointer"
               >
                 <span className="material-symbols-outlined text-base">edit_note</span>
                 <span>Add Journal Entry</span>
