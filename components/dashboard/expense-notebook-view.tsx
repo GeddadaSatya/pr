@@ -166,69 +166,79 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
       {/* 3 Top Summary KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-5 w-full">
         {/* Card 1: DAILY AVERAGE SPEND */}
-        <div className="bg-white p-4 md:p-5 rounded-2xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-3 relative overflow-hidden">
+        <div className="bg-white p-4 md:p-5 rounded-xl shadow-xs border border-slate-200/80 flex flex-col justify-between min-h-[155px] h-full relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-[#fed65b]" />
           <div className="flex items-start justify-between">
-            <span className="text-[10px] md:text-[11px] uppercase text-slate-500 font-bold tracking-wider">
+            <span className="font-label-caps text-[10px] md:text-[11px] uppercase text-slate-500 font-bold tracking-wider">
               DAILY AVERAGE SPEND
             </span>
             <span className="material-symbols-outlined text-slate-400 text-lg">speed</span>
           </div>
           <div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl md:text-3xl font-serif font-bold text-slate-900 tracking-tight">
-                {privacyMode ? '••••••' : '₹228.01'}
+            <div className="flex items-baseline gap-1 mt-1">
+              <span className="font-headline-lg-mobile md:font-headline-lg text-slate-900 font-semibold tracking-tight">
+                {privacyMode ? '••••••' : '₹228'}
               </span>
-              <span className="text-xs text-slate-400 font-medium">/day</span>
+              <span className="font-label-numeric text-xs text-slate-500 font-medium">
+                {privacyMode ? '' : '.01'}
+              </span>
+              <span className="text-xs text-slate-400 font-medium ml-0.5">/day</span>
             </div>
-            <div className="flex items-center gap-1.5 mt-2 text-xs text-emerald-800 font-medium">
-              <span className="material-symbols-outlined text-sm">check_circle</span>
-              <span>Well within ₹250 budget target</span>
-            </div>
+          </div>
+          <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs text-emerald-800 font-medium">
+            <span className="material-symbols-outlined text-sm">check_circle</span>
+            <span>Well within ₹250 budget target</span>
           </div>
         </div>
 
         {/* Card 2: TOTAL SPENT THIS MONTH */}
-        <div className="bg-white p-4 md:p-5 rounded-2xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-3 relative overflow-hidden">
+        <div className="bg-white p-4 md:p-5 rounded-xl shadow-xs border border-slate-200/80 flex flex-col justify-between min-h-[155px] h-full relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-red-600" />
           <div className="flex items-start justify-between">
-            <span className="text-[10px] md:text-[11px] uppercase text-slate-500 font-bold tracking-wider">
+            <span className="font-label-caps text-[10px] md:text-[11px] uppercase text-slate-500 font-bold tracking-wider">
               TOTAL SPENT THIS MONTH
             </span>
             <span className="material-symbols-outlined text-slate-400 text-lg">receipt_long</span>
           </div>
           <div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl md:text-3xl font-serif font-bold text-slate-900 tracking-tight">
-                {privacyMode ? '••••••' : '₹7,068.40'}
+            <div className="flex items-baseline gap-1 mt-1">
+              <span className="font-headline-lg-mobile md:font-headline-lg text-red-700 font-semibold tracking-tight">
+                {privacyMode ? '••••••' : '₹7,068'}
+              </span>
+              <span className="font-label-numeric text-xs text-red-500 font-medium">
+                {privacyMode ? '' : '.40'}
               </span>
             </div>
-            <div className="flex items-center gap-1.5 mt-2">
-              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[11px] font-bold bg-red-50 text-red-700 border border-red-200/60">
-                <span className="material-symbols-outlined text-xs">trending_down</span>
-                <span>-4.2%</span>
-              </span>
-              <span className="text-xs text-slate-500 font-medium">vs previous month</span>
-            </div>
+          </div>
+          <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs font-medium">
+            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[11px] font-bold bg-red-50 text-red-700 border border-red-200/60">
+              <span className="material-symbols-outlined text-xs">trending_down</span>
+              <span>-4.2%</span>
+            </span>
+            <span className="text-slate-500">vs previous month</span>
           </div>
         </div>
 
         {/* Card 3: NOTEBOOK ENTRIES */}
-        <div className="bg-white p-4 md:p-5 rounded-2xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-3 relative overflow-hidden">
+        <div className="bg-white p-4 md:p-5 rounded-xl shadow-xs border border-slate-200/80 flex flex-col justify-between min-h-[155px] h-full relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500" />
           <div className="flex items-start justify-between">
-            <span className="text-[10px] md:text-[11px] uppercase text-slate-500 font-bold tracking-wider">
+            <span className="font-label-caps text-[10px] md:text-[11px] uppercase text-slate-500 font-bold tracking-wider">
               NOTEBOOK ENTRIES
             </span>
             <span className="material-symbols-outlined text-slate-400 text-lg">auto_stories</span>
           </div>
           <div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl md:text-3xl font-serif font-bold text-slate-900 tracking-tight">
-                42 Entries
+            <div className="flex items-baseline gap-1 mt-1">
+              <span className="font-headline-lg-mobile md:font-headline-lg text-slate-900 font-semibold tracking-tight">
+                42
               </span>
+              <span className="text-sm font-semibold text-slate-600 ml-1">Entries</span>
             </div>
-            <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-500 font-medium">
-              <span className="material-symbols-outlined text-sm text-slate-400">verified</span>
-              <span>38 verified with tax receipts</span>
-            </div>
+          </div>
+          <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs text-slate-500 font-medium">
+            <span className="material-symbols-outlined text-sm text-slate-400">verified</span>
+            <span>38 verified with tax receipts</span>
           </div>
         </div>
       </div>

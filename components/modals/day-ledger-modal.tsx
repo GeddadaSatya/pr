@@ -287,16 +287,17 @@ export function DayLedgerModal({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5 w-full">
             {/* Card 1: TODAY'S INFLOW */}
             <div className="bg-white p-4 md:p-5 rounded-2xl shadow-xs border border-slate-200/90 flex flex-col justify-between gap-3 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500" />
               <div className="flex justify-between items-start">
                 <div className="flex flex-col">
                   <span className="text-[10px] md:text-[11px] uppercase text-slate-400 font-bold tracking-wider">
                     TODAY&apos;S INFLOW
                   </span>
                   <div className="flex items-baseline gap-1 mt-1">
-                    <span className="text-2xl md:text-3xl font-serif font-bold text-slate-900 tracking-tight">
-                      {privacyMode ? '••••••' : `₹${dayConfig.inflow.toLocaleString('en-IN')}`}
+                    <span className="font-headline-lg-mobile md:font-headline-lg text-slate-900 font-semibold tracking-tight">
+                      {privacyMode ? '••••••' : `₹${Math.floor(dayConfig.inflow).toLocaleString('en-IN')}`}
                     </span>
-                    <span className="text-xs text-slate-400 font-medium">
+                    <span className="font-label-numeric text-xs text-slate-400 font-medium">
                       {privacyMode ? '' : '.00'}
                     </span>
                   </div>
@@ -323,16 +324,17 @@ export function DayLedgerModal({
 
             {/* Card 2: TODAY'S OUTFLOW */}
             <div className="bg-white p-4 md:p-5 rounded-2xl shadow-xs border border-slate-200/90 flex flex-col justify-between gap-3 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-red-600" />
               <div className="flex justify-between items-start">
                 <div className="flex flex-col">
                   <span className="text-[10px] md:text-[11px] uppercase text-slate-400 font-bold tracking-wider">
                     TODAY&apos;S OUTFLOW
                   </span>
                   <div className="flex items-baseline gap-1 mt-1">
-                    <span className="text-2xl md:text-3xl font-serif font-bold text-slate-900 tracking-tight">
-                      {privacyMode ? '••••••' : `₹${dayConfig.outflow.toLocaleString('en-IN')}`}
+                    <span className="font-headline-lg-mobile md:font-headline-lg text-red-700 font-semibold tracking-tight">
+                      {privacyMode ? '••••••' : `₹${Math.floor(dayConfig.outflow).toLocaleString('en-IN')}`}
                     </span>
-                    <span className="text-xs text-slate-400 font-medium">
+                    <span className="font-label-numeric text-xs text-red-400 font-medium">
                       {privacyMode ? '' : '.00'}
                     </span>
                   </div>

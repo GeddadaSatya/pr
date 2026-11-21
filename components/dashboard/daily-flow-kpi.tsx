@@ -163,8 +163,8 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
 
         {/* CARD 2: TODAY'S CASH OUTFLOW (WITH DAY-OVER-DAY SUBTRACTION) */}
         <div className="bg-white p-3.5 md:p-5 rounded-xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-3 relative overflow-hidden">
-          {/* Gold / Amber Top Accent Strip */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-[#fed65b]" />
+          {/* Red Top Accent Strip */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-red-600" />
 
           {/* Top Label & Icon */}
           <div className="flex justify-between items-start">
@@ -173,18 +173,18 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
                 Today&apos;s Outflow
               </span>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-headline-lg-mobile md:font-headline-lg text-slate-900 font-semibold tracking-tight text-base sm:text-2xl md:text-3xl">
+                <span className="font-headline-lg-mobile md:font-headline-lg text-red-700 font-semibold tracking-tight text-base sm:text-2xl md:text-3xl">
                   {privacyMode
                     ? '••••••'
                     : `₹${todayOutflow.toLocaleString('en-IN')}`}
                 </span>
-                <span className="font-label-numeric text-xs text-slate-400">
+                <span className="font-label-numeric text-xs text-red-400">
                   {privacyMode ? '' : '.00'}
                 </span>
               </div>
             </div>
 
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#fef9e7] text-[#b48e28] flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-base sm:text-lg">
                 arrow_upward
               </span>

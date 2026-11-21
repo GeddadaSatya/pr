@@ -54,6 +54,8 @@ body {
   font-family: var(--font-manrope), sans-serif;
   color: #0f172a;
   -webkit-font-smoothing: antialiased;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
 }
 
 /* Material symbols outlined styling */
@@ -72,13 +74,15 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Custom typography classes matching design */
+/* Custom typography classes matching design with strict lining numbers */
 .font-headline-lg-mobile {
   font-family: 'Newsreader', serif;
   font-size: 26px;
   line-height: 34px;
   letter-spacing: -0.01em;
   font-weight: 500;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
 }
 
 .font-headline-lg {
@@ -87,6 +91,8 @@ body {
   line-height: 40px;
   letter-spacing: -0.015em;
   font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
 }
 
 .font-headline-md {
@@ -94,6 +100,8 @@ body {
   font-size: 24px;
   line-height: 32px;
   font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
 }
 
 .font-headline-sm {
@@ -101,6 +109,8 @@ body {
   font-size: 20px;
   line-height: 28px;
   font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
 }
 
 .font-title-md {
