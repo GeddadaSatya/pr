@@ -141,7 +141,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
 
   return (
     <div className="flex flex-col w-full gap-5 md:gap-6 animate-fade-in" id="expense-notebook-container">
-      {/* Top Header Row with "+ New Entry" button */}
+      {/* Top Header Row with "New Entry" button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 tracking-tight">
@@ -158,7 +158,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           className="h-10 px-4 rounded-xl bg-[#111c2d] hover:bg-[#1a283e] text-white text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer self-start sm:self-auto"
         >
           <span className="material-symbols-outlined text-sm text-[#d4af37]">add</span>
-          <span>+ New Entry</span>
+          <span>New Entry</span>
         </button>
       </div>
 
