@@ -1,4 +1,27 @@
-import { CategoryStat, ExpenseItem, LoanItem, PayableItem, UserProfile } from './types';
+import { CategoryStat, ExpenseItem, LoanItem, PayableItem, PeerReceivableItem, UserProfile } from './types';
+
+export const INITIAL_PEER_RECEIVABLES: PeerReceivableItem[] = [
+  {
+    id: 'pr-1',
+    friendName: 'Rahul Sharma',
+    amount: 2000.00,
+    dateGiven: 'Yesterday',
+    dateKey: '2026-10-27',
+    paymentMethod: 'HDFC Bank UPI',
+    note: 'Dinner & cab share',
+    status: 'pending',
+  },
+  {
+    id: 'pr-2',
+    friendName: 'Priya Patel',
+    amount: 1500.00,
+    dateGiven: '2 days ago',
+    dateKey: '2026-10-26',
+    paymentMethod: 'ICICI Corporate Card',
+    note: 'Concert ticket advance',
+    status: 'pending',
+  },
+];
 
 export const INITIAL_USER: UserProfile = {
   name: 'Sterling H.',

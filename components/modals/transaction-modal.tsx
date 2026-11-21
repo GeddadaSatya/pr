@@ -5,7 +5,7 @@ import { useFinance } from '@/components/context/finance-context';
 import { LedgerType } from '@/lib/types';
 
 export function TransactionModal() {
-  const { isModalOpen, modalType, closeModal, addExpense, addPayable, addLoan, modalInitialData } = useFinance();
+  const { isModalOpen, modalType, closeModal, addExpense, addPayable, addLoan, addPeerReceivable, modalInitialData } = useFinance();
 
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
@@ -80,6 +80,14 @@ export function TransactionModal() {
         principalAmount: numAmount,
         interestRateAnnual: 18.0,
       });
+    } else if (type === 'receive') {
+      addPeerReceivable({
+        friendName: title,
+        amount: numAmount,
+        dateGiven: 'Today',
+        paymentMethod: paidWith || 'UPI Transfer',
+        note: category !== 'Dining' && category !== '' ? category : 'Friend advance',
+      });
     }
 
     setSavedFeedback(true);
@@ -124,7 +132,7 @@ export function TransactionModal() {
         <form onSubmit={handleSave} className="flex flex-col gap-3">
           <div>
             <label className="text-[11px] text-slate-600 uppercase block mb-1 font-semibold">
-              Entry Title / Person
+              {type === 'receive' ? "Friend's Name" : type === 'due' ? 'Creditor / Bill Name' : 'Entry Title / Person'}
             </label>
             <input
               required
@@ -136,6 +144,8 @@ export function TransactionModal() {
                   ? 'e.g. Airline tickets or Executive dinner'
                   : type === 'due'
                   ? 'e.g. Marcus Vance (Vendor Equipment)'
+                  : type === 'receive'
+                  ? 'e.g. Rahul Sharma or Priya'
                   : 'e.g. Devon Reed'
               }
               type="text"
@@ -169,7 +179,8 @@ export function TransactionModal() {
                 className="w-full h-11 px-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:bg-white transition-all cursor-pointer"
               >
                 <option value="expense">Add Expense</option>
-                <option value="due">Add Debt / Bill</option>
+                <option value="due">- To Give (Bill / Debt)</option>
+                <option value="receive">+ To Receive (Friend Advance)</option>
                 <option value="loan">Lend Money</option>
               </select>
             </div>
@@ -213,7 +224,34 @@ export function TransactionModal() {
             </div>
           )}
 
-          {type !== 'expense' && (
+          {type === 'receive' && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[11px] text-slate-600 uppercase block mb-1 font-semibold">
+                  Purpose / Note (Optional)
+                </label>
+                <input
+                  value={category === 'Dining' ? '' : category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full h-11 px-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:bg-white transition-all"
+                  placeholder="e.g. Lunch split, Cab, Advance"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] text-slate-600 uppercase block mb-1 font-semibold">
+                  How Given (Method)
+                </label>
+                <input
+                  value={paidWith}
+                  onChange={(e) => setPaidWith(e.target.value)}
+                  className="w-full h-11 px-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-900 text-xs focus:outline-none focus:ring-2 focus:ring-[#d4af37] focus:bg-white transition-all"
+                  placeholder="e.g. UPI, Cash, Card"
+                />
+              </div>
+            </div>
+          )}
+
+          {(type === 'due' || type === 'loan') && (
             <div>
               <label className="text-[11px] text-slate-600 uppercase block mb-1 font-semibold">
                 Due Date / Terms (Optional)

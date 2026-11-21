@@ -1,4 +1,16 @@
-export type LedgerType = 'expense' | 'due' | 'loan';
+export type LedgerType = 'expense' | 'due' | 'loan' | 'receive';
+
+export interface PeerReceivableItem {
+  id: string;
+  friendName: string;
+  amount: number;
+  dateGiven: string;
+  dateKey?: string;
+  paymentMethod: string;
+  note?: string;
+  status: 'pending' | 'received';
+  settledDate?: string;
+}
 
 export interface ExpenseItem {
   id: string;

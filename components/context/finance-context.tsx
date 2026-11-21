@@ -1,8 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ExpenseItem, PayableItem, LoanItem, LedgerType, UserProfile } from '@/lib/types';
-import { INITIAL_EXPENSES, INITIAL_PAYABLES, INITIAL_LOANS, INITIAL_USER } from '@/lib/mock-data';
+import { ExpenseItem, PayableItem, LoanItem, PeerReceivableItem, LedgerType, UserProfile } from '@/lib/types';
+import { INITIAL_EXPENSES, INITIAL_PAYABLES, INITIAL_LOANS, INITIAL_PEER_RECEIVABLES, INITIAL_USER } from '@/lib/mock-data';
 
 export interface ModalInitialData {
   title?: string;
@@ -15,6 +15,7 @@ interface FinanceContextType {
   expenses: ExpenseItem[];
   payables: PayableItem[];
   loans: LoanItem[];
+  peerReceivables: PeerReceivableItem[];
   userProfile: UserProfile;
   privacyMode: boolean;
   togglePrivacyMode: () => void;
@@ -35,6 +36,8 @@ interface FinanceContextType {
   resetDefaultData: () => void;
   addPayable: (payable: Omit<PayableItem, 'id' | 'status'>) => void;
   addLoan: (loan: Omit<LoanItem, 'id' | 'monthlyInterest' | 'status'>) => void;
+  addPeerReceivable: (receivable: Omit<PeerReceivableItem, 'id' | 'status'>) => void;
+  markReceivableReceived: (id: string) => void;
   recordPayout: (id: string) => void;
 }
 
@@ -44,6 +47,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [expenses, setExpenses] = useState<ExpenseItem[]>(INITIAL_EXPENSES);
   const [payables, setPayables] = useState<PayableItem[]>(INITIAL_PAYABLES);
   const [loans, setLoans] = useState<LoanItem[]>(INITIAL_LOANS);
+  const [peerReceivables, setPeerReceivables] = useState<PeerReceivableItem[]>(INITIAL_PEER_RECEIVABLES);
   const [userProfile, setUserProfile] = useState<UserProfile>(INITIAL_USER);
   const [privacyMode, setPrivacyMode] = useState<boolean>(false);
   
@@ -87,7 +91,26 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     if (savedPrivacy !== null) {
       setPrivacyMode(savedPrivacy === 'true');
     }
+    const savedReceivables = localStorage.getItem('wt_peer_receivables');
+    if (savedReceivables !== null) {
+      try {
+        setPeerReceivables(JSON.parse(savedReceivables));
+      } catch (e) {
+        // Fallback to initial
+      }
+    }
   }, []);
+
+  // Sync peer receivables to localStorage
+  const updatePeerReceivables = (updater: (prev: PeerReceivableItem[]) => PeerReceivableItem[]) => {
+    setPeerReceivables((prev) => {
+      const updated = updater(prev);
+      try {
+        localStorage.setItem('wt_peer_receivables', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+  };
 
   const togglePrivacyMode = () => {
     setPrivacyMode((prev) => {
@@ -128,12 +151,14 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     setExpenses([]);
     setPayables([]);
     setLoans([]);
+    updatePeerReceivables(() => []);
   };
 
   const resetDefaultData = () => {
     setExpenses(INITIAL_EXPENSES);
     setPayables(INITIAL_PAYABLES);
     setLoans(INITIAL_LOANS);
+    updatePeerReceivables(() => INITIAL_PEER_RECEIVABLES);
   };
 
   // Expose global helper for testing and demonstration
@@ -144,9 +169,10 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         resetDefaultData,
         importExpenses,
         getExpenses: () => expenses,
+        getPeerReceivables: () => peerReceivables,
       };
     }
-  }, [expenses]);
+  }, [expenses, peerReceivables]);
 
   const addPayable = (item: Omit<PayableItem, 'id' | 'status'>) => {
     const newPayable: PayableItem = {
@@ -168,6 +194,31 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     setLoans((prev) => [newLoan, ...prev]);
   };
 
+  const addPeerReceivable = (item: Omit<PeerReceivableItem, 'id' | 'status'>) => {
+    const newReceivable: PeerReceivableItem = {
+      ...item,
+      id: `pr-${Date.now()}`,
+      status: 'pending',
+    };
+    updatePeerReceivables((prev) => [newReceivable, ...prev]);
+    // Also record an outflow on the day given so money leaving the account is accurately logged
+    addExpense({
+      title: `${item.friendName} (Advance)`,
+      subtitle: item.note || 'Peer Advance (Awaiting Return)',
+      category: 'Miscellaneous',
+      paidWith: item.paymentMethod || 'UPI Transfer',
+      amount: item.amount,
+    });
+  };
+
+  const markReceivableReceived = (id: string) => {
+    updatePeerReceivables((prev) =>
+      prev.map((r) =>
+        r.id === id ? { ...r, status: 'received' as const, settledDate: 'Today' } : r
+      )
+    );
+  };
+
   const recordPayout = (id: string) => {
     setPayables((prev) => prev.filter((p) => p.id !== id));
   };
@@ -178,6 +229,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         expenses,
         payables,
         loans,
+        peerReceivables,
         userProfile,
         privacyMode,
         togglePrivacyMode,
@@ -198,6 +250,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         resetDefaultData,
         addPayable,
         addLoan,
+        addPeerReceivable,
+        markReceivableReceived,
         recordPayout,
       }}
     >
