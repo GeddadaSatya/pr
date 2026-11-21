@@ -49,6 +49,13 @@
   --gold-light: #fef9e7;
 }
 
+*,
+*::before,
+*::after {
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+}
+
 body {
   background-color: #f8fafc;
   font-family: var(--font-manrope), sans-serif;
@@ -72,6 +79,24 @@ body {
   direction: ltr;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Dedicated numeric KPI display class: uses Manrope with lining numbers so digits NEVER dance up and down */
+.font-kpi-val {
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 26px;
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-feature-settings: "lnum" 1, "tnum" 1;
+}
+
+@media (min-width: 768px) {
+  .font-kpi-val {
+    font-size: 32px;
+    line-height: 40px;
+  }
 }
 
 /* Custom typography classes matching design with strict lining numbers */

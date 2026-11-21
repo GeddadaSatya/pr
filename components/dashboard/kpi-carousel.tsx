@@ -81,7 +81,7 @@ export function KpiCarousel() {
             <div className="flex flex-col">
               <span className="font-label-caps text-[11px] uppercase text-slate-500">Total Property &amp; Assets</span>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-headline-lg-mobile md:font-headline-lg text-slate-900 font-semibold tracking-tight">
+                <span className="font-kpi-val text-slate-900 tracking-tight">
                   {privacyMode ? '••••••' : '₹6,20,000'}
                 </span>
                 <span className="font-label-numeric text-xs text-slate-500">{privacyMode ? '' : '.00'}</span>
@@ -117,7 +117,7 @@ export function KpiCarousel() {
                 </span>
               </div>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-headline-lg-mobile md:font-headline-lg text-red-700 font-semibold tracking-tight">
+                <span className="font-kpi-val text-red-700 tracking-tight">
                   {privacyMode ? '••••••' : `₹${totalPayables.toLocaleString('en-IN')}`}
                 </span>
                 <span className="font-label-numeric text-xs text-slate-500">{privacyMode ? '' : '.00'}</span>
@@ -156,7 +156,7 @@ export function KpiCarousel() {
                 </span>
               </div>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-headline-lg-mobile md:font-headline-lg text-slate-900 font-semibold tracking-tight">
+                <span className="font-kpi-val text-slate-900 tracking-tight">
                   {privacyMode ? '••••••' : `₹${totalLoans.toLocaleString('en-IN')}`}
                 </span>
                 <span className="font-label-numeric text-xs text-slate-500">{privacyMode ? '' : '.00'}</span>
@@ -179,7 +179,7 @@ export function KpiCarousel() {
             <div className="flex flex-col">
               <span className="font-label-caps text-[11px] uppercase text-slate-500">This Month&apos;s Expenses</span>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-headline-lg-mobile md:font-headline-lg text-slate-900 font-semibold tracking-tight">
+                <span className="font-kpi-val text-slate-900 tracking-tight">
                   {formatCurrency(totalExpenses, privacyMode)}
                 </span>
               </div>

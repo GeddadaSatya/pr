@@ -293,7 +293,7 @@ export function DayLedgerModal({
                     TODAY&apos;S INFLOW
                   </span>
                   <div className="flex items-baseline gap-1 mt-1">
-                    <span className="font-headline-lg-mobile md:font-headline-lg text-slate-900 font-semibold tracking-tight">
+                    <span className="font-kpi-val text-slate-900 tracking-tight">
                       {privacyMode ? '••••••' : `₹${Math.floor(dayConfig.inflow).toLocaleString('en-IN')}`}
                     </span>
                     <span className="font-label-numeric text-xs text-slate-400 font-medium">
@@ -330,10 +330,10 @@ export function DayLedgerModal({
                     TODAY&apos;S OUTFLOW
                   </span>
                   <div className="flex items-baseline gap-1 mt-1">
-                    <span className="font-headline-lg-mobile md:font-headline-lg text-red-700 font-semibold tracking-tight">
+                    <span className="font-kpi-val text-slate-900 tracking-tight">
                       {privacyMode ? '••••••' : `₹${Math.floor(dayConfig.outflow).toLocaleString('en-IN')}`}
                     </span>
-                    <span className="font-label-numeric text-xs text-red-400 font-medium">
+                    <span className="font-label-numeric text-xs text-slate-500 font-medium">
                       {privacyMode ? '' : '.00'}
                     </span>
                   </div>
@@ -451,8 +451,8 @@ export function DayLedgerModal({
 
                   {/* Right Side: Amount */}
                   <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
-                    <span className="text-base font-bold text-slate-900 tracking-tight">
-                      {privacyMode ? '••••••' : `₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                    <span className="text-base font-bold text-slate-900 tracking-tight font-label-numeric">
+                      {privacyMode ? '••••••' : `-₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
                     </span>
                   </div>
                 </div>

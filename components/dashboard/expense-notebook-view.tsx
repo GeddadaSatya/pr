@@ -254,7 +254,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           </div>
           <div>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="font-headline-lg-mobile md:font-headline-lg text-slate-900 font-semibold tracking-tight">
+              <span className="font-kpi-val text-slate-900 tracking-tight">
                 {privacyMode ? '••••••' : '₹228'}
               </span>
               <span className="font-label-numeric text-xs text-slate-500 font-medium">
@@ -280,10 +280,10 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           </div>
           <div>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="font-headline-lg-mobile md:font-headline-lg text-red-700 font-semibold tracking-tight">
+              <span className="font-kpi-val text-slate-900 tracking-tight">
                 {privacyMode ? '••••••' : '₹7,068'}
               </span>
-              <span className="font-label-numeric text-xs text-red-500 font-medium">
+              <span className="font-label-numeric text-xs text-slate-500 font-medium">
                 {privacyMode ? '' : '.40'}
               </span>
             </div>
@@ -308,7 +308,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           </div>
           <div>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="font-headline-lg-mobile md:font-headline-lg text-slate-900 font-semibold tracking-tight">
+              <span className="font-kpi-val text-slate-900 tracking-tight">
                 42
               </span>
               <span className="text-sm font-semibold text-slate-600 ml-1">Entries</span>
@@ -547,8 +547,11 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-serif font-bold text-slate-900">
-                      {privacyMode ? '••••••' : `₹${group.total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                    <span className="text-xs font-medium text-slate-500 font-label-numeric flex items-baseline gap-1">
+                      <span>Total:</span>
+                      <span className="text-sm font-bold text-slate-900">
+                        {privacyMode ? '••••••' : `₹${group.total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                      </span>
                     </span>
                     <button
                       type="button"
@@ -608,8 +611,8 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
 
                       {/* Right Side: Amount */}
                       <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
-                        <span className="text-base font-bold text-slate-900 tracking-tight">
-                          {privacyMode ? '••••••' : `₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                        <span className="text-base font-bold text-slate-900 tracking-tight font-label-numeric">
+                          {privacyMode ? '••••••' : `-₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
                         </span>
                       </div>
                     </div>
