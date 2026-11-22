@@ -1645,7 +1645,6 @@ export function LoansInterestView() {
                             arrow_forward
                           </span>
                         </span>
-                        <span className="material-symbols-outlined text-sm text-[#9a761e]">check_circle</span>
                       </div>
                       <span className="text-xs text-[#76777d] mt-0.5">{b.contactOrNote}</span>
                       <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
@@ -1685,18 +1684,13 @@ export function LoansInterestView() {
                     </div>
                   </div>
 
-                  {/* Middle Right: Strict Due Date & Settlement Channel */}
+                  {/* Middle Right: Strict Due Date */}
                   <div className="flex flex-col text-xs text-[#45464d] min-w-[180px]">
                     <span className="text-[10px] uppercase font-semibold text-[#76777d]">STRICT DUE DATE</span>
                     <div className="flex items-center gap-1 font-semibold text-[#0f172a] mt-0.5">
                       <span className="material-symbols-outlined text-sm text-[#9a761e]">calendar_today</span>
                       <span>{b.nextDueDate}</span>
                       <span className="text-[11px] font-normal text-[#76777d]">({b.dueCountdownText})</span>
-                    </div>
-                    <span className="text-[10px] uppercase font-semibold text-[#76777d] mt-1.5">SETTLEMENT CHANNEL</span>
-                    <div className="flex items-center gap-1 text-[11px] text-[#45464d] mt-0.5 truncate">
-                      <span className="material-symbols-outlined text-xs text-[#76777d]">account_balance</span>
-                      <span className="truncate">{b.settlementChannel || b.paymentMode}</span>
                     </div>
                   </div>
 
@@ -1719,25 +1713,6 @@ export function LoansInterestView() {
                     </button>
                   </div>
                 </div>
-
-                {/* Optional Note / Attachment Card */}
-                {b.noteText && (
-                  <div className="p-2.5 rounded-xl bg-[#f8fafc] border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[#45464d]">
-                    <div className="flex items-start gap-1.5">
-                      <span className="material-symbols-outlined text-sm text-[#76777d] mt-0.5">article</span>
-                      <div>
-                        <strong className="text-[#0f172a] font-semibold">{b.noteTitle || 'Note'}:</strong>{' '}
-                        {b.noteText}
-                      </div>
-                    </div>
-                    {b.attachmentName && (
-                      <span className="inline-flex items-center gap-1 text-xs text-[#0f172a] hover:text-[#9a761e] font-medium shrink-0 transition-colors cursor-pointer">
-                        <span className="material-symbols-outlined text-sm text-[#9a761e]">description</span>
-                        <span>{b.attachmentName}</span>
-                      </span>
-                    )}
-                  </div>
-                )}
               </div>
             ))}
           </div>
