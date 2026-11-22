@@ -956,17 +956,17 @@ export function LoansInterestView() {
               <div>
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-[#76777d] block uppercase tracking-wider font-semibold">
-                    {isCompound ? 'Monthly Interest (Compounding)' : 'Monthly Interest'}
+                    Monthly Interest
                   </span>
                   {isCompound && (
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200 shrink-0">
                       Grows monthly
                     </span>
                   )}
                 </div>
 
                 {isCompound && parsedTenure > 1 ? (
-                  <div className="mt-1 flex flex-col gap-1">
+                  <div className="mt-0.5 flex flex-col gap-1">
                     <div className="flex items-baseline justify-between gap-1">
                       <span className="text-xs text-[#76777d]">1st Month:</span>
                       <AmountDisplay amount={monthlySchedule.firstMonthInterest} color="text-[#9a761e]" size="base" />
