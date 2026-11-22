@@ -23,13 +23,47 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
   const [showCategoryConfirmModal, setShowCategoryConfirmModal] = useState(false);
   const [categoryHighlight, setCategoryHighlight] = useState(false);
   const [parsedQuickEntry, setParsedQuickEntry] = useState<{ title: string; amount: string } | null>(null);
-  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
   const [selectedDateFilter, setSelectedDateFilter] = useState('all');
   const [isDateFilterOpen, setIsDateFilterOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  // Per-day search and category filters
+  const [dayFilters, setDayFilters] = useState<Record<string, { search: string; category: string }>>({
+    '2026-10-28': { search: '', category: 'all' },
+    '2026-10-27': { search: '', category: 'all' },
+    '2026-10-25': { search: '', category: 'all' },
+  });
+
+  const handleDaySearchChange = (dateKey: string, search: string) => {
+    setDayFilters((prev) => ({
+      ...prev,
+      [dateKey]: {
+        search,
+        category: prev[dateKey]?.category || 'all',
+      },
+    }));
+  };
+
+  const handleDayCategoryChange = (dateKey: string, category: string) => {
+    setDayFilters((prev) => ({
+      ...prev,
+      [dateKey]: {
+        search: prev[dateKey]?.search || '',
+        category,
+      },
+    }));
+  };
+
+  const handleClearDayFilters = (dateKey: string) => {
+    setDayFilters((prev) => ({
+      ...prev,
+      [dateKey]: {
+        search: '',
+        category: 'all',
+      },
+    }));
+  };
 
   // Sync any newly added expenses from FinanceContext into notebook entries
   useEffect(() => {
@@ -73,55 +107,43 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
     }
   }, [expenses]);
 
-  // Group entries by date and apply filters
-  const filteredEntries = entries.filter((item) => {
-    const matchesCategory =
-      selectedCategoryFilter === 'all' ||
-      item.category.toLowerCase().includes(selectedCategoryFilter.toLowerCase()) ||
-      item.tag.toLowerCase().includes(selectedCategoryFilter.toLowerCase());
-    const matchesSearch =
-      searchTerm.trim() === '' ||
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.paidWith.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.tag.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const filterDayItems = (dateKey: string, rawItems: NotebookEntry[]) => {
+    const filter = dayFilters[dateKey] || { search: '', category: 'all' };
+    return rawItems.filter((item) => {
+      const matchesCategory =
+        filter.category === 'all' ||
+        item.category.toLowerCase().includes(filter.category.toLowerCase()) ||
+        item.tag.toLowerCase().includes(filter.category.toLowerCase());
+      const matchesSearch =
+        filter.search.trim() === '' ||
+        item.title.toLowerCase().includes(filter.search.toLowerCase()) ||
+        item.subtitle.toLowerCase().includes(filter.search.toLowerCase()) ||
+        item.paidWith.toLowerCase().includes(filter.search.toLowerCase()) ||
+        item.category.toLowerCase().includes(filter.search.toLowerCase()) ||
+        item.tag.toLowerCase().includes(filter.search.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  };
 
-  const todayItems = filteredEntries.filter((e) => e.dateGroup === 'Today, October 28');
-  const todayTotal = todayItems.reduce((sum, item) => sum + item.amount, 0);
-
-  const sundayItems = filteredEntries.filter((e) => e.dateGroup === 'Sunday, October 27');
-  const sundayTotal = sundayItems.reduce((sum, item) => sum + item.amount, 0);
-
-  const fridayItems = filteredEntries.filter((e) => e.dateGroup === 'Friday, October 25');
-  const fridayTotal = fridayItems.reduce((sum, item) => sum + item.amount, 0);
+  const rawTodayItems = entries.filter((e) => e.dateGroup === 'Today, October 28');
+  const rawSundayItems = entries.filter((e) => e.dateGroup === 'Sunday, October 27');
+  const rawFridayItems = entries.filter((e) => e.dateGroup === 'Friday, October 25');
 
   const dateGroups = [
     {
-      dateGroup: 'Today, October 28',
+      dateGroup: 'TODAY, OCTOBER 28',
       dateKey: '2026-10-28',
-      badge: `${todayItems.length} ${todayItems.length === 1 ? 'ENTRY' : 'ENTRIES'}`,
-      badgeColor: 'bg-amber-100/70 text-amber-900 border-amber-200/60',
-      total: todayTotal,
-      items: todayItems,
+      rawItems: rawTodayItems,
     },
     {
-      dateGroup: 'Sunday, October 27',
+      dateGroup: 'SUNDAY, OCTOBER 27',
       dateKey: '2026-10-27',
-      badge: `${sundayItems.length} ${sundayItems.length === 1 ? 'ENTRY' : 'ENTRIES'}`,
-      badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
-      total: sundayTotal,
-      items: sundayItems,
+      rawItems: rawSundayItems,
     },
     {
-      dateGroup: 'Friday, October 25',
+      dateGroup: 'FRIDAY, OCTOBER 25',
       dateKey: '2026-10-25',
-      badge: `${fridayItems.length} ${fridayItems.length === 1 ? 'ENTRY' : 'ENTRIES'}`,
-      badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
-      total: fridayTotal,
-      items: fridayItems,
+      rawItems: rawFridayItems,
     },
   ];
 
@@ -140,6 +162,9 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
     selectedDateFilter === 'all'
       ? dateGroups
       : dateGroups.filter((g) => g.dateKey === selectedDateFilter);
+
+  const sortedDateGroups =
+    sortOrder === 'oldest' ? [...visibleDateGroups].reverse() : visibleDateGroups;
 
   const initialNotebookIds = new Set(INITIAL_NOTEBOOK_ENTRIES.map((e) => e.id));
   const dynamicExpensesAdded = entries.filter((e) => !initialNotebookIds.has(e.id));
@@ -576,69 +601,6 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
               )}
             </div>
 
-            {/* Filter Dropdown */}
-            <div className="relative flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
-                  selectedCategoryFilter !== 'all'
-                    ? 'bg-amber-50 border-amber-300 text-amber-900 shadow-2xs'
-                    : 'bg-slate-100 hover:bg-slate-200/80 border-slate-200 text-slate-700'
-                }`}
-              >
-                <span>
-                  {selectedCategoryFilter === 'all'
-                    ? 'All Categories'
-                    : selectedCategoryFilter}
-                </span>
-                <span className="material-symbols-outlined text-sm text-slate-500">expand_more</span>
-              </button>
-
-              {selectedCategoryFilter !== 'all' && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedCategoryFilter('all')}
-                  className="h-9 w-7 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
-                  title="Clear category filter"
-                  aria-label="Clear category filter"
-                >
-                  <span className="material-symbols-outlined text-xs">close</span>
-                </button>
-              )}
-
-              {isCategoryOpen && (
-                <div className="absolute left-0 mt-1 w-52 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-30 animate-fade-in top-full">
-                  {[
-                    { key: 'all', label: 'All Categories' },
-                    { key: 'Dining', label: 'Dining' },
-                    { key: 'Travel', label: 'Travel & Logistics' },
-                    { key: 'Hardware', label: 'Hardware & Tech' },
-                    { key: 'Tech', label: 'Tech & Infra' },
-                    { key: 'Hosting', label: 'Client Hosting' },
-                    { key: 'Legal', label: 'Legal & Retainers' },
-                    { key: 'Real Estate', label: 'Real Estate & Maint.' },
-                    { key: 'Wellness', label: 'Wellness' },
-                  ].map((cat) => (
-                    <button
-                      key={cat.key}
-                      type="button"
-                      onClick={() => {
-                        setSelectedCategoryFilter(cat.key);
-                        setIsCategoryOpen(false);
-                      }}
-                      className="w-full px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 flex items-center justify-between cursor-pointer"
-                    >
-                      <span>{cat.label}</span>
-                      {selectedCategoryFilter === cat.key && (
-                        <span className="material-symbols-outlined text-sm text-[#b48e28]">check</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {/* Sort Toggle */}
             <button
               type="button"
@@ -671,152 +633,113 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           </div>
         </div>
 
-        {/* Search & Category Filter Controls Bar (Matching Reference Design with Individual Clear Controls) */}
-        <div className="flex flex-col gap-2 pt-1">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            {/* Search Box with Individual Clear Button */}
-            <div className="relative flex items-center w-full sm:w-auto">
-              <span className="material-symbols-outlined absolute left-2.5 text-slate-400 text-base pointer-events-none">
-                search
-              </span>
-              <input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className={`h-9 pl-8 ${searchTerm ? 'pr-8' : 'pr-3'} text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-full sm:w-64 shadow-xs`}
-                placeholder="Search transactions..."
-                type="text"
-              />
-              {searchTerm && (
-                <button
-                  type="button"
-                  onClick={() => setSearchTerm('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
-                  title="Clear search"
-                  aria-label="Clear search"
-                >
-                  <span className="material-symbols-outlined text-sm leading-none">close</span>
-                </button>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-              {/* Category Filter with Individual Clear Button */}
-              <div className="flex items-center gap-1.5 flex-1 sm:flex-initial">
-                <div className="relative flex items-center flex-1 sm:flex-initial">
-                  <span className="material-symbols-outlined absolute left-2.5 text-slate-500 text-sm pointer-events-none">
-                    filter_list
-                  </span>
-                  <select
-                    value={selectedCategoryFilter}
-                    onChange={(e) => setSelectedCategoryFilter(e.target.value)}
-                    className={`h-9 w-full sm:w-[155px] pl-8 pr-7 text-xs font-semibold rounded-lg border transition-all shadow-xs cursor-pointer ${
-                      selectedCategoryFilter !== 'all'
-                        ? 'bg-amber-50/70 border-amber-300 text-amber-950 font-bold'
-                        : 'bg-white border-slate-200 text-slate-800 hover:border-[#d4af37]'
-                    }`}
-                  >
-                    <option value="all">All Categories</option>
-                    <option value="Dining">Dining</option>
-                    <option value="Travel">Travel &amp; Logistics</option>
-                    <option value="Hardware">Hardware &amp; Tech</option>
-                    <option value="Tech">Tech &amp; Infra</option>
-                    <option value="Hosting">Client Hosting</option>
-                    <option value="Legal">Legal &amp; Retainers</option>
-                    <option value="Real Estate">Real Estate &amp; Maintenance</option>
-                    <option value="Wellness">Wellness</option>
-                  </select>
-                </div>
-
-                {selectedCategoryFilter !== 'all' && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCategoryFilter('all')}
-                    className="h-9 w-9 rounded-lg border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 hover:text-amber-950 flex items-center justify-center transition-colors cursor-pointer shadow-xs shrink-0"
-                    title="Clear category filter"
-                    aria-label="Clear category filter"
-                  >
-                    <span className="material-symbols-outlined text-sm">close</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Combined Master Clear Filters */}
-              <button
-                onClick={() => {
-                  setSelectedCategoryFilter('all');
-                  setSelectedDateFilter('all');
-                  setSearchTerm('');
-                }}
-                className={`h-9 px-3 rounded-lg border text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer ${
-                  searchTerm || selectedCategoryFilter !== 'all' || selectedDateFilter !== 'all'
-                    ? 'border-amber-300 bg-[#fef9e7] hover:bg-[#fdf3ce] text-[#9a761e] font-bold'
-                    : 'border-slate-200 bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900'
-                }`}
-                title="Clear all filters"
-                type="button"
-              >
-                <span className="material-symbols-outlined text-sm">restart_alt</span>
-                <span>Clear Filters</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Active Filter Tags / Indicator */}
-          {(searchTerm || selectedCategoryFilter !== 'all' || selectedDateFilter !== 'all') && (
-            <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs text-slate-500">
-              <span className="text-[11px] font-medium text-slate-400">Active filters:</span>
-              {searchTerm && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-800 text-[11px] font-medium">
-                  <span>Search: &ldquo;{searchTerm}&rdquo;</span>
-                  <button
-                    type="button"
-                    onClick={() => setSearchTerm('')}
-                    className="hover:text-red-600 cursor-pointer flex items-center"
-                    title="Clear search"
-                  >
-                    <span className="material-symbols-outlined text-xs">close</span>
-                  </button>
-                </span>
-              )}
-              {selectedCategoryFilter !== 'all' && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-medium">
-                  <span>Category: {selectedCategoryFilter}</span>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCategoryFilter('all')}
-                    className="hover:text-red-600 cursor-pointer flex items-center"
-                    title="Clear category filter"
-                  >
-                    <span className="material-symbols-outlined text-xs">close</span>
-                  </button>
-                </span>
-              )}
-              {selectedDateFilter !== 'all' && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 border border-blue-200 text-blue-900 text-[11px] font-medium">
-                  <span>Date: {selectedDateFilterLabel}</span>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedDateFilter('all')}
-                    className="hover:text-red-600 cursor-pointer flex items-center"
-                    title="Clear date filter"
-                  >
-                    <span className="material-symbols-outlined text-xs">close</span>
-                  </button>
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Date-Grouped Daywise Tables */}
+        {/* Date-Grouped Daywise Tables (Matching Reference Design: Each day has its own header with search & category filters) */}
         <div className="flex flex-col gap-6">
-          {visibleDateGroups.map((group) => {
-            if (group.items.length === 0) return null;
-
-            const displayedItems = group.items.slice(0, 5);
+          {sortedDateGroups.map((group) => {
+            const dayFilter = dayFilters[group.dateKey] || { search: '', category: 'all' };
+            const dayItems = filterDayItems(group.dateKey, group.rawItems);
+            const displayedItems = dayItems.slice(0, 5);
+            const dayTotal = dayItems.reduce((sum, item) => sum + item.amount, 0);
+            const isDayFiltered = Boolean(dayFilter.search || dayFilter.category !== 'all');
 
             return (
-              <div key={group.dateKey} className="flex flex-col rounded-xl border border-slate-200/80 overflow-hidden shadow-2xs">
+              <div key={group.dateKey} className="flex flex-col rounded-xl border border-slate-200/80 overflow-hidden shadow-2xs bg-white">
+                {/* Day Header Bar: Date Title on left with search; Category & Clear Filters on right */}
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 px-4 py-3 bg-white border-b border-slate-200/80">
+                  {/* Left: Date Group Title & Search input */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="text-[11px] sm:text-xs font-bold text-slate-800 uppercase tracking-wider">
+                      {group.dateGroup} • {dayItems.length} {dayItems.length === 1 ? 'ENTRY' : 'ENTRIES'} • TOTAL:{' '}
+                      {privacyMode ? (
+                        '••••••'
+                      ) : (
+                        <span className="font-serif font-bold text-slate-900">
+                          ₹{dayTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        </span>
+                      )}
+                    </span>
+
+                    {/* Search Box with Individual Clear Button */}
+                    <div className="relative flex items-center">
+                      <span className="material-symbols-outlined absolute left-2 text-slate-400 text-sm pointer-events-none">
+                        search
+                      </span>
+                      <input
+                        value={dayFilter.search}
+                        onChange={(e) => handleDaySearchChange(group.dateKey, e.target.value)}
+                        className={`h-7.5 pl-6.5 ${dayFilter.search ? 'pr-6.5' : 'pr-2'} text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-36 sm:w-52 shadow-2xs`}
+                        placeholder="Search transactions..."
+                        type="text"
+                      />
+                      {dayFilter.search && (
+                        <button
+                          type="button"
+                          onClick={() => handleDaySearchChange(group.dateKey, '')}
+                          className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer flex items-center justify-center p-0.5"
+                          title="Clear search"
+                        >
+                          <span className="material-symbols-outlined text-xs leading-none">close</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right: Category Dropdown & Clear Filters */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      <div className="relative flex items-center">
+                        <span className="material-symbols-outlined absolute left-2 text-slate-500 text-xs pointer-events-none">
+                          filter_list
+                        </span>
+                        <select
+                          value={dayFilter.category}
+                          onChange={(e) => handleDayCategoryChange(group.dateKey, e.target.value)}
+                          className={`h-7.5 pl-6 pr-6 text-xs font-semibold rounded-lg border transition-all shadow-2xs cursor-pointer ${
+                            dayFilter.category !== 'all'
+                              ? 'bg-amber-50/80 border-amber-300 text-amber-950 font-bold'
+                              : 'bg-white border-slate-200 text-slate-700 hover:border-[#d4af37]'
+                          }`}
+                        >
+                          <option value="all">All Categories</option>
+                          <option value="Dining">Dining</option>
+                          <option value="Travel">Travel &amp; Logistics</option>
+                          <option value="Hardware">Hardware &amp; Tech</option>
+                          <option value="Tech">Tech &amp; Infra</option>
+                          <option value="Hosting">Client Hosting</option>
+                          <option value="Legal">Legal &amp; Retainers</option>
+                          <option value="Real Estate">Real Estate &amp; Maintenance</option>
+                          <option value="Wellness">Wellness</option>
+                        </select>
+                      </div>
+
+                      {dayFilter.category !== 'all' && (
+                        <button
+                          type="button"
+                          onClick={() => handleDayCategoryChange(group.dateKey, 'all')}
+                          className="h-7.5 w-6 rounded-lg border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 flex items-center justify-center transition-colors cursor-pointer shadow-2xs shrink-0"
+                          title="Clear category filter"
+                        >
+                          <span className="material-symbols-outlined text-xs">close</span>
+                        </button>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => handleClearDayFilters(group.dateKey)}
+                      className={`h-7.5 px-2.5 rounded-lg border text-xs font-semibold transition-colors flex items-center justify-center gap-1 shadow-2xs shrink-0 cursor-pointer ${
+                        isDayFiltered
+                          ? 'border-amber-300 bg-[#fef9e7] hover:bg-[#fdf3ce] text-[#9a761e] font-bold'
+                          : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900'
+                      }`}
+                      title="Clear filters"
+                      type="button"
+                    >
+                      <span className="material-symbols-outlined text-xs">restart_alt</span>
+                      <span>Clear Filters</span>
+                    </button>
+                  </div>
+                </div>
+
                 {/* Day Table */}
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse table-fixed min-w-[760px]">
@@ -828,80 +751,112 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                       <col className="w-[14%]" />
                     </colgroup>
                     <thead>
-                      <tr className="text-slate-600 text-[11px] uppercase tracking-wider bg-slate-50 border-b border-slate-200/80">
-                        <th className="w-[38%] py-2.5 px-4 font-semibold text-slate-800 text-xs truncate">
-                          {group.dateGroup} • {group.items.length} {group.items.length === 1 ? 'Entry' : 'Entries'} • Total: {privacyMode ? '••••••' : `₹${group.total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                      <tr className="text-slate-500 text-[11px] uppercase tracking-wider bg-slate-50/70 border-b border-slate-200/80">
+                        <th className="w-[38%] py-2.5 px-4 font-semibold text-xs text-left">
+                          EXPENSE TITLE
                         </th>
-                        <th className="w-[18%] py-2.5 px-4 text-center text-xs">CATEGORY</th>
-                        <th className="w-[18%] py-2.5 px-4 text-xs">PAID WITH</th>
-                        <th className="w-[12%] py-2.5 px-4 text-xs">DATE &amp; TIME</th>
-                        <th className="w-[14%] py-2.5 px-4 text-right text-xs">AMOUNT</th>
+                        <th className="w-[18%] py-2.5 px-4 text-center text-xs font-semibold">
+                          CATEGORY
+                        </th>
+                        <th className="w-[18%] py-2.5 px-4 text-xs font-semibold text-left">
+                          PAID WITH
+                        </th>
+                        <th className="w-[12%] py-2.5 px-4 text-xs font-semibold text-left">
+                          DATE &amp; TIME
+                        </th>
+                        <th className="w-[14%] py-2.5 px-4 text-right text-xs font-semibold">
+                          AMOUNT
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 bg-white">
-                      {displayedItems.map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                          {/* Item details */}
-                          <td className="w-[38%] py-3 px-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-slate-700 shrink-0">
-                                <span className="material-symbols-outlined text-base">{item.icon}</span>
-                              </div>
-                              <div className="flex flex-col min-w-0">
-                                <span className="text-sm font-semibold text-slate-900 truncate">
-                                  {item.title}
-                                </span>
-                                <span className="text-xs text-slate-500 truncate">
-                                  {item.subtitle}
-                                </span>
-                              </div>
+                      {displayedItems.length === 0 ? (
+                        <tr>
+                          <td colSpan={5} className="py-8 text-center text-xs text-slate-500">
+                            <div className="flex flex-col items-center justify-center gap-1.5">
+                              <span className="material-symbols-outlined text-slate-400 text-lg">search_off</span>
+                              <span>No transactions match your search or filter criteria for this day.</span>
+                              <button
+                                type="button"
+                                onClick={() => handleClearDayFilters(group.dateKey)}
+                                className="text-[11px] text-[#b48e28] hover:underline font-semibold mt-0.5 cursor-pointer"
+                              >
+                                Reset day filters
+                              </button>
                             </div>
                           </td>
-
-                          {/* Category pill */}
-                          <td className="w-[18%] py-3 px-4 text-center">
-                            <span
-                              className={`inline-block px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                                item.category.includes('Travel')
-                                  ? 'bg-amber-100/70 text-amber-900 border border-amber-200/60'
-                                  : item.category.includes('Tech') || item.category.includes('Hardware')
-                                  ? 'bg-slate-100 text-slate-800 border border-slate-200/60'
-                                  : item.category.includes('Dining')
-                                  ? 'bg-blue-50/70 text-blue-900 border border-blue-200/60'
-                                  : 'bg-slate-100 text-slate-700 border border-slate-200/60'
-                              }`}
-                            >
-                              {item.category}
-                            </span>
-                          </td>
-
-                          {/* Paid With */}
-                          <td className="w-[18%] py-3 px-4 text-xs text-slate-600 font-medium whitespace-nowrap truncate">
-                            {item.paidWith}
-                          </td>
-
-                          {/* Date & Time */}
-                          <td className="w-[12%] py-3 px-4 text-xs text-slate-500 whitespace-nowrap truncate">
-                            {item.time || item.dateTime}
-                          </td>
-
-                          {/* Amount */}
-                          <td className="w-[14%] py-3 px-4 text-right whitespace-nowrap">
-                            {privacyMode ? (
-                              <span className="text-sm font-bold text-slate-900 tracking-tight font-serif">••••••</span>
-                            ) : (
-                              <div className="inline-flex items-baseline justify-end gap-0.5">
-                                <span className="font-serif font-bold text-sm text-red-700 tracking-tight">
-                                  -₹{Math.floor(item.amount).toLocaleString('en-IN')}
-                                </span>
-                                <span className="font-label-numeric text-xs text-red-500 font-medium">
-                                  .{(item.amount % 1).toFixed(2).split('.')[1] || '00'}
-                                </span>
-                              </div>
-                            )}
-                          </td>
                         </tr>
-                      ))}
+                      ) : (
+                        displayedItems.map((item, idx) => (
+                          <tr key={`${group.dateKey}-${item.id}-${idx}`} className="hover:bg-slate-50/80 transition-colors">
+                            {/* Item details */}
+                            <td className="w-[38%] py-3 px-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-slate-700 shrink-0">
+                                  <span className="material-symbols-outlined text-base">{item.icon}</span>
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                  <span className="text-sm font-semibold text-slate-900 truncate">
+                                    {item.title}
+                                  </span>
+                                  <span className="text-xs text-slate-500 truncate">
+                                    {item.subtitle}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Category pill */}
+                            <td className="w-[18%] py-3 px-4 text-center">
+                              <span
+                                className={`inline-block px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                                  item.category.includes('Travel')
+                                    ? 'bg-amber-100/70 text-amber-900 border border-amber-200/60'
+                                    : item.category.includes('Tech') || item.category.includes('Hardware')
+                                    ? 'bg-slate-100 text-slate-800 border border-slate-200/60'
+                                    : item.category.includes('Dining')
+                                    ? 'bg-blue-50/70 text-blue-900 border border-blue-200/60'
+                                    : item.category.includes('Hosting')
+                                    ? 'bg-slate-100 text-slate-700 border border-slate-200/60'
+                                    : item.category.includes('Legal')
+                                    ? 'bg-indigo-50/70 text-indigo-900 border border-indigo-200/60'
+                                    : item.category.includes('Real Estate')
+                                    ? 'bg-emerald-50/70 text-emerald-900 border border-emerald-200/60'
+                                    : 'bg-teal-50/70 text-teal-900 border border-teal-200/60'
+                                }`}
+                              >
+                                {item.category}
+                              </span>
+                            </td>
+
+                            {/* Paid With */}
+                            <td className="w-[18%] py-3 px-4 text-xs text-slate-600 font-medium whitespace-nowrap truncate">
+                              {item.paidWith}
+                            </td>
+
+                            {/* Date & Time */}
+                            <td className="w-[12%] py-3 px-4 text-xs text-slate-500 whitespace-nowrap truncate">
+                              {item.time || item.dateTime}
+                            </td>
+
+                            {/* Amount */}
+                            <td className="w-[14%] py-3 px-4 text-right whitespace-nowrap">
+                              {privacyMode ? (
+                                <span className="text-sm font-bold text-slate-900 tracking-tight font-serif">••••••</span>
+                              ) : (
+                                <div className="inline-flex items-baseline justify-end gap-0.5">
+                                  <span className="font-serif font-bold text-sm text-red-700 tracking-tight">
+                                    -₹{Math.floor(item.amount).toLocaleString('en-IN')}
+                                  </span>
+                                  <span className="font-label-numeric text-xs text-red-500 font-medium">
+                                    .{(item.amount % 1).toFixed(2).split('.')[1] || '00'}
+                                  </span>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -917,8 +872,8 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                       menu_book
                     </span>
                     <span>
-                      {group.items.length > 5
-                        ? `View All (${group.items.length} Entries) in Day Ledger`
+                      {dayItems.length > 5
+                        ? `View All (${dayItems.length} Entries) in Day Ledger`
                         : 'View Day Ledger'}
                     </span>
                     <span className="material-symbols-outlined text-sm text-slate-400 group-hover:text-slate-700 transition-colors">
@@ -929,39 +884,6 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
               </div>
             );
           })}
-
-          {/* Empty State when no transactions match */}
-          {visibleDateGroups.every((g) => g.items.length === 0) && (
-            <div className="py-12 px-4 text-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center gap-3 animate-fade-in">
-              <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200/60 flex items-center justify-center text-[#b48e28]">
-                <span className="material-symbols-outlined text-2xl">search_off</span>
-              </div>
-              <div className="flex flex-col gap-1 max-w-sm">
-                <h4 className="text-sm font-semibold text-slate-800">No transactions found</h4>
-                <p className="text-xs text-slate-500">
-                  {searchTerm && selectedCategoryFilter !== 'all'
-                    ? `No transactions matched "${searchTerm}" in ${selectedCategoryFilter}.`
-                    : searchTerm
-                    ? `No transactions matched "${searchTerm}".`
-                    : selectedCategoryFilter !== 'all'
-                    ? `No transactions found under ${selectedCategoryFilter}.`
-                    : 'No transactions found for the selected date.'}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCategoryFilter('all');
-                  setSelectedDateFilter('all');
-                }}
-                className="mt-1 h-8 px-3.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors shadow-xs cursor-pointer flex items-center gap-1.5"
-              >
-                <span className="material-symbols-outlined text-sm text-[#b48e28]">restart_alt</span>
-                <span>Reset All Filters</span>
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Notebook Bottom Pagination */}
