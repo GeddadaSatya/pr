@@ -285,20 +285,12 @@ export function LoansInterestView() {
     return clean ? parseInt(clean, 10) : 0;
   }, [simTenure]);
 
-  // Handle Clear All Calculator inputs
-  const handleClearAllCalculator = () => {
+  // Handle Reset Calculator (clears all calculator inputs)
+  const handleResetCalculator = () => {
     setSimPrincipal('');
     setSimRate('');
     setSimTenure('');
-    showToast('Cleared all calculator inputs');
-  };
-
-  // Handle Reset Calculator to standard defaults
-  const handleResetCalculator = () => {
-    setSimPrincipal('25000');
-    setSimRate('10');
-    setSimTenure('2');
-    showToast('Reset calculator to defaults');
+    showToast('Calculator reset');
   };
 
   // Notification Toast
@@ -741,23 +733,13 @@ export function LoansInterestView() {
               </div>
             </div>
 
-            {/* Actions: Clear All & Simple vs Compound Mode */}
+            {/* Actions: Reset & Simple vs Compound Mode */}
             <div className="flex items-center gap-2 flex-wrap">
-              <button
-                type="button"
-                onClick={handleClearAllCalculator}
-                className="h-8 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-semibold flex items-center gap-1 shadow-2xs transition-colors cursor-pointer"
-                title="Clear all calculator inputs to 0"
-              >
-                <span className="material-symbols-outlined text-sm text-slate-500">backspace</span>
-                <span>Clear All</span>
-              </button>
-
               <button
                 type="button"
                 onClick={handleResetCalculator}
                 className="h-8 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-semibold flex items-center gap-1 shadow-2xs transition-colors cursor-pointer"
-                title="Reset to 25k, 10%, 2mo"
+                title="Reset calculator inputs"
               >
                 <span className="material-symbols-outlined text-sm text-[#9a761e]">restart_alt</span>
                 <span>Reset</span>
