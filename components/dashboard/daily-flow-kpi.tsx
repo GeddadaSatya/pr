@@ -54,13 +54,11 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
       : 0;
 
   const netDaily = todayInflow - todayOutflow;
-  const dailyTarget = 4000;
-  const budgetUsedPercent = Math.min(Math.round((todayOutflow / dailyTarget) * 100), 100);
 
   return (
     <div className="w-full flex flex-col gap-2.5" id="daily-cash-pulse-section">
       {/* Section Header */}
-      <div className="flex items-center justify-between w-full flex-wrap gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-2">
         <div className="flex items-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
           <span className="font-label-caps text-xs text-slate-500 uppercase tracking-wider font-semibold">
@@ -68,10 +66,10 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
           </span>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
           {!isZeroData && (
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-medium text-slate-500 hidden sm:inline">
+              <span className="text-[11px] font-medium text-slate-500 hidden md:inline">
                 Net 24h Velocity:
               </span>
               <span
@@ -86,7 +84,7 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
                 </span>
                 {privacyMode
                   ? '••••••'
-                  : `${netDaily >= 0 ? '+' : '-'}₹${Math.abs(netDaily).toLocaleString('en-IN')}.00 Net ${
+                  : `${netDaily >= 0 ? '+' : '-'}₹${Math.abs(netDaily).toLocaleString('en-IN', { minimumFractionDigits: 2 })} Net ${
                       netDaily >= 0 ? 'Surplus' : 'Deficit'
                     }`}
               </span>
@@ -97,11 +95,10 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
             <button
               type="button"
               onClick={onOpenDayLedger}
-              className="text-xs font-semibold text-[#b48e28] hover:text-[#8c6b12] flex items-center gap-0.5 transition-colors cursor-pointer ml-1"
+              className="text-xs font-semibold text-[#b48e28] hover:text-[#8c6b12] flex items-center gap-0.5 transition-colors cursor-pointer ml-auto sm:ml-1"
               title="Open Day Ledger"
             >
-              <span className="hidden sm:inline">View Day Ledger</span>
-              <span className="sm:hidden">Day Ledger</span>
+              <span>Day Ledger</span>
               <span className="material-symbols-outlined text-sm">chevron_right</span>
             </button>
           )}
@@ -111,29 +108,29 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
       {/* 2-Card Grid: Desktop (gap-6) & Mobile (gap-3) */}
       <div className="grid grid-cols-2 gap-3 md:gap-6 w-full">
         {/* CARD 1: TODAY'S CASH INFLOW */}
-        <div className="bg-white p-3.5 md:p-5 rounded-xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-3 relative overflow-hidden">
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-3 relative overflow-hidden">
           {/* Emerald Top Accent Strip */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500" />
 
           {/* Top Label & Icon */}
           <div className="flex justify-between items-start">
             <div className="flex flex-col min-w-0">
-              <span className="font-label-caps text-[10px] md:text-[11px] uppercase text-slate-500 font-bold tracking-wider truncate">
+              <span className="font-label-caps text-[10px] sm:text-[11px] uppercase text-slate-500 font-bold tracking-wider truncate">
                 Today&apos;s Inflow
               </span>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight text-base sm:text-2xl md:text-3xl">
+                <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight text-lg sm:text-2xl md:text-3xl">
                   {privacyMode
                     ? '••••••'
-                    : `₹${todayInflow.toLocaleString('en-IN')}`}
+                    : `₹${Math.floor(todayInflow).toLocaleString('en-IN')}`}
                 </span>
                 <span className="font-label-numeric text-xs text-slate-500 font-medium">
-                  {privacyMode ? '' : '.00'}
+                  {privacyMode ? '' : `.${(todayInflow % 1).toFixed(2).split('.')[1] || '00'}`}
                 </span>
               </div>
             </div>
 
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-base sm:text-lg">
                 arrow_downward
               </span>
@@ -141,7 +138,7 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
           </div>
 
           {/* Bottom Comparison vs Yesterday */}
-          <div className="flex flex-col gap-1.5 pt-1 border-t border-slate-100">
+          <div className="flex flex-col gap-1.5 pt-2 border-t border-slate-100">
             {isZeroData ? (
               <span className="text-[11px] text-slate-400 font-medium">
                 No inflows recorded today
@@ -160,50 +157,50 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
                       -{privacyMode ? '•••' : `₹${Math.abs(inflowDiff).toLocaleString('en-IN')}`} ({inflowPercent}%)
                     </span>
                   )}
-                  <span className="text-[10px] md:text-[11px] text-slate-500 font-medium inline-flex items-center gap-1 whitespace-nowrap">
-                    <span>vs yesterday:</span>
-                    <span className="font-semibold text-slate-700 font-label-numeric">
-                      {privacyMode ? '••••' : `₹${yesterdayInflow.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-                    </span>
-                  </span>
                 </div>
+                <span className="text-[10px] md:text-[11px] text-slate-500 font-medium inline-flex items-center gap-1 whitespace-nowrap">
+                  <span>vs yesterday:</span>
+                  <span className="font-semibold text-slate-700 font-label-numeric">
+                    {privacyMode ? '••••' : `₹${yesterdayInflow.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                  </span>
+                </span>
               </>
             )}
           </div>
         </div>
 
-        {/* CARD 2: TODAY'S CASH OUTFLOW (WITH DAY-OVER-DAY SUBTRACTION) */}
-        <div className="bg-white p-3.5 md:p-5 rounded-xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-3 relative overflow-hidden">
+        {/* CARD 2: TODAY'S CASH OUTFLOW (MATCHING INFLOW LAYOUT - NO TARGET BAR) */}
+        <div className="bg-white p-3.5 sm:p-5 rounded-2xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-3 relative overflow-hidden">
           {/* Red Top Accent Strip */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-red-600" />
 
           {/* Top Label & Icon */}
           <div className="flex justify-between items-start">
             <div className="flex flex-col min-w-0">
-              <span className="font-label-caps text-[10px] md:text-[11px] uppercase text-slate-500 font-bold tracking-wider truncate">
+              <span className="font-label-caps text-[10px] sm:text-[11px] uppercase text-slate-500 font-bold tracking-wider truncate">
                 Today&apos;s Outflow
               </span>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-red-700 font-semibold tracking-tight text-base sm:text-2xl md:text-3xl">
+                <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-red-600 font-semibold tracking-tight text-lg sm:text-2xl md:text-3xl">
                   {privacyMode
                     ? '••••••'
-                    : `₹${todayOutflow.toLocaleString('en-IN')}`}
+                    : `₹${Math.floor(todayOutflow).toLocaleString('en-IN')}`}
                 </span>
-                <span className="font-label-numeric text-xs text-red-500 font-medium">
-                  {privacyMode ? '' : '.00'}
+                <span className="font-label-numeric text-xs text-red-400 font-medium">
+                  {privacyMode ? '' : `.${(todayOutflow % 1).toFixed(2).split('.')[1] || '00'}`}
                 </span>
               </div>
             </div>
 
-            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center shrink-0">
               <span className="material-symbols-outlined text-base sm:text-lg">
                 arrow_upward
               </span>
             </div>
           </div>
 
-          {/* Bottom Comparison vs Yesterday (Minus calculation) */}
-          <div className="flex flex-col gap-1.5 pt-1 border-t border-slate-100">
+          {/* Bottom Comparison vs Yesterday */}
+          <div className="flex flex-col gap-1.5 pt-2 border-t border-slate-100">
             {isZeroData ? (
               <span className="text-[11px] text-slate-400 font-medium">
                 0 outflows logged today
@@ -228,29 +225,13 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
                       Equal to yesterday
                     </span>
                   )}
-                  <span className="text-[10px] md:text-[11px] text-slate-500 font-medium inline-flex items-center gap-1 whitespace-nowrap">
-                    <span>vs yesterday:</span>
-                    <span className="font-semibold text-slate-700 font-label-numeric">
-                      {privacyMode ? '••••' : `₹${yesterdayOutflow.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-                    </span>
+                </div>
+                <span className="text-[10px] md:text-[11px] text-slate-500 font-medium inline-flex items-center gap-1 whitespace-nowrap">
+                  <span>vs yesterday:</span>
+                  <span className="font-semibold text-slate-700 font-label-numeric">
+                    {privacyMode ? '••••' : `₹${yesterdayOutflow.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
                   </span>
-                </div>
-
-                {/* Progress bar vs daily budget limit */}
-                <div className="flex flex-col gap-1 mt-0.5">
-                  <div className="flex items-center justify-between text-[10px] text-slate-500">
-                    <span>Target: {privacyMode ? '••••' : `₹${dailyTarget.toLocaleString('en-IN')}`}</span>
-                    <span className="font-semibold text-slate-700">{budgetUsedPercent}% used</span>
-                  </div>
-                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${
-                        budgetUsedPercent > 90 ? 'bg-red-500' : 'bg-[#fed65b]'
-                      }`}
-                      style={{ width: `${budgetUsedPercent}%` }}
-                    />
-                  </div>
-                </div>
+                </span>
               </>
             )}
           </div>
@@ -258,62 +239,61 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
       </div>
 
       {/* PENDING FRIEND ADVANCES (LOCATED BELOW KPI CARDS) */}
-      <div className="w-full bg-linear-to-r from-emerald-50/70 via-white to-amber-50/40 border border-emerald-200/80 rounded-xl p-3 md:p-3.5 shadow-xs flex flex-col gap-2.5 transition-all">
-        {/* Header Strip with Total Pending & Action Buttons */}
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-base">schedule</span>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-bold text-slate-800">
-                {pendingReceivables.length > 0
-                  ? `${pendingReceivables.length} ${pendingReceivables.length === 1 ? 'Friend Advance' : 'Advances'} Pending`
-                  : 'Friend Advances (Recoverable)'}
-              </span>
-              {pendingReceivables.length > 0 && (
-                <>
-                  <span className="text-xs text-slate-400">•</span>
-                  <span className="text-xs text-slate-600 font-medium">To get back:</span>
-                  <span className="text-xs font-bold font-label-numeric text-emerald-800">
-                    {privacyMode
-                      ? '••••••'
-                      : `₹${totalPendingReceivables.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-                  </span>
-                </>
-              )}
-            </div>
+      <div className="w-full bg-[#f0fdf4]/80 border border-emerald-200/90 rounded-2xl p-3 sm:p-3.5 shadow-xs flex flex-col gap-2.5 transition-all">
+        {/* Top Header Strip with Total Pending */}
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+            <span className="material-symbols-outlined text-sm">schedule</span>
           </div>
-
-          <div className="flex items-center gap-2">
-            {/* Quick "+ Given to Friend" Button */}
-            <button
-              type="button"
-              onClick={() => openModal('receive')}
-              className="px-2.5 py-1 rounded-md bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
-              title="Record money given to a friend awaiting return"
-            >
-              <span className="material-symbols-outlined text-sm text-emerald-600">handshake</span>
-              <span>+ Given to Friend</span>
-            </button>
-
-            {/* Collapse / Expand Toggle: By default COLLAPSED */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-bold text-slate-800">
+              {pendingReceivables.length > 0
+                ? `${pendingReceivables.length} ${pendingReceivables.length === 1 ? 'Advance' : 'Advances'} Pending`
+                : 'Friend Advances (Recoverable)'}
+            </span>
             {pendingReceivables.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setIsPendingExpanded(!isPendingExpanded)}
-                className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-0.5 px-2.5 py-1 rounded-md bg-white border border-slate-200 shadow-2xs cursor-pointer transition-colors"
-              >
-                <span>{isPendingExpanded ? 'Collapse' : `View All (${pendingReceivables.length})`}</span>
-                <span
-                  className="material-symbols-outlined text-sm transition-transform duration-200"
-                  style={{ transform: isPendingExpanded ? 'rotate(180deg)' : 'none' }}
-                >
-                  expand_more
+              <>
+                <span className="text-xs text-slate-400">•</span>
+                <span className="text-xs text-slate-600 font-medium">To get back:</span>
+                <span className="text-xs font-bold font-serif text-emerald-800">
+                  {privacyMode
+                    ? '••••••'
+                    : `₹${totalPendingReceivables.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
                 </span>
-              </button>
+              </>
             )}
           </div>
+        </div>
+
+        {/* Action Buttons Row */}
+        <div className="flex items-center justify-between gap-2 pt-0.5">
+          {/* Quick "+ Log Recoverable" Button */}
+          <button
+            type="button"
+            onClick={() => openModal('receive')}
+            className="h-8 px-3 rounded-xl bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+            title="Record money given to a friend awaiting return"
+          >
+            <span className="material-symbols-outlined text-sm text-emerald-600">handshake</span>
+            <span>+ Log Recoverable</span>
+          </button>
+
+          {/* Collapse / Expand Toggle: By default COLLAPSED */}
+          {pendingReceivables.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setIsPendingExpanded(!isPendingExpanded)}
+              className="h-8 text-xs font-semibold text-slate-700 hover:text-slate-900 flex items-center gap-1 px-3 rounded-xl bg-white border border-slate-200 shadow-2xs cursor-pointer transition-colors"
+            >
+              <span>{isPendingExpanded ? 'Collapse' : `View All (${pendingReceivables.length})`}</span>
+              <span
+                className="material-symbols-outlined text-sm transition-transform duration-200"
+                style={{ transform: isPendingExpanded ? 'rotate(180deg)' : 'none' }}
+              >
+                expand_more
+              </span>
+            </button>
+          )}
         </div>
 
         {/* Detailed Advances List (ONLY shown when expanded - COLLAPSED BY DEFAULT ON ALL SCREENS) */}
@@ -327,7 +307,7 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold text-xs text-slate-900">{item.friendName}</span>
                       <span className="text-[11px] text-slate-400">•</span>
-                      <span className="font-bold text-xs font-label-numeric text-slate-900">
+                      <span className="font-bold text-xs font-serif text-slate-900">
                         {privacyMode
                           ? '••••'
                           : `₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
