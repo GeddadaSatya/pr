@@ -61,6 +61,8 @@ export function TransactionModal() {
         paidWith,
         amount: numAmount,
         receiptUrl: receiptPreview || undefined,
+        dateTime: 'Today, Just now',
+        dateKey: '2026-10-28',
       });
     } else if (type === 'due') {
       addPayable({
@@ -79,6 +81,7 @@ export function TransactionModal() {
         note: 'Direct loan • 18% p.a.',
         principalAmount: numAmount,
         interestRateAnnual: 18.0,
+        monthlyInterest: Math.round((numAmount * 0.18) / 12),
       });
     } else if (type === 'receive') {
       addPeerReceivable({

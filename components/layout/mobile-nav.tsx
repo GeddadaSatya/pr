@@ -9,15 +9,16 @@ interface MobileNavProps {
 }
 
 export function MobileNav({ activeTab, setActiveTab }: MobileNavProps) {
-  const { openModal } = useFinance();
+  const { openModal, payables, borrowers, expenses, assets } = useFinance();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAiAdvisorOpen, setIsAiAdvisorOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const handleAction = (type: 'expense' | 'loan' | 'due' | 'ai') => {
     setIsMenuOpen(false);
     if (type === 'ai') {
-      alert('AI Wealth Advisor is active. You can ask queries regarding your balance, upcoming dues, or high-yield loans.');
+      setIsAiAdvisorOpen(true);
       return;
     }
     openModal(type);
@@ -308,6 +309,83 @@ export function MobileNav({ activeTab, setActiveTab }: MobileNavProps) {
           </div>
         </div>
       </nav>
+
+      {/* AI Wealth Advisor Modal */}
+      {isAiAdvisorOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in md:hidden">
+          <div className="bg-white rounded-2xl max-w-sm w-full border border-slate-200 shadow-2xl p-5 flex flex-col gap-4">
+            <div className="flex items-start justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#fef9e7] border border-[#d4af37]/40 text-[#b48e28] flex items-center justify-center">
+                  <span className="material-symbols-outlined text-lg">auto_awesome</span>
+                </div>
+                <div>
+                  <h3 className="font-serif font-bold text-slate-900 text-sm">
+                    AI Wealth Advisor
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Real-time liquidity &amp; portfolio intelligence
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAiAdvisorOpen(false)}
+                className="w-7 h-7 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-base">close</span>
+              </button>
+            </div>
+
+            {/* Live Insights */}
+            <div className="flex flex-col gap-2.5">
+              <div className="p-3 bg-emerald-50/70 border border-emerald-200/60 rounded-xl text-xs flex flex-col gap-1">
+                <span className="font-bold text-emerald-900 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm">trending_up</span>
+                  <span>Healthy Inflow Trajectory</span>
+                </span>
+                <p className="text-emerald-800 text-[11px] leading-relaxed">
+                  Active loan portfolio yield is performing at an average rate across {borrowers.filter(b => b.status === 'active').length} active agreements.
+                </p>
+              </div>
+
+              <div className="p-3 bg-amber-50/70 border border-amber-200/60 rounded-xl text-xs flex flex-col gap-1">
+                <span className="font-bold text-amber-900 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-sm">priority_high</span>
+                  <span>Upcoming Dues Action</span>
+                </span>
+                <p className="text-amber-800 text-[11px] leading-relaxed">
+                  You have {payables.filter(p => p.status === 'pending').length} pending vendor payables totaling ₹{payables.filter(p => p.status === 'pending').reduce((s, p) => s + p.amount, 0).toLocaleString('en-IN')}. Settle via ACH or wire to avoid penalties.
+                </p>
+              </div>
+            </div>
+
+            {/* Quick Navigation Actions */}
+            <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAiAdvisorOpen(false);
+                  setActiveTab('payables');
+                }}
+                className="h-9 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+              >
+                View Payables
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAiAdvisorOpen(false);
+                  setActiveTab('lending');
+                }}
+                className="h-9 px-3 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 text-xs font-bold transition-all cursor-pointer shadow-2xs"
+              >
+                Inspect Loans
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

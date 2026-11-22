@@ -18,7 +18,7 @@ export function DayLedgerView({
   previousTabTitle = 'Expense Notebook',
   onDateChange,
 }: DayLedgerViewProps) {
-  const { privacyMode, openModal, expenses, setActiveTab } = useFinance();
+  const { privacyMode, openModal, expenses, setActiveTab, computeDayLedger } = useFinance();
   const [currentDateKey, setCurrentDateKey] = useState(selectedDateKey);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -57,33 +57,42 @@ export function DayLedgerView({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Retrieve configuration for selected date
-  const dayConfig = DAY_LEDGER_CONFIGS[currentDateKey] || DAY_LEDGER_CONFIGS['2026-10-28'];
+  // Compute live day ledger metrics from FinanceContext
+  const dayConfig = computeDayLedger(currentDateKey);
 
-  // Retrieve entries for selected date (including any dynamic advances or expenses logged today)
-  const initialIds = new Set(INITIAL_NOTEBOOK_ENTRIES.map((e) => e.id));
-  const dynamicTodayEntries: NotebookEntry[] = currentDateKey === '2026-10-28'
-    ? expenses
-        .filter((exp) => !initialIds.has(exp.id))
-        .map((exp) => ({
+  // Retrieve entries for selected date dynamically from FinanceContext expenses
+  const dayEntries: NotebookEntry[] = React.useMemo(() => {
+    return expenses
+      .filter((exp) => (exp.dateKey || '2026-10-28') === currentDateKey)
+      .map((exp) => {
+        const catLower = exp.category.toLowerCase();
+        const icon =
+          exp.icon ||
+          (catLower.includes('dining')
+            ? 'restaurant'
+            : catLower.includes('travel')
+            ? 'flight_takeoff'
+            : catLower.includes('friend') || catLower.includes('advance')
+            ? 'handshake'
+            : 'receipt_long');
+
+        return {
           id: exp.id,
           title: exp.title,
           subtitle: exp.subtitle || 'Day-to-day cashflow entry',
-          tag: `#${exp.category.split(' ')[0]}`,
+          tag: exp.tag || `#${exp.category.split(' ')[0]}`,
           category: exp.category,
-          statusBadge: 'Verified Receipt',
+          statusBadge: exp.statusBadge || 'Verified Receipt',
           paidWith: exp.paidWith || 'UPI Transfer',
-          dateTime: 'Today, Just now',
+          dateTime: exp.dateTime || 'Today, Just now',
           amount: exp.amount,
-          icon: exp.category.toLowerCase().includes('friend') ? 'handshake' : 'receipt_long',
-          dateGroup: 'Today, October 28',
-          dateKey: '2026-10-28',
-          time: 'Just now',
-        }))
-    : [];
-
-  const baseDayEntries = INITIAL_NOTEBOOK_ENTRIES.filter((e) => e.dateKey === currentDateKey);
-  const dayEntries = [...dynamicTodayEntries, ...baseDayEntries];
+          icon,
+          dateGroup: exp.dateGroup || 'Today, October 28',
+          dateKey: exp.dateKey || currentDateKey,
+          time: exp.time || '12:00 PM',
+        };
+      });
+  }, [expenses, currentDateKey]);
 
   // Filter entries
   const filteredEntries = dayEntries.filter((item) => {

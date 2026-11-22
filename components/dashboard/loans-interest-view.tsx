@@ -295,10 +295,7 @@ const INITIAL_BORROWERS: BorrowerLoan[] = [
 ];
 
 export function LoansInterestView() {
-  const { privacyMode } = useFinance();
-
-  // Master loan records
-  const [borrowers, setBorrowers] = useState<BorrowerLoan[]>(INITIAL_BORROWERS);
+  const { privacyMode, borrowers, addBorrower, toggleBorrowerPaid, recordLoanRepayment } = useFinance();
 
   // Selected Borrower for Dossier / Customer Profile View
   const [selectedBorrower, setSelectedBorrower] = useState<BorrowerLoan | null>(null);
@@ -495,43 +492,13 @@ export function LoansInterestView() {
 
   // Handle Mark as Paid
   const handleMarkAsPaid = (id: string, name: string) => {
-    setBorrowers((prev) =>
-      prev.map((b) => {
-        if (b.id === id) {
-          const alreadyPaid = b.receivedAmount >= b.totalReceivable;
-          return {
-            ...b,
-            receivedAmount: alreadyPaid ? 0 : b.totalReceivable,
-            progressPercent: alreadyPaid ? 0 : 100,
-            status: alreadyPaid ? 'active' : 'paid',
-            statusLabel: alreadyPaid ? 'Active & Paying' : 'Fully Settled',
-          };
-        }
-        return b;
-      })
-    );
+    toggleBorrowerPaid(id);
     showToast(`Payment status updated for ${name}`);
   };
 
   // Handle Quick Partial Payment
   const handlePayPart = (id: string, name: string) => {
-    const addAmt = 1000;
-    setBorrowers((prev) =>
-      prev.map((b) => {
-        if (b.id === id) {
-          const nextReceived = Math.min(b.totalReceivable, b.receivedAmount + addAmt);
-          const percent = Math.min(100, Math.round((nextReceived / b.totalReceivable) * 100));
-          return {
-            ...b,
-            receivedAmount: nextReceived,
-            progressPercent: percent,
-            status: percent >= 100 ? 'paid' : b.status,
-            statusLabel: percent >= 100 ? 'Fully Settled' : b.statusLabel,
-          };
-        }
-        return b;
-      })
-    );
+    recordLoanRepayment(id, 1000, 'UPI / Cash Handover');
     showToast(`Added ₹1,000 partial payment from ${name}`);
   };
 
@@ -625,7 +592,7 @@ export function LoansInterestView() {
       noteText: `${formInterestType} loan at ${rate}% interest for ${duration} months.`,
     };
 
-    setBorrowers([newLoan, ...borrowers]);
+    addBorrower(newLoan);
     setIsModalOpen(false);
     setFormName('');
     setFormContact('');
@@ -634,9 +601,10 @@ export function LoansInterestView() {
   };
 
   if (selectedBorrower) {
+    const currentSelectedBorrower = borrowers.find((b) => b.id === selectedBorrower.id) || selectedBorrower;
     return (
       <BorrowerDetailView
-        borrower={selectedBorrower}
+        borrower={currentSelectedBorrower}
         initialShowLedger={showLedgerDirectly}
         onBack={() => {
           setSelectedBorrower(null);
@@ -644,19 +612,7 @@ export function LoansInterestView() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onRecordPayment={(id, amt) => {
-          handlePayPart(id, selectedBorrower.name);
-          setSelectedBorrower((prev) => {
-            if (!prev) return null;
-            const nextRec = Math.min(prev.totalReceivable, prev.receivedAmount + amt);
-            const pct = Math.min(100, Math.round((nextRec / prev.totalReceivable) * 100));
-            return {
-              ...prev,
-              receivedAmount: nextRec,
-              progressPercent: pct,
-              status: pct >= 100 ? 'paid' : prev.status,
-              outstandingBalance: Math.max(0, (prev.outstandingBalance ?? prev.nextDueAmount) - amt),
-            };
-          });
+          recordLoanRepayment(id, amt, 'Direct Repayment');
         }}
       />
     );

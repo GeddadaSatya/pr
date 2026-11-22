@@ -17,7 +17,7 @@ export function PayablesLoansHub() {
 
   const totalYield = loans
     .filter((l) => l.status === 'active')
-    .reduce((sum, l) => sum + l.monthlyInterest, 0);
+    .reduce((sum, l) => sum + (l.monthlyInterest || 0), 0);
 
   return (
     <div className="flex flex-col gap-4 w-full" id="operational-hub-section">
@@ -287,7 +287,7 @@ export function PayablesLoansHub() {
                         </div>
                       )}
                       <span className="text-[11px] text-[#b48e28] font-semibold">
-                        +{privacyMode ? '••••' : `₹${Math.round(loan.monthlyInterest).toLocaleString('en-IN')}`}/mo interest
+                        +{privacyMode ? '••••' : `₹${Math.round(loan.monthlyInterest || 0).toLocaleString('en-IN')}`}/mo interest
                       </span>
                     </div>
                   </div>

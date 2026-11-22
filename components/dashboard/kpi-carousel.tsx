@@ -5,7 +5,7 @@ import { useFinance } from '@/components/context/finance-context';
 import { formatCurrency } from '@/lib/utils';
 
 export function KpiCarousel() {
-  const { privacyMode, payables, loans, expenses } = useFinance();
+  const { privacyMode, payables, loans, expenses, assets, setActiveTab } = useFinance();
   const carouselRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -60,9 +60,10 @@ export function KpiCarousel() {
 
   const totalYield = loans
     .filter((l) => l.status === 'active')
-    .reduce((sum, l) => sum + l.monthlyInterest, 0);
+    .reduce((sum, l) => sum + (l.monthlyInterest || 0), 0);
 
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const totalPropertyAssets = assets.reduce((sum, a) => sum + a.valuation, 0);
   const monthlyBudget = 9500;
   const expensePercentage = Math.min(Math.round((totalExpenses / monthlyBudget) * 100), 100);
   const remainingBudget = Math.max(monthlyBudget - totalExpenses, 0);
@@ -114,14 +115,17 @@ export function KpiCarousel() {
         style={{ scrollbarWidth: 'none' }}
       >
         {/* Card 1: Total Property & Assets */}
-        <div className="min-w-[280px] w-[82vw] max-w-[340px] md:w-[calc(50%-0.5rem)] md:max-w-none md:min-w-[320px] shrink-0 snap-start bg-white p-4 md:p-5 rounded-xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-4 relative overflow-hidden">
+        <div
+          onClick={() => setActiveTab('assets')}
+          className="min-w-[280px] w-[82vw] max-w-[340px] md:w-[calc(50%-0.5rem)] md:max-w-none md:min-w-[320px] shrink-0 snap-start bg-white p-4 md:p-5 rounded-xl shadow-xs border border-slate-200/80 flex flex-col justify-between gap-4 relative overflow-hidden cursor-pointer hover:border-[#d4af37]/60 transition-colors"
+        >
           <div className="absolute top-0 left-0 right-0 h-1 bg-[#fed65b]"></div>
           <div className="flex justify-between items-start">
             <div className="flex flex-col">
               <span className="font-label-caps text-[11px] uppercase text-slate-500">Total Property &amp; Assets</span>
               <div className="flex items-baseline gap-1 mt-1">
                 <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
-                  {privacyMode ? '••••••' : '₹6,20,000'}
+                  {privacyMode ? '••••••' : `₹${Math.floor(totalPropertyAssets).toLocaleString('en-IN')}`}
                 </span>
                 <span className="font-label-numeric text-xs text-slate-500 font-medium">{privacyMode ? '' : '.00'}</span>
               </div>

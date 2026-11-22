@@ -27,6 +27,39 @@ export function CategoryAnalytics() {
 
   const totalSpent = expenses.reduce((acc, exp) => acc + exp.amount, 0);
 
+  // Dynamically calculate category stats from live expenses
+  const dynamicCategories = React.useMemo(() => {
+    if (!expenses || expenses.length === 0) return CATEGORIES_DATA;
+    const catMap: Record<string, number> = {};
+    for (const exp of expenses) {
+      const cat = exp.category || 'General';
+      catMap[cat] = (catMap[cat] || 0) + exp.amount;
+    }
+    const total = Object.values(catMap).reduce((a, b) => a + b, 0) || 1;
+    const colorPalette = ['#d4af37', '#0f172a', '#735c00', '#64748b', '#0284c7', '#10b981', '#f59e0b', '#8b5cf6'];
+
+    let cumulativePercent = 0;
+    return Object.entries(catMap)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, amount], index) => {
+        const percent = Math.max(1, Math.round((amount / total) * 100));
+        const color = colorPalette[index % colorPalette.length];
+        const dashoffset = String(376.99 - (cumulativePercent / 100) * 376.99);
+        cumulativePercent += percent;
+        return {
+          name,
+          amount,
+          percent,
+          color,
+          dasharray: '376.99',
+          dashoffset,
+        };
+      });
+  }, [expenses]);
+
+  const topCategoryName = dynamicCategories[0]?.name || 'Travel';
+  const topCategoryPercent = dynamicCategories[0]?.percent || 30;
+
   return (
     <div className="w-full">
       {/* Mobile View (< 780px) */}
@@ -490,7 +523,7 @@ export function CategoryAnalytics() {
                 <div className="relative w-44 h-44 flex items-center justify-center">
                   <svg className="w-44 h-44 -rotate-90 transform" viewBox="0 0 160 160">
                     <circle cx="80" cy="80" r="60" fill="none" stroke="#f1f5f9" strokeWidth="18" />
-                    {CATEGORIES_DATA.map((cat, idx) => (
+                    {dynamicCategories.map((cat, idx) => (
                       <circle
                         key={idx}
                         cx="80"
@@ -522,19 +555,19 @@ export function CategoryAnalytics() {
                       </div>
                     )}
                     <span className="text-[10px] px-2 py-0.5 mt-0.5 rounded-full bg-slate-200/60 text-slate-600 font-medium">
-                      8 Sectors
+                      {dynamicCategories.length} Sectors
                     </span>
                   </div>
                 </div>
                 <span className="text-[11px] text-slate-500 mt-2 font-medium">
-                  Top Sector: <strong className="text-slate-800 font-semibold">Travel (30%)</strong>
+                  Top Sector: <strong className="text-slate-800 font-semibold">{topCategoryName} ({topCategoryPercent}%)</strong>
                 </span>
               </div>
 
               {/* Right Scrollable Category Grid */}
               <div className="flex-1 w-full lg:pl-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-1">
-                  {CATEGORIES_DATA.map((cat) => (
+                  {dynamicCategories.map((cat) => (
                     <div
                       key={cat.name}
                       className="flex flex-col justify-between p-2.5 rounded-lg bg-white border border-slate-200/80 shadow-xs hover:bg-slate-50 transition-colors"

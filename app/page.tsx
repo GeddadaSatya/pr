@@ -16,9 +16,12 @@ import { PayablesDuesView } from '@/components/dashboard/payables-dues-view';
 import { LoansInterestView } from '@/components/dashboard/loans-interest-view';
 import { ExpenseNotebookView } from '@/components/dashboard/expense-notebook-view';
 import { DayLedgerView } from '@/components/dashboard/day-ledger-view';
+import { AssetsHoldingsView } from '@/components/dashboard/assets-holdings-view';
 import { TransactionModal } from '@/components/modals/transaction-modal';
 import { AuthModal } from '@/components/modals/auth-modal';
 import { PrivacyUnlockModal } from '@/components/modals/privacy-unlock-modal';
+import { SearchModal } from '@/components/modals/search-modal';
+import { NotificationsDrawer } from '@/components/modals/notifications-drawer';
 
 import { useFinance } from '@/components/context/finance-context';
 
@@ -66,6 +69,8 @@ function DashboardContent() {
               <PayablesDuesView />
             ) : activeTab === 'lending' ? (
               <LoansInterestView />
+            ) : activeTab === 'assets' ? (
+              <AssetsHoldingsView />
             ) : (
               <>
                 {/* Top Command Strip & Greeting */}
@@ -98,6 +103,8 @@ function DashboardContent() {
       <TransactionModal />
       <AuthModal />
       <PrivacyUnlockModal />
+      <SearchModal />
+      <NotificationsDrawer />
     </div>
   );
 }

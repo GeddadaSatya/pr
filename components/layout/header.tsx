@@ -4,7 +4,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 
 export function Header() {
-  const { userProfile, openAuthModal, isCollapsed, privacyMode, requestRevealPrivacy } = useFinance();
+  const {
+    userProfile,
+    openAuthModal,
+    isCollapsed,
+    privacyMode,
+    requestRevealPrivacy,
+    openSearchModal,
+    openNotificationsDrawer,
+    unreadNotificationsCount,
+  } = useFinance();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -35,6 +44,8 @@ export function Header() {
           <div className="flex items-center gap-2">
             <button
               aria-label="Search"
+              onClick={openSearchModal}
+              title="Search (Ctrl+K)"
               className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all cursor-pointer"
               type="button"
             >
@@ -42,11 +53,17 @@ export function Header() {
             </button>
             <button
               aria-label="Notifications"
+              onClick={openNotificationsDrawer}
+              title="Notifications & Activity"
               className="w-9 h-9 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all relative cursor-pointer"
               type="button"
             >
               <span className="material-symbols-outlined text-xl">notifications</span>
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#d4af37] ring-2 ring-white"></span>
+              {unreadNotificationsCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 min-w-[14px] h-[14px] px-0.5 rounded-full bg-[#d4af37] text-slate-950 font-bold text-[9px] flex items-center justify-center ring-2 ring-white">
+                  {unreadNotificationsCount}
+                </span>
+              )}
             </button>
             {/* Privacy Mode Eye Toggle */}
             <button

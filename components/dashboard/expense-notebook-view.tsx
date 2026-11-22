@@ -18,8 +18,7 @@ const QUICK_CATEGORIES = [
 ];
 
 export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProps) {
-  const { privacyMode, openModal, addExpense, expenses } = useFinance();
-  const [entries, setEntries] = useState<NotebookEntry[]>(INITIAL_NOTEBOOK_ENTRIES);
+  const { privacyMode, openModal, addExpense, deleteExpense, expenses } = useFinance();
   const [quickInput, setQuickInput] = useState('');
   const [selectedQuickCategory, setSelectedQuickCategory] = useState<string | null>(null);
   const [showCategoryConfirmModal, setShowCategoryConfirmModal] = useState(false);
@@ -67,46 +66,39 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
     selectedDateFilter !== 'all'
   );
 
-  // Sync any newly added expenses from FinanceContext into notebook entries
-  useEffect(() => {
-    if (expenses && expenses.length > 0) {
-      const existingIds = new Set(entries.map((e) => e.id));
-      const newItems: NotebookEntry[] = [];
-      for (const exp of expenses) {
-        if (!existingIds.has(exp.id)) {
-          const catLower = exp.category.toLowerCase();
-          const icon = catLower.includes('dining')
-            ? 'restaurant'
-            : catLower.includes('travel')
-            ? 'directions_car'
-            : catLower.includes('hardware') || catLower.includes('tech')
-            ? 'laptop_mac'
-            : catLower.includes('wellness')
-            ? 'fitness_center'
-            : catLower.includes('friend') || catLower.includes('advance')
-            ? 'handshake'
-            : 'receipt_long';
-          newItems.push({
-            id: exp.id,
-            title: exp.title,
-            subtitle: exp.subtitle || `Manual ledger entry • ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-            tag: exp.category.split(' ')[0],
-            category: exp.category,
-            statusBadge: 'Verified Receipt',
-            paidWith: exp.paidWith || 'Direct Payment',
-            dateTime: exp.dateTime || 'Today, Just now',
-            amount: exp.amount,
-            icon,
-            dateGroup: exp.dateTime?.includes('Oct 27') || exp.dateTime?.includes('Yesterday') ? 'Sunday, October 27' : 'Today, October 28',
-            dateKey: exp.dateTime?.includes('Oct 27') || exp.dateTime?.includes('Yesterday') ? '2026-10-27' : '2026-10-28',
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          });
-        }
-      }
-      if (newItems.length > 0) {
-        setEntries((prev) => [...newItems, ...prev]);
-      }
-    }
+  // Derive notebook entries directly from FinanceContext expenses
+  const entries: NotebookEntry[] = React.useMemo(() => {
+    return expenses.map((exp) => {
+      const catLower = exp.category.toLowerCase();
+      const icon = exp.icon || (catLower.includes('dining')
+        ? 'restaurant'
+        : catLower.includes('travel')
+        ? 'directions_car'
+        : catLower.includes('hardware') || catLower.includes('tech')
+        ? 'laptop_mac'
+        : catLower.includes('wellness')
+        ? 'fitness_center'
+        : catLower.includes('friend') || catLower.includes('advance')
+        ? 'handshake'
+        : 'receipt_long');
+
+      return {
+        id: exp.id,
+        title: exp.title,
+        subtitle: exp.subtitle || `Ledger entry • ${exp.dateTime || 'Oct 28'}`,
+        tag: exp.tag || exp.category.split(' ')[0],
+        category: exp.category,
+        statusBadge: exp.statusBadge || 'Verified Receipt',
+        paidWith: exp.paidWith || 'Direct Payment',
+        dateTime: exp.dateTime || 'Today, Just now',
+        amount: exp.amount,
+        icon,
+        dateGroup: exp.dateGroup || (exp.dateTime?.includes('Oct 27') || exp.dateTime?.includes('Yesterday') ? 'Sunday, October 27' : 'Today, October 28'),
+        dateKey: exp.dateKey || (exp.dateTime?.includes('Oct 27') || exp.dateTime?.includes('Yesterday') ? '2026-10-27' : '2026-10-28'),
+        time: exp.time || '12:00 PM',
+        attachments: exp.receiptUrl ? [exp.receiptUrl] : undefined,
+      };
+    });
   }, [expenses]);
 
   const formatDateDisplay = (dateStr: string) => {
@@ -205,11 +197,9 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
     }
   });
 
-  const initialNotebookIds = new Set(INITIAL_NOTEBOOK_ENTRIES.map((e) => e.id));
-  const dynamicExpensesAdded = entries.filter((e) => !initialNotebookIds.has(e.id));
-  const dynamicTotalAdded = dynamicExpensesAdded.reduce((sum, e) => sum + e.amount, 0);
-  const totalSpentThisMonth = 7068.4 + dynamicTotalAdded;
-  const totalNotebookEntriesCount = 42 + dynamicExpensesAdded.length;
+  const totalSpentThisMonth = expenses.reduce((sum, e) => sum + e.amount, 0);
+  const totalNotebookEntriesCount = expenses.length;
+  const dailyAverageSpend = totalSpentThisMonth > 0 ? totalSpentThisMonth / 31 : 0;
 
   const handleCategoryChipClick = (catName: string) => {
     if (selectedQuickCategory === catName) {
@@ -276,40 +266,27 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
     else if (category === 'Hardware') icon = 'laptop_mac';
     else if (category === 'Wellness') icon = 'fitness_center';
 
-    const newEntry: NotebookEntry = {
+    addExpense({
       id: `nb-${Date.now()}`,
       title,
       subtitle: `Instant ledger sync via AI Assist • ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-      tag,
       category,
-      statusBadge: 'Verified Receipt',
-      paidWith: 'UPI Transfer',
-      dateTime: 'Today, Just now',
-      amount,
-      icon,
-      dateGroup: 'Today, October 28',
-      dateKey: '2026-10-28',
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
-
-    setEntries((prev) => [newEntry, ...prev]);
-    addExpense({
-      id: newEntry.id,
-      title: newEntry.title,
-      subtitle: newEntry.subtitle,
-      category: newEntry.category,
       categoryColor: '#d4af37',
-      paidWith: newEntry.paidWith,
-      amount: newEntry.amount,
-      tag: newEntry.tag,
-      statusBadge: newEntry.statusBadge,
-      icon: newEntry.icon,
+      paidWith: 'UPI Transfer',
+      amount,
+      tag,
+      statusBadge: 'Verified Receipt',
+      icon,
+      dateTime: 'Today, Just now',
+      dateKey: '2026-10-28',
+      dateGroup: 'Today, October 28',
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     });
 
     setQuickInput('');
     setSelectedQuickCategory(null);
     setNotification({
-      message: `Logged: ${newEntry.title} (₹${amount})`,
+      message: `Logged: ${title} (₹${amount})`,
       type: 'success',
     });
     setTimeout(() => setNotification(null), 3500);
@@ -378,10 +355,10 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           <div>
             <div className="flex items-baseline gap-1 mt-1">
               <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
-                {privacyMode ? '••••••' : '₹228'}
+                {privacyMode ? '••••••' : `₹${Math.floor(dailyAverageSpend).toLocaleString('en-IN')}`}
               </span>
               <span className="font-label-numeric text-xs text-slate-500 font-medium">
-                {privacyMode ? '' : '.01'}
+                {privacyMode ? '' : `.${(dailyAverageSpend % 1).toFixed(2).split('.')[1] || '00'}`}
               </span>
               <span className="text-xs text-slate-400 font-medium ml-0.5">/day</span>
             </div>
@@ -837,25 +814,27 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse table-fixed min-w-[760px]">
               <colgroup>
-                <col className="w-[34%]" />
+                <col className="w-[32%]" />
                 <col className="w-[20%]" />
                 <col className="w-[18%]" />
-                <col className="w-[14%]" />
-                <col className="w-[14%]" />
+                <col className="w-[13%]" />
+                <col className="w-[12%]" />
+                <col className="w-[5%]" />
               </colgroup>
               <thead>
                 <tr className="text-slate-500 text-[11px] uppercase tracking-wider bg-slate-50 border-b border-slate-200/80 font-bold">
-                  <th className="py-2.5 px-4 w-[34%] text-xs font-semibold text-left">EXPENSE ITEM</th>
+                  <th className="py-2.5 px-4 w-[32%] text-xs font-semibold text-left">EXPENSE ITEM</th>
                   <th className="py-2.5 px-4 w-[20%] text-xs font-semibold text-center">CATEGORY</th>
                   <th className="py-2.5 px-4 w-[18%] text-xs font-semibold text-left">PAID WITH</th>
-                  <th className="py-2.5 px-4 w-[14%] text-xs font-semibold text-left">DATE &amp; TIME</th>
-                  <th className="py-2.5 px-4 w-[14%] text-xs font-semibold text-right">AMOUNT</th>
+                  <th className="py-2.5 px-4 w-[13%] text-xs font-semibold text-left">DATE &amp; TIME</th>
+                  <th className="py-2.5 px-4 w-[12%] text-xs font-semibold text-right">AMOUNT</th>
+                  <th className="py-2.5 px-2 w-[5%] text-xs font-semibold text-center">ACTION</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white">
                 {sortedEntries.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-12 px-4 text-center">
+                    <td colSpan={6} className="py-12 px-4 text-center">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <div className="w-10 h-10 rounded-full bg-amber-50 border border-amber-200/60 flex items-center justify-center text-[#b48e28]">
                           <span className="material-symbols-outlined text-xl">search_off</span>
@@ -877,9 +856,9 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                   </tr>
                 ) : (
                   sortedEntries.map((item, idx) => (
-                    <tr key={`${item.id}-${idx}`} className="hover:bg-slate-50/80 transition-colors">
+                    <tr key={`${item.id}-${idx}`} className="hover:bg-slate-50/80 transition-colors group">
                       {/* Expense Item */}
-                      <td className="w-[34%] py-3.5 px-4">
+                      <td className="w-[32%] py-3.5 px-4">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-slate-700 shrink-0">
                             <span className="material-symbols-outlined text-base">{item.icon}</span>
@@ -912,7 +891,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                       </td>
 
                       {/* Date & Time */}
-                      <td className="w-[14%] py-3.5 px-4 text-xs font-medium text-slate-600 truncate">
+                      <td className="w-[13%] py-3.5 px-4 text-xs font-medium text-slate-600 truncate">
                         <button
                           type="button"
                           onClick={() => onOpenDayLedger(item.dateKey || '2026-10-28')}
@@ -924,7 +903,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                       </td>
 
                       {/* Amount */}
-                      <td className="w-[14%] py-3.5 px-4 text-right whitespace-nowrap">
+                      <td className="w-[12%] py-3.5 px-4 text-right whitespace-nowrap">
                         <AmountDisplay
                           amount={item.amount}
                           privacyMode={privacyMode}
@@ -933,6 +912,22 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                           decimalColor="text-red-500"
                           size="sm"
                         />
+                      </td>
+
+                      {/* Action */}
+                      <td className="w-[5%] py-3.5 px-2 text-center">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            deleteExpense(item.id);
+                            setNotification({ message: `Removed ${item.title}`, type: 'success' });
+                            setTimeout(() => setNotification(null), 3000);
+                          }}
+                          className="w-7 h-7 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 inline-flex items-center justify-center transition-colors cursor-pointer"
+                          title="Delete expense"
+                        >
+                          <span className="material-symbols-outlined text-sm">delete_outline</span>
+                        </button>
                       </td>
                     </tr>
                   ))

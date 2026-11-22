@@ -48,7 +48,7 @@ export function BorrowerDetailView({
   onRecordPayment,
   initialShowLedger = false,
 }: BorrowerDetailViewProps) {
-  const { privacyMode, setActiveTab } = useFinance();
+  const { privacyMode, setActiveTab, recordLoanRepayment, addLoanAdvance, addLoanDocument, borrowers } = useFinance();
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState('2500');
@@ -57,19 +57,21 @@ export function BorrowerDetailView({
   const [uploadDocTitle, setUploadDocTitle] = useState('');
   const [showLedgerView, setShowLedgerView] = useState(initialShowLedger);
 
+  const activeBorrower = borrowers.find((b) => b.id === borrower.id) || borrower;
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
   };
 
   // Dynamic or default borrower metadata
-  const borrowerIdCode = borrower.borrowerId || 'PD-90803';
-  const phoneNumber = borrower.phone || '+91 98765 43210';
-  const addressText = borrower.address || 'Madhapur (C), Sector 2, Cyber Towers, Hyderabad';
-  const totalSanctioned = borrower.totalSanctioned || (borrower.principalAmount * 2.6);
-  const outstandingBalance = borrower.outstandingBalance !== undefined ? borrower.outstandingBalance : borrower.nextDueAmount;
-  const repaymentPacing = borrower.repaymentPacing || `${borrower.progressPercent > 0 ? borrower.progressPercent.toFixed(1) : '90.0'}%`;
-  const lifetimeCollected = borrower.lifetimeCollected || (borrower.principalAmount * 2.5);
+  const borrowerIdCode = activeBorrower.borrowerId || 'PD-90803';
+  const phoneNumber = activeBorrower.phone || '+91 98765 43210';
+  const addressText = activeBorrower.address || 'Madhapur (C), Sector 2, Cyber Towers, Hyderabad';
+  const totalSanctioned = activeBorrower.totalSanctioned || (activeBorrower.principalAmount * 2.6);
+  const outstandingBalance = activeBorrower.outstandingBalance !== undefined ? activeBorrower.outstandingBalance : activeBorrower.nextDueAmount;
+  const repaymentPacing = activeBorrower.repaymentPacing || `${activeBorrower.progressPercent > 0 ? activeBorrower.progressPercent.toFixed(1) : '90.0'}%`;
+  const lifetimeCollected = activeBorrower.lifetimeCollected || (activeBorrower.principalAmount * 2.5);
 
   // Distribution advances
   const [advances, setAdvances] = useState<AdvanceRow[]>([
@@ -172,37 +174,28 @@ export function BorrowerDetailView({
     const amt = parseFloat(paymentAmount) || 0;
     if (amt <= 0) return;
 
-    const newRep: RepaymentItem = {
-      id: `rep-${Date.now()}`,
-      date: 'Today, Just now',
-      installmentNumber: repayments.length + 1,
-      amount: amt,
-      status: 'Completed',
-    };
-
-    setRepayments([newRep, ...repayments]);
+    recordLoanRepayment(activeBorrower.id, amt, 'Direct Repayment');
     if (onRecordPayment) {
-      onRecordPayment(borrower.id, amt);
+      onRecordPayment(activeBorrower.id, amt);
     }
     setShowPaymentModal(false);
-    showToast(`Successfully recorded payment of ₹${amt.toLocaleString('en-IN')} for ${borrower.name}`);
+    showToast(`Successfully recorded payment of ₹${amt.toLocaleString('en-IN')} for ${activeBorrower.name}`);
   };
 
   const handleUploadSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadDocTitle.trim()) return;
 
-    const newDoc: DocumentItem = {
-      id: `doc-${Date.now()}`,
+    addLoanDocument(activeBorrower.id, {
+      borrowerId: activeBorrower.id,
       title: uploadDocTitle,
       type: 'PDF',
       size: '1.8 MB',
       uploadedBy: 'Current User (Manager)',
       uploadDate: 'Today',
       iconType: 'pdf',
-    };
+    });
 
-    setDocuments([newDoc, ...documents]);
     setUploadDocTitle('');
     setShowUploadModal(false);
     showToast(`Uploaded document "${uploadDocTitle}"`);
@@ -216,7 +209,7 @@ export function BorrowerDetailView({
   if (showLedgerView) {
     return (
       <RepaymentsLedgerView
-        borrower={borrower}
+        borrower={activeBorrower}
         onBackToProfile={() => {
           setShowLedgerView(false);
           window.scrollTo({ top: 0, behavior: 'smooth' });

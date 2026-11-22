@@ -15,13 +15,15 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
   // Dynamic calculations based on active expenses
   const todayExpenses = expenses.filter(
     (e) =>
-      e.dateTime.toLowerCase().includes('today') ||
-      e.dateTime.toLowerCase().includes('just now')
+      (e.dateTime || '').toLowerCase().includes('today') ||
+      (e.dateTime || '').toLowerCase().includes('just now') ||
+      e.dateKey === '2026-10-28'
   );
   const todayOutflow = todayExpenses.reduce((sum, e) => sum + e.amount, 0);
 
   const yesterdayExpenses = expenses.filter((e) =>
-    e.dateTime.toLowerCase().includes('yesterday')
+    (e.dateTime || '').toLowerCase().includes('yesterday') ||
+    e.dateKey === '2026-10-27'
   );
   const yesterdayOutflow = yesterdayExpenses.reduce((sum, e) => sum + e.amount, 0);
 

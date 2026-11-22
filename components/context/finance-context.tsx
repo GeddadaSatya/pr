@@ -1,8 +1,30 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { ExpenseItem, PayableItem, LoanItem, PeerReceivableItem, LedgerType, UserProfile } from '@/lib/types';
-import { INITIAL_EXPENSES, INITIAL_PAYABLES, INITIAL_LOANS, INITIAL_PEER_RECEIVABLES, INITIAL_USER } from '@/lib/mock-data';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import {
+  ExpenseItem,
+  PayableItem,
+  LoanItem,
+  PeerReceivableItem,
+  BorrowerLoan,
+  AssetHolding,
+  NotificationItem,
+  LedgerType,
+  UserProfile,
+  LoanAdvance,
+  LoanRepayment,
+  LoanDocument,
+} from '@/lib/types';
+import {
+  INITIAL_EXPENSES,
+  INITIAL_PAYABLES,
+  INITIAL_LOANS,
+  INITIAL_BORROWERS,
+  INITIAL_ASSETS,
+  INITIAL_NOTIFICATIONS,
+  INITIAL_PEER_RECEIVABLES,
+  INITIAL_USER,
+} from '@/lib/mock-data';
 
 export interface ModalInitialData {
   title?: string;
@@ -11,14 +33,40 @@ export interface ModalInitialData {
   source?: 'quick-add' | 'header';
 }
 
+export interface DayLedgerComputation {
+  dateKey: string;
+  dateLabel: string;
+  formattedDate: string;
+  inflow: number;
+  inflowDelta: number;
+  inflowPercent: number;
+  yesterdayInflow: number;
+  inflowNote: string;
+  outflow: number;
+  outflowDelta: number;
+  outflowPercent: number;
+  yesterdayOutflow: number;
+  targetCeiling: number;
+  netVelocity: number;
+}
+
 interface FinanceContextType {
+  // Collections
   expenses: ExpenseItem[];
   payables: PayableItem[];
   loans: LoanItem[];
+  borrowers: BorrowerLoan[];
+  assets: AssetHolding[];
   peerReceivables: PeerReceivableItem[];
+  notifications: NotificationItem[];
   userProfile: UserProfile;
+  unreadNotificationsCount: number;
+
+  // Active navigation
   activeTab: string;
   setActiveTab: (tab: string) => void;
+
+  // Privacy Mode
   privacyMode: boolean;
   setPrivacyMode: (val: boolean) => void;
   togglePrivacyMode: () => void;
@@ -29,45 +77,112 @@ interface FinanceContextType {
   privacyPin: string;
   setPrivacyPin: (pin: string) => void;
   verifyPrivacyPin: (pin: string) => boolean;
+
+  // Transaction Modal
   isModalOpen: boolean;
   modalType: LedgerType;
   modalInitialData: ModalInitialData | null;
   openModal: (type?: LedgerType, initialData?: ModalInitialData) => void;
   closeModal: () => void;
+
+  // Global Dialogs
   isAuthModalOpen: boolean;
   openAuthModal: () => void;
   closeAuthModal: () => void;
+  isSearchModalOpen: boolean;
+  openSearchModal: () => void;
+  closeSearchModal: () => void;
+  isNotificationsDrawerOpen: boolean;
+  openNotificationsDrawer: () => void;
+  closeNotificationsDrawer: () => void;
+
+  // Layout
   isCollapsed: boolean;
   setIsCollapsed: (collapsed: boolean) => void;
   toggleSidebar: () => void;
-  addExpense: (expense: Omit<ExpenseItem, 'id' | 'dateTime'> & { id?: string }) => void;
+
+  // CRUD Operations: Expenses
+  addExpense: (expense: Omit<ExpenseItem, 'id'> & { id?: string }) => void;
+  deleteExpense: (id: string) => void;
   importExpenses: (items: ExpenseItem[]) => void;
-  clearAllData: () => void;
-  resetDefaultData: () => void;
-  addPayable: (payable: Omit<PayableItem, 'id' | 'status'>) => void;
-  addLoan: (loan: Omit<LoanItem, 'id' | 'monthlyInterest' | 'status'>) => void;
+
+  // CRUD Operations: Payables
+  addPayable: (payable: Omit<PayableItem, 'id' | 'status'> & { id?: string }) => void;
+  settlePayable: (id: string) => void;
+  recordPayout: (id: string) => void;
+  deletePayable: (id: string) => void;
+
+  // CRUD Operations: Loans & Borrowers
+  addLoan: (loan: Omit<LoanItem, 'id' | 'status'> & { id?: string }) => void;
+  addBorrower: (borrower: Omit<BorrowerLoan, 'id'> & { id?: string }) => void;
+  recordLoanRepayment: (borrowerId: string, amount: number, method?: string) => void;
+  addLoanAdvance: (borrowerId: string, advance: Omit<LoanAdvance, 'id'>) => void;
+  addLoanDocument: (borrowerId: string, document: Omit<LoanDocument, 'id'>) => void;
+  updateBorrowerProfile: (borrowerId: string, updates: Partial<BorrowerLoan>) => void;
+  toggleBorrowerPaid: (borrowerId: string) => void;
+
+  // CRUD Operations: Assets & Holdings
+  addAsset: (asset: Omit<AssetHolding, 'id'> & { id?: string }) => void;
+  updateAssetValuation: (id: string, newValuation: number) => void;
+  deleteAsset: (id: string) => void;
+
+  // CRUD Operations: Peer Receivables
   addPeerReceivable: (receivable: Omit<PeerReceivableItem, 'id' | 'status'>) => void;
   markReceivableReceived: (id: string) => void;
-  recordPayout: (id: string) => void;
+
+  // Notifications
+  markNotificationRead: (id: string) => void;
+  markAllNotificationsRead: () => void;
+  dismissNotification: (id: string) => void;
+
+  // Dynamic Day Ledger Computation
+  computeDayLedger: (dateKey: string) => DayLedgerComputation;
+
+  // Global actions
+  clearAllData: () => void;
+  resetDefaultData: () => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
 
 export function FinanceProvider({ children }: { children: React.ReactNode }) {
+  // Primary Entity Collections with Initial Seeding
   const [expenses, setExpenses] = useState<ExpenseItem[]>(INITIAL_EXPENSES);
   const [payables, setPayables] = useState<PayableItem[]>(INITIAL_PAYABLES);
-  const [loans, setLoans] = useState<LoanItem[]>(INITIAL_LOANS);
+  const [borrowers, setBorrowers] = useState<BorrowerLoan[]>(INITIAL_BORROWERS);
+  const [assets, setAssets] = useState<AssetHolding[]>(INITIAL_ASSETS);
   const [peerReceivables, setPeerReceivables] = useState<PeerReceivableItem[]>(INITIAL_PEER_RECEIVABLES);
+  const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
   const [userProfile, setUserProfile] = useState<UserProfile>(INITIAL_USER);
-  // By default, values are hidden (eye closed) on every load and login
+
+  // Backward-compatible `loans` state derived from borrowers
+  const loans: LoanItem[] = useMemo(() => {
+    return borrowers.map((b) => ({
+      id: b.id,
+      borrowerName: b.name,
+      initials: b.initials,
+      note: `${b.contractType || 'Promissory Note'} • ${b.interestRate}%`,
+      principalAmount: b.principalAmount,
+      interestRateAnnual: b.interestRate,
+      monthlyInterest: Math.round((b.principalAmount * (b.interestRate / 100)) / (b.tenureMonths || 12)),
+      status: b.status === 'paid' ? 'repaid' : 'active',
+    }));
+  }, [borrowers]);
+
+  // Security & Privacy State
   const [privacyMode, setPrivacyMode] = useState<boolean>(true);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState<boolean>(false);
   const [privacyPin, setPrivacyPinState] = useState<string>('1234');
-  
+
+  // Modals & Drawers
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<LedgerType>('expense');
   const [modalInitialData, setModalInitialData] = useState<ModalInitialData | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
+  const [isNotificationsDrawerOpen, setIsNotificationsDrawerOpen] = useState<boolean>(false);
+
+  // Layout & Navigation State
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
   const [activeTab, setActiveTabState] = useState<string>('overview');
 
@@ -76,7 +191,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Auto collapse below 1100px screen width and support saved state
+  // Auto-collapse sidebar on smaller screens & persist user toggle
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1100) {
@@ -90,7 +205,6 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         }
       }
     };
-
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -104,35 +218,39 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  // Load from localStorage if present for local persistence
+  // Rehydrate all collections from localStorage on client mount
   useEffect(() => {
-    // Default to privacyMode = true on load/reload as required
     setPrivacyMode(true);
     const savedPin = localStorage.getItem('wt_privacy_pin');
-    if (savedPin) {
-      setPrivacyPinState(savedPin);
-    }
-    const savedReceivables = localStorage.getItem('wt_peer_receivables');
-    if (savedReceivables !== null) {
+    if (savedPin) setPrivacyPinState(savedPin);
+
+    const loadLocal = <T,>(key: string, setter: (val: T) => void, fallback: T) => {
       try {
-        setPeerReceivables(JSON.parse(savedReceivables));
-      } catch (e) {
-        // Fallback to initial
+        const raw = localStorage.getItem(key);
+        if (raw !== null) {
+          setter(JSON.parse(raw));
+        }
+      } catch (err) {
+        setter(fallback);
       }
-    }
+    };
+
+    loadLocal('wt_expenses', setExpenses, INITIAL_EXPENSES);
+    loadLocal('wt_payables', setPayables, INITIAL_PAYABLES);
+    loadLocal('wt_borrowers', setBorrowers, INITIAL_BORROWERS);
+    loadLocal('wt_assets', setAssets, INITIAL_ASSETS);
+    loadLocal('wt_peer_receivables', setPeerReceivables, INITIAL_PEER_RECEIVABLES);
+    loadLocal('wt_notifications', setNotifications, INITIAL_NOTIFICATIONS);
   }, []);
 
-  // Sync peer receivables to localStorage
-  const updatePeerReceivables = (updater: (prev: PeerReceivableItem[]) => PeerReceivableItem[]) => {
-    setPeerReceivables((prev) => {
-      const updated = updater(prev);
-      try {
-        localStorage.setItem('wt_peer_receivables', JSON.stringify(updated));
-      } catch (e) {}
-      return updated;
-    });
+  // Save changes to localStorage
+  const saveLocal = (key: string, data: any) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(data));
+    } catch (err) {}
   };
 
+  // Privacy Pin Helpers
   const setPrivacyPin = (newPin: string) => {
     setPrivacyPinState(newPin);
     try {
@@ -147,13 +265,10 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const openPrivacyModal = () => setIsPrivacyModalOpen(true);
   const closePrivacyModal = () => setIsPrivacyModalOpen(false);
 
-  // Every time user clicks to make visible, they must enter password!
   const requestRevealPrivacy = () => {
     if (privacyMode) {
-      // It is currently hidden -> open password modal to reveal!
       setIsPrivacyModalOpen(true);
     } else {
-      // It is currently visible -> immediately hide (eye closed) without password!
       setPrivacyMode(true);
     }
   };
@@ -162,6 +277,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     requestRevealPrivacy();
   };
 
+  // Modal Control
   const openModal = (type: LedgerType = 'expense', initialData?: ModalInitialData) => {
     setModalType(type);
     setModalInitialData(initialData || null);
@@ -176,93 +292,567 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const openAuthModal = () => setIsAuthModalOpen(true);
   const closeAuthModal = () => setIsAuthModalOpen(false);
 
-  const addExpense = (item: Omit<ExpenseItem, 'id' | 'dateTime'> & { id?: string }) => {
+  const openSearchModal = () => setIsSearchModalOpen(true);
+  const closeSearchModal = () => setIsSearchModalOpen(false);
+
+  const openNotificationsDrawer = () => setIsNotificationsDrawerOpen(true);
+  const closeNotificationsDrawer = () => setIsNotificationsDrawerOpen(false);
+
+  // ---------------------------------------------------------------------------
+  // CRUD Operations: Expenses
+  // ---------------------------------------------------------------------------
+  const addExpense = (item: Omit<ExpenseItem, 'id'> & { id?: string }) => {
     const newExpense: ExpenseItem = {
       ...item,
       id: item.id || `exp-${Date.now()}`,
-      dateTime: 'Just now',
+      dateTime: item.dateTime || 'Today, Just now',
+      dateKey: item.dateKey || '2026-10-28',
+      tag: item.tag || `#${item.category.split(' ')[0]}`,
+      statusBadge: item.statusBadge || 'Verified Receipt',
+      icon: item.icon || 'receipt_long',
+      dateGroup: item.dateGroup || 'Today, October 28',
     };
-    setExpenses((prev) => [newExpense, ...prev]);
+    setExpenses((prev) => {
+      const updated = [newExpense, ...prev];
+      saveLocal('wt_expenses', updated);
+      return updated;
+    });
+  };
+
+  const deleteExpense = (id: string) => {
+    setExpenses((prev) => {
+      const updated = prev.filter((e) => e.id !== id);
+      saveLocal('wt_expenses', updated);
+      return updated;
+    });
   };
 
   const importExpenses = (items: ExpenseItem[]) => {
-    setExpenses((prev) => [...items, ...prev]);
+    setExpenses((prev) => {
+      const updated = [...items, ...prev];
+      saveLocal('wt_expenses', updated);
+      return updated;
+    });
   };
 
-  const clearAllData = () => {
-    setExpenses([]);
-    setPayables([]);
-    setLoans([]);
-    updatePeerReceivables(() => []);
-  };
-
-  const resetDefaultData = () => {
-    setExpenses(INITIAL_EXPENSES);
-    setPayables(INITIAL_PAYABLES);
-    setLoans(INITIAL_LOANS);
-    updatePeerReceivables(() => INITIAL_PEER_RECEIVABLES);
-  };
-
-  // Expose global helper for testing and demonstration
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      (window as any).__finance = {
-        clearAllData,
-        resetDefaultData,
-        importExpenses,
-        getExpenses: () => expenses,
-        getPeerReceivables: () => peerReceivables,
-      };
-    }
-  }, [expenses, peerReceivables]);
-
-  const addPayable = (item: Omit<PayableItem, 'id' | 'status'>) => {
+  // ---------------------------------------------------------------------------
+  // CRUD Operations: Payables
+  // ---------------------------------------------------------------------------
+  const addPayable = (item: Omit<PayableItem, 'id' | 'status'> & { id?: string }) => {
     const newPayable: PayableItem = {
       ...item,
-      id: `pay-${Date.now()}`,
+      id: item.id || `pay-${Date.now()}`,
       status: 'pending',
+      statusLabel: item.statusLabel || 'Due Soon',
+      actionLabel: item.actionLabel || 'Settle Now',
     };
-    setPayables((prev) => [newPayable, ...prev]);
+    setPayables((prev) => {
+      const updated = [newPayable, ...prev];
+      saveLocal('wt_payables', updated);
+      return updated;
+    });
   };
 
-  const addLoan = (item: Omit<LoanItem, 'id' | 'monthlyInterest' | 'status'>) => {
-    const monthly = (item.principalAmount * (item.interestRateAnnual || 18) / 100) / 12;
-    const newLoan: LoanItem = {
-      ...item,
-      id: `loan-${Date.now()}`,
-      monthlyInterest: monthly,
+  const settlePayable = (id: string) => {
+    const payable = payables.find((p) => p.id === id);
+    if (!payable) return;
+
+    // 1. Mark payable as settled
+    setPayables((prev) => {
+      const updated = prev.map((p) =>
+        p.id === id
+          ? {
+              ...p,
+              status: 'paid' as const,
+              statusLabel: 'Settled',
+              settledAt: new Date().toISOString(),
+            }
+          : p
+      );
+      saveLocal('wt_payables', updated);
+      return updated;
+    });
+
+    // 2. Automatically log an outflow expense so the balance updates everywhere
+    addExpense({
+      title: `${payable.creditorName} (Settlement)`,
+      subtitle: payable.invoiceNote || 'Vendor liability settled',
+      category: payable.category || 'Vendor Liability',
+      paidWith: payable.disbursementRoute || 'Direct Wire (HDFC)',
+      amount: payable.amount,
+      dateTime: 'Today, Just now',
+      dateKey: '2026-10-28',
+      dateGroup: 'Today, October 28',
+    });
+
+    // 3. Add success notification
+    addNotification({
+      title: `Invoice Settled: ${payable.creditorName}`,
+      description: `Payment of ₹${payable.amount.toLocaleString('en-IN')} successfully disbursed via ${
+        payable.disbursementRoute || 'Direct Wire'
+      }.`,
+      type: 'due_alert',
+      severity: 'info',
+      actionTab: 'payables',
+    });
+  };
+
+  const deletePayable = (id: string) => {
+    setPayables((prev) => {
+      const updated = prev.filter((p) => p.id !== id);
+      saveLocal('wt_payables', updated);
+      return updated;
+    });
+  };
+
+  // ---------------------------------------------------------------------------
+  // CRUD Operations: Loans & Borrowers
+  // ---------------------------------------------------------------------------
+  const addLoan = (loan: Omit<LoanItem, 'id' | 'status'> & { id?: string }) => {
+    addBorrower({
+      name: loan.borrowerName,
+      initials: loan.initials,
+      contactOrNote: loan.note,
+      principalAmount: loan.principalAmount,
+      paymentMode: 'Bank Transfer',
+      paymentModeIcon: 'account_balance',
+      dateGiven: 'Today',
+      interestRate: loan.interestRateAnnual || 18,
+      interestRatePeriod: 'flat rate',
+      payoutFrequency: 'Monthly Payout',
+      tenureMonths: 12,
+      termLabel: '12-Month Term',
+      nextDueDate: 'Next Month',
+      nextDueAmount: Math.round((loan.principalAmount * ((loan.interestRateAnnual || 18) / 100)) / 12),
+      dueCountdownText: '30 Days Remaining',
+      dueCountdownType: 'normal',
+      receivedAmount: 0,
+      totalReceivable: loan.principalAmount * (1 + (loan.interestRateAnnual || 18) / 100),
+      progressPercent: 0,
       status: 'active',
-    };
-    setLoans((prev) => [newLoan, ...prev]);
+      statusLabel: 'Active & Paying',
+    });
   };
 
+  const addBorrower = (item: Omit<BorrowerLoan, 'id'> & { id?: string }) => {
+    const words = item.name.trim().split(' ');
+    const initials =
+      item.initials ||
+      (words.length > 1 ? `${words[0][0]}${words[1][0]}`.toUpperCase() : words[0].slice(0, 2).toUpperCase());
+
+    const newBorrower: BorrowerLoan = {
+      ...item,
+      id: item.id || `borrower-${Date.now()}`,
+      initials,
+      avatarBg: item.avatarBg || 'bg-[#0f172a]',
+      avatarText: item.avatarText || 'text-[#d4af37]',
+      status: item.status || 'active',
+      statusLabel: item.statusLabel || 'Active',
+      borrowerId: item.borrowerId || `LN-${Math.floor(10000 + Math.random() * 90000)}`,
+      receivedAmount: item.receivedAmount || 0,
+      totalReceivable: item.totalReceivable || item.principalAmount * 1.1,
+      progressPercent: item.progressPercent || 0,
+      totalSanctioned: item.totalSanctioned || item.principalAmount,
+      outstandingBalance: item.outstandingBalance || item.totalReceivable || item.principalAmount * 1.1,
+      repaymentPacing: item.repaymentPacing || '0.0%',
+      lifetimeCollected: item.lifetimeCollected || 0,
+      advances: item.advances || [
+        {
+          id: `adv-${Date.now()}`,
+          advanceId: `ADV-${Math.floor(1000 + Math.random() * 9000)}`,
+          agent: 'Arjun Sharma (Field Lead)',
+          issueDate: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }),
+          issueAmount: item.principalAmount,
+          outstandingTotal: item.principalAmount,
+          total: item.principalAmount,
+        },
+      ],
+      repayments: item.repayments || [],
+      documents: item.documents || [],
+    };
+
+    setBorrowers((prev) => {
+      const updated = [newBorrower, ...prev];
+      saveLocal('wt_borrowers', updated);
+      return updated;
+    });
+
+    // Also record outflow expense when lending money so day cashflow reflects capital deployment
+    addExpense({
+      title: `${item.name} (Capital Lent)`,
+      subtitle: `${item.contractType || 'Promissory Loan'} • Disbursed via ${item.paymentMode || 'Wire'}`,
+      category: 'Capital Deployment',
+      paidWith: item.paymentMode || 'Bank Wire',
+      amount: item.principalAmount,
+      dateTime: 'Today, Just now',
+      dateKey: '2026-10-28',
+      dateGroup: 'Today, October 28',
+    });
+  };
+
+  const recordLoanRepayment = (borrowerId: string, amount: number, method: string = 'UPI') => {
+    let borrowerName = 'Borrower';
+    setBorrowers((prev) => {
+      const updated = prev.map((b) => {
+        if (b.id === borrowerId) {
+          borrowerName = b.name;
+          const newReceived = Math.min(b.totalReceivable, b.receivedAmount + amount);
+          const percent = Math.min(100, Math.round((newReceived / b.totalReceivable) * 100));
+          const newOutstanding = Math.max(0, b.totalReceivable - newReceived);
+
+          const newRepayment: LoanRepayment = {
+            id: `rep-${Date.now()}`,
+            borrowerId,
+            installmentNum: (b.repayments?.length || 0) + 1,
+            dueDate: new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' }),
+            amount,
+            paymentDate: 'Today',
+            method,
+            referenceId: `REF-${Math.floor(100000000 + Math.random() * 900000000)}`,
+            status: 'Completed',
+          };
+
+          return {
+            ...b,
+            receivedAmount: newReceived,
+            outstandingBalance: newOutstanding,
+            progressPercent: percent,
+            status: percent >= 100 ? ('paid' as const) : b.status,
+            statusLabel: percent >= 100 ? 'Fully Settled' : b.statusLabel,
+            lifetimeCollected: (b.lifetimeCollected || 0) + amount,
+            repayments: [newRepayment, ...(b.repayments || [])],
+          };
+        }
+        return b;
+      });
+      saveLocal('wt_borrowers', updated);
+      return updated;
+    });
+
+    // Notify user of cash inflow
+    addNotification({
+      title: `Loan Installment Collected: ${borrowerName}`,
+      description: `Received ₹${amount.toLocaleString('en-IN')} via ${method}. Outstanding balance updated.`,
+      type: 'loan_payment',
+      severity: 'info',
+      actionTab: 'lending',
+    });
+  };
+
+  const addLoanAdvance = (borrowerId: string, advance: Omit<LoanAdvance, 'id'>) => {
+    setBorrowers((prev) => {
+      const updated = prev.map((b) => {
+        if (b.id === borrowerId) {
+          const newAdv: LoanAdvance = { ...advance, id: `adv-${Date.now()}` };
+          return {
+            ...b,
+            advances: [newAdv, ...(b.advances || [])],
+            totalSanctioned: (b.totalSanctioned || 0) + advance.issueAmount,
+            principalAmount: b.principalAmount + advance.issueAmount,
+            totalReceivable: b.totalReceivable + advance.total,
+            outstandingBalance: (b.outstandingBalance || 0) + advance.outstandingTotal,
+          };
+        }
+        return b;
+      });
+      saveLocal('wt_borrowers', updated);
+      return updated;
+    });
+  };
+
+  const addLoanDocument = (borrowerId: string, doc: Omit<LoanDocument, 'id'>) => {
+    setBorrowers((prev) => {
+      const updated = prev.map((b) => {
+        if (b.id === borrowerId) {
+          const newDoc: LoanDocument = { ...doc, id: `doc-${Date.now()}` };
+          return {
+            ...b,
+            documents: [newDoc, ...(b.documents || [])],
+          };
+        }
+        return b;
+      });
+      saveLocal('wt_borrowers', updated);
+      return updated;
+    });
+  };
+
+  const updateBorrowerProfile = (borrowerId: string, updates: Partial<BorrowerLoan>) => {
+    setBorrowers((prev) => {
+      const updated = prev.map((b) => (b.id === borrowerId ? { ...b, ...updates } : b));
+      saveLocal('wt_borrowers', updated);
+      return updated;
+    });
+  };
+
+  const toggleBorrowerPaid = (borrowerId: string) => {
+    setBorrowers((prev) => {
+      const updated = prev.map((b) => {
+        if (b.id === borrowerId) {
+          const isCurrentlyPaid = b.status === 'paid';
+          return {
+            ...b,
+            status: isCurrentlyPaid ? ('active' as const) : ('paid' as const),
+            statusLabel: isCurrentlyPaid ? 'Active' : 'Fully Settled',
+            progressPercent: isCurrentlyPaid ? 50 : 100,
+            receivedAmount: isCurrentlyPaid ? Math.round(b.totalReceivable / 2) : b.totalReceivable,
+            outstandingBalance: isCurrentlyPaid ? Math.round(b.totalReceivable / 2) : 0,
+          };
+        }
+        return b;
+      });
+      saveLocal('wt_borrowers', updated);
+      return updated;
+    });
+  };
+
+  // ---------------------------------------------------------------------------
+  // CRUD Operations: Assets & Holdings
+  // ---------------------------------------------------------------------------
+  const addAsset = (item: Omit<AssetHolding, 'id'> & { id?: string }) => {
+    const yieldRate = item.annualYieldRate || 0;
+    const monthlyYield = (item.valuation * (yieldRate / 100)) / 12;
+    const newAsset: AssetHolding = {
+      ...item,
+      id: item.id || `asset-${Date.now()}`,
+      monthlyYield,
+      lastValuationDate: item.lastValuationDate || new Date().toISOString().slice(0, 10),
+    };
+    setAssets((prev) => {
+      const updated = [newAsset, ...prev];
+      saveLocal('wt_assets', updated);
+      return updated;
+    });
+
+    addNotification({
+      title: `New Asset Registered: ${item.name}`,
+      description: `Valuation of ₹${item.valuation.toLocaleString('en-IN')} added to Sovereign Net Worth.`,
+      type: 'system',
+      severity: 'info',
+      actionTab: 'assets',
+    });
+  };
+
+  const updateAssetValuation = (id: string, newValuation: number) => {
+    setAssets((prev) => {
+      const updated = prev.map((a) => {
+        if (a.id === id) {
+          const monthlyYield = (newValuation * (a.annualYieldRate / 100)) / 12;
+          return {
+            ...a,
+            valuation: newValuation,
+            monthlyYield,
+            lastValuationDate: new Date().toISOString().slice(0, 10),
+          };
+        }
+        return a;
+      });
+      saveLocal('wt_assets', updated);
+      return updated;
+    });
+  };
+
+  const deleteAsset = (id: string) => {
+    setAssets((prev) => {
+      const updated = prev.filter((a) => a.id !== id);
+      saveLocal('wt_assets', updated);
+      return updated;
+    });
+  };
+
+  // ---------------------------------------------------------------------------
+  // CRUD Operations: Peer Receivables
+  // ---------------------------------------------------------------------------
   const addPeerReceivable = (item: Omit<PeerReceivableItem, 'id' | 'status'>) => {
     const newReceivable: PeerReceivableItem = {
       ...item,
       id: `pr-${Date.now()}`,
       status: 'pending',
     };
-    updatePeerReceivables((prev) => [newReceivable, ...prev]);
-    // Also record an outflow on the day given so money leaving the account is accurately logged
+    setPeerReceivables((prev) => {
+      const updated = [newReceivable, ...prev];
+      saveLocal('wt_peer_receivables', updated);
+      return updated;
+    });
+
+    // Also record outflow expense
     addExpense({
       title: `${item.friendName} (Advance)`,
       subtitle: item.note || 'Peer Advance (Awaiting Return)',
       category: 'Miscellaneous',
       paidWith: item.paymentMethod || 'UPI Transfer',
       amount: item.amount,
+      dateTime: 'Today, Just now',
+      dateKey: '2026-10-28',
+      dateGroup: 'Today, October 28',
     });
   };
 
   const markReceivableReceived = (id: string) => {
-    updatePeerReceivables((prev) =>
-      prev.map((r) =>
-        r.id === id ? { ...r, status: 'received' as const, settledDate: 'Today' } : r
-      )
-    );
+    let friendName = 'Friend';
+    let amt = 0;
+    setPeerReceivables((prev) => {
+      const updated = prev.map((r) => {
+        if (r.id === id) {
+          friendName = r.friendName;
+          amt = r.amount;
+          return { ...r, status: 'received' as const, settledDate: 'Today' };
+        }
+        return r;
+      });
+      saveLocal('wt_peer_receivables', updated);
+      return updated;
+    });
+
+    addNotification({
+      title: `Peer Advance Repaid: ${friendName}`,
+      description: `Collected ₹${amt.toLocaleString('en-IN')} return into cash balance.`,
+      type: 'loan_payment',
+      severity: 'info',
+      actionTab: 'overview',
+    });
   };
 
-  const recordPayout = (id: string) => {
-    setPayables((prev) => prev.filter((p) => p.id !== id));
+  // ---------------------------------------------------------------------------
+  // Notifications
+  // ---------------------------------------------------------------------------
+  const addNotification = (item: Omit<NotificationItem, 'id' | 'timestamp' | 'read'>) => {
+    const newNotif: NotificationItem = {
+      ...item,
+      id: `notif-${Date.now()}`,
+      timestamp: 'Just now',
+      read: false,
+    };
+    setNotifications((prev) => {
+      const updated = [newNotif, ...prev];
+      saveLocal('wt_notifications', updated);
+      return updated;
+    });
+  };
+
+  const markNotificationRead = (id: string) => {
+    setNotifications((prev) => {
+      const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+      saveLocal('wt_notifications', updated);
+      return updated;
+    });
+  };
+
+  const markAllNotificationsRead = () => {
+    setNotifications((prev) => {
+      const updated = prev.map((n) => ({ ...n, read: true }));
+      saveLocal('wt_notifications', updated);
+      return updated;
+    });
+  };
+
+  const dismissNotification = (id: string) => {
+    setNotifications((prev) => {
+      const updated = prev.filter((n) => n.id !== id);
+      saveLocal('wt_notifications', updated);
+      return updated;
+    });
+  };
+
+  const unreadNotificationsCount = useMemo(() => {
+    return notifications.filter((n) => !n.read).length;
+  }, [notifications]);
+
+  // ---------------------------------------------------------------------------
+  // Dynamic Day Ledger Aggregator
+  // ---------------------------------------------------------------------------
+  const computeDayLedger = useCallback(
+    (dateKey: string): DayLedgerComputation => {
+      // 1. Calculate actual outflows for dateKey
+      const dayExpenses = expenses.filter((e) => (e.dateKey || '2026-10-28') === dateKey);
+      const actualOutflow = dayExpenses.reduce((sum, e) => sum + e.amount, 0);
+
+      // Baseline inflows & settled friend returns
+      const settledReturns = peerReceivables
+        .filter((r) => r.status === 'received' && (r.dateKey === dateKey || (dateKey === '2026-10-28' && r.settledDate === 'Today')))
+        .reduce((sum, r) => sum + r.amount, 0);
+
+      const baselineInflows: Record<string, number> = {
+        '2026-10-28': 5200.0,
+        '2026-10-27': 3800.0,
+        '2026-10-25': 4500.0,
+        '2026-10-23': 3200.0,
+      };
+
+      const baseInflow = baselineInflows[dateKey] ?? 3500.0;
+      const actualInflow = baseInflow + settledReturns;
+
+      const yesterdayOutflow = dateKey === '2026-10-28' ? 1890.0 : 2850.0;
+      const yesterdayInflow = dateKey === '2026-10-28' ? 3800.0 : 3000.0;
+
+      const outflowDelta = actualOutflow - yesterdayOutflow;
+      const outflowPercent = yesterdayOutflow > 0 ? Math.round((outflowDelta / yesterdayOutflow) * 100) : 0;
+
+      const inflowDelta = actualInflow - yesterdayInflow;
+      const inflowPercent = yesterdayInflow > 0 ? Math.round((inflowDelta / yesterdayInflow) * 100) : 0;
+
+      const netVelocity = actualInflow - actualOutflow;
+
+      const labels: Record<string, { label: string; formatted: string }> = {
+        '2026-10-28': { label: 'Today, October 28', formatted: 'Oct 28, 2026' },
+        '2026-10-27': { label: 'Sunday, October 27', formatted: 'Oct 27, 2026' },
+        '2026-10-25': { label: 'Friday, October 25', formatted: 'Oct 25, 2026' },
+        '2026-10-23': { label: 'Wednesday, October 23', formatted: 'Oct 23, 2026' },
+      };
+
+      const dateMeta = labels[dateKey] || { label: `Date ${dateKey}`, formatted: dateKey };
+
+      return {
+        dateKey,
+        dateLabel: dateMeta.label,
+        formattedDate: dateMeta.formatted,
+        inflow: actualInflow,
+        inflowDelta,
+        inflowPercent,
+        yesterdayInflow,
+        inflowNote: `Yesterday: ₹${yesterdayInflow.toLocaleString('en-IN', { minimumFractionDigits: 2 })} • Consulting & Yield`,
+        outflow: actualOutflow,
+        outflowDelta,
+        outflowPercent,
+        yesterdayOutflow,
+        targetCeiling: 4000.0,
+        netVelocity,
+      };
+    },
+    [expenses, peerReceivables]
+  );
+
+  // ---------------------------------------------------------------------------
+  // Global Reset & Testing
+  // ---------------------------------------------------------------------------
+  const clearAllData = () => {
+    setExpenses([]);
+    setPayables([]);
+    setBorrowers([]);
+    setAssets([]);
+    setPeerReceivables([]);
+    setNotifications([]);
+    localStorage.removeItem('wt_expenses');
+    localStorage.removeItem('wt_payables');
+    localStorage.removeItem('wt_borrowers');
+    localStorage.removeItem('wt_assets');
+    localStorage.removeItem('wt_peer_receivables');
+    localStorage.removeItem('wt_notifications');
+  };
+
+  const resetDefaultData = () => {
+    setExpenses(INITIAL_EXPENSES);
+    setPayables(INITIAL_PAYABLES);
+    setBorrowers(INITIAL_BORROWERS);
+    setAssets(INITIAL_ASSETS);
+    setPeerReceivables(INITIAL_PEER_RECEIVABLES);
+    setNotifications(INITIAL_NOTIFICATIONS);
+    saveLocal('wt_expenses', INITIAL_EXPENSES);
+    saveLocal('wt_payables', INITIAL_PAYABLES);
+    saveLocal('wt_borrowers', INITIAL_BORROWERS);
+    saveLocal('wt_assets', INITIAL_ASSETS);
+    saveLocal('wt_peer_receivables', INITIAL_PEER_RECEIVABLES);
+    saveLocal('wt_notifications', INITIAL_NOTIFICATIONS);
   };
 
   return (
@@ -271,10 +861,16 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         expenses,
         payables,
         loans,
+        borrowers,
+        assets,
         peerReceivables,
+        notifications,
         userProfile,
+        unreadNotificationsCount,
+
         activeTab,
         setActiveTab,
+
         privacyMode,
         setPrivacyMode,
         togglePrivacyMode,
@@ -285,26 +881,61 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         privacyPin,
         setPrivacyPin,
         verifyPrivacyPin,
+
         isModalOpen,
         modalType,
         modalInitialData,
         openModal,
         closeModal,
+
         isAuthModalOpen,
         openAuthModal,
         closeAuthModal,
+
+        isSearchModalOpen,
+        openSearchModal,
+        closeSearchModal,
+
+        isNotificationsDrawerOpen,
+        openNotificationsDrawer,
+        closeNotificationsDrawer,
+
         isCollapsed,
         setIsCollapsed,
         toggleSidebar,
+
         addExpense,
+        deleteExpense,
         importExpenses,
-        clearAllData,
-        resetDefaultData,
+
         addPayable,
+        settlePayable,
+        recordPayout: settlePayable,
+        deletePayable,
+
         addLoan,
+        addBorrower,
+        recordLoanRepayment,
+        addLoanAdvance,
+        addLoanDocument,
+        updateBorrowerProfile,
+        toggleBorrowerPaid,
+
+        addAsset,
+        updateAssetValuation,
+        deleteAsset,
+
         addPeerReceivable,
         markReceivableReceived,
-        recordPayout,
+
+        markNotificationRead,
+        markAllNotificationsRead,
+        dismissNotification,
+
+        computeDayLedger,
+
+        clearAllData,
+        resetDefaultData,
       }}
     >
       {children}

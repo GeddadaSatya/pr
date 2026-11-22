@@ -7,23 +7,28 @@ import { AmountDisplay } from '@/components/ui/amount-display';
 import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
 
 export function PayablesDuesView() {
-  const { payables, recordPayout, privacyMode, openModal } = useFinance();
+  const { payables, settlePayable, deletePayable, privacyMode, openModal } = useFinance();
   const [activeLedgerTab, setActiveLedgerTab] = useState<'all' | 'paid'>('all');
   const [selectedMonth, setSelectedMonth] = useState('October');
   const [pageSize, setPageSize] = useState('10');
-  const [settledItems, setSettledItems] = useState<PayableItem[]>([]);
+  const [settleModalItem, setSettleModalItem] = useState<PayableItem | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
 
   // Settle action handler
-  const handleSettle = (id: string) => {
-    const item = payables.find((p) => p.id === id);
-    if (item) {
-      setSettledItems((prev) => [{ ...item, status: 'paid', statusLabel: 'Settled' }, ...prev]);
-      recordPayout(id);
-    }
+  const handleSettle = (item: PayableItem) => {
+    settlePayable(item.id);
+    setSettleModalItem(null);
+    showToast(`Successfully settled ₹${item.amount.toLocaleString('en-IN')} to ${item.creditorName}`);
   };
 
   const pendingPayables = payables.filter((p) => p.status === 'pending');
-  const displayedPayables = activeLedgerTab === 'all' ? pendingPayables : settledItems;
+  const settledPayables = payables.filter((p) => p.status === 'paid');
+  const displayedPayables = activeLedgerTab === 'all' ? pendingPayables : settledPayables;
 
   const totalOutstanding = pendingPayables.reduce((sum, p) => sum + p.amount, 0);
   const dueWithin7Days = pendingPayables
@@ -305,7 +310,7 @@ export function PayablesDuesView() {
           {marcusItem ? (
             <button
               type="button"
-              onClick={() => handleSettle(marcusItem.id)}
+              onClick={() => setSettleModalItem(marcusItem)}
               className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
             >
               Record Payout (Marcus)
@@ -313,7 +318,7 @@ export function PayablesDuesView() {
           ) : pendingPayables.length > 0 ? (
             <button
               type="button"
-              onClick={() => handleSettle(pendingPayables[0].id)}
+              onClick={() => setSettleModalItem(pendingPayables[0])}
               className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
             >
               Record Payout ({pendingPayables[0].creditorName.split(' ')[0]})
@@ -494,11 +499,11 @@ export function PayablesDuesView() {
                         {/* Action */}
                         <td className="py-3.5 px-4 text-center">
                           {isPaid ? (
-                            <span className="inline-flex items-center justify-center w-[96px] h-7 text-xs font-semibold text-emerald-600">Paid</span>
+                            <span className="inline-flex items-center justify-center w-[96px] h-7 text-xs font-semibold text-emerald-600 bg-emerald-50 rounded-lg border border-emerald-200/60">Paid</span>
                           ) : item.actionLabel === 'Settle Now' || isUrgent ? (
                             <button
                               type="button"
-                              onClick={() => handleSettle(item.id)}
+                              onClick={() => setSettleModalItem(item)}
                               className="w-[96px] h-7 rounded-lg bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs shadow-2xs transition-colors cursor-pointer inline-flex items-center justify-center"
                             >
                               Settle Now
@@ -506,7 +511,7 @@ export function PayablesDuesView() {
                           ) : item.actionLabel === 'Review ACH' ? (
                             <button
                               type="button"
-                              onClick={() => alert(`Reviewing automated ACH release for ${item.creditorName}`)}
+                              onClick={() => setSettleModalItem(item)}
                               className="w-[96px] h-7 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer inline-flex items-center justify-center"
                             >
                               Review ACH
@@ -514,7 +519,7 @@ export function PayablesDuesView() {
                           ) : (
                             <button
                               type="button"
-                              onClick={() => alert(`Managing payable for ${item.creditorName}`)}
+                              onClick={() => setSettleModalItem(item)}
                               className="w-[96px] h-7 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer inline-flex items-center justify-center"
                             >
                               {item.actionLabel || 'Manage'}
@@ -573,6 +578,105 @@ export function PayablesDuesView() {
           </div>
         </div>
       </div>
+
+      {/* Settle / Review Payable Modal */}
+      {settleModalItem && (
+        <div className="fixed inset-0 z-50 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-2xl p-6 flex flex-col gap-4">
+            <div className="flex items-start justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-[#b48e28] border border-amber-200/60 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-xl">payments</span>
+                </div>
+                <div>
+                  <h3 className="font-serif font-bold text-slate-900 text-base">
+                    Disburse Liability Settlement
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Review and authorize payment disbursement
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSettleModalItem(null)}
+                className="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
+            </div>
+
+            {/* Payable Details Card */}
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/80 flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-500">Beneficiary / Vendor</span>
+                <span className="text-xs font-bold text-slate-900">{settleModalItem.creditorName}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-500">Invoice Note</span>
+                <span className="text-xs text-slate-700">{settleModalItem.invoiceNote}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-500">Disbursement Route</span>
+                <span className="text-xs font-semibold text-slate-800 flex items-center gap-1">
+                  <span className="material-symbols-outlined text-xs text-slate-500">account_balance</span>
+                  <span>{settleModalItem.disbursementRoute || 'Direct Wire'}</span>
+                </span>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-slate-200/60">
+                <span className="text-xs font-bold text-slate-700">Settlement Amount</span>
+                <AmountDisplay
+                  amount={settleModalItem.amount}
+                  privacyMode={privacyMode}
+                  size="base"
+                  color="text-slate-900"
+                />
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-between gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  deletePayable(settleModalItem.id);
+                  setSettleModalItem(null);
+                  showToast(`Removed payable for ${settleModalItem.creditorName}`);
+                }}
+                className="h-10 px-3 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+              >
+                Delete Bill
+              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSettleModalItem(null)}
+                  className="h-10 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSettle(settleModalItem)}
+                  className="h-10 px-5 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 text-xs font-bold shadow-xs hover:shadow transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-base">check</span>
+                  <span>Authorize &amp; Settle</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Feedback */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-60 bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-xl border border-slate-700 flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
+          <span className="material-symbols-outlined text-sm text-emerald-400">check_circle</span>
+          <span>{toastMessage}</span>
+        </div>
+      )}
     </div>
   );
 }
