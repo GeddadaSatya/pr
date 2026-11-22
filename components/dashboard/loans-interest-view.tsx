@@ -805,7 +805,7 @@ export function LoansInterestView() {
       {/* Interactive ROI Calculator Simulator & Visual Analytics Bento Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Left: Interactive Calculator (7 cols) */}
-        <div className="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs flex flex-col justify-between">
+        <div className="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs flex flex-col justify-between min-w-0 max-w-full">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 flex-wrap gap-2">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-[#fdf8ea] border border-[#d4af37]/30 flex items-center justify-center text-[#9a761e]">
@@ -1071,7 +1071,7 @@ export function LoansInterestView() {
 
           {/* Month-by-Month Compounding Schedule Table */}
           {showSchedule && isCompound && (
-            <div className="mt-3 pt-3 border-t border-slate-200 flex flex-col gap-2 animate-in fade-in duration-200">
+            <div className="mt-3 pt-3 border-t border-slate-200 flex flex-col gap-2 animate-in fade-in duration-200 w-full min-w-0 max-w-full">
               <div className="flex items-center justify-between flex-wrap gap-1">
                 <div className="flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-sm text-[#9a761e]">table_rows</span>
@@ -1084,7 +1084,7 @@ export function LoansInterestView() {
                 </span>
               </div>
 
-              <div className="overflow-x-auto max-h-52 border border-slate-200 rounded-xl bg-white shadow-2xs">
+              <div className="overflow-x-auto max-h-52 border border-slate-200 rounded-xl bg-white shadow-2xs w-full max-w-full">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead className="sticky top-0 bg-slate-50 border-b border-slate-200 text-[#76777d] text-[10px] uppercase font-bold tracking-wider">
                     <tr>
@@ -1140,7 +1140,7 @@ export function LoansInterestView() {
         </div>
 
         {/* Right: Visual Growth Trend & Next Due (5 cols) */}
-        <div className="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs flex flex-col justify-between min-w-0 max-w-full">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[#0f172a] text-lg">trending_up</span>

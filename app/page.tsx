@@ -49,7 +49,7 @@ function DashboardContent() {
 
         {/* Dashboard Main Canvas */}
         <main className="w-full pt-20 pb-28 md:pt-20 md:pb-12 bg-[#f8fafc] min-h-[calc(100vh-4rem)]">
-          <div className="flex flex-col w-full px-4 md:px-0 md:w-[88%] mx-auto gap-5 md:gap-6">
+          <div className="flex flex-col w-full px-4 md:px-0 md:w-[80%] mx-auto gap-5 md:gap-6">
             {activeTab === 'expenses' ? (
               <ExpenseNotebookView onOpenDayLedger={handleOpenDayLedger} />
             ) : activeTab === 'day-ledger' ? (

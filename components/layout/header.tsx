@@ -25,7 +25,7 @@ export function Header() {
         isCollapsed ? 'left-20' : 'left-60'
       }`}
     >
-      <div className="w-[88%] mx-auto h-16 flex items-center justify-between">
+      <div className="w-[80%] mx-auto h-16 flex items-center justify-between">
         <div className="flex items-center gap-4">
           {/* Left spacing/slot */}
         </div>

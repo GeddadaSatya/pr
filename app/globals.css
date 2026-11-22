@@ -6,6 +6,12 @@
 
 @layer base {
 
+  @media (min-width: 975px) {
+    html {
+      zoom: 0.8;
+    }
+  }
+
   html,
   body {
     margin: 0;

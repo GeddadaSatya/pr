@@ -754,7 +754,7 @@ export function BorrowerDetailView({
         </div>
 
         {/* Advances Data Table */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto w-full max-w-full">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50/70 border-b border-slate-200 text-slate-500 font-medium">
@@ -1017,7 +1017,7 @@ export function BorrowerDetailView({
         </div>
 
         {/* Documents Table List */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto w-full max-w-full">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="bg-slate-50/70 border-b border-slate-200 text-slate-500 font-medium">
