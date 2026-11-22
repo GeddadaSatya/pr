@@ -264,6 +264,7 @@ export function LoansInterestView() {
   const [simRate, setSimRate] = useState<number>(1.5);
   const [simTenure, setSimTenure] = useState<number>(12);
   const [isCompound, setIsCompound] = useState<boolean>(false);
+  const [showSchedule, setShowSchedule] = useState<boolean>(true);
 
   // Notification Toast
   const [notification, setNotification] = useState<string | null>(null);
@@ -272,6 +273,59 @@ export function LoansInterestView() {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3000);
   };
+
+  // Month-by-month Compounding & Schedule Breakdown
+  const monthlySchedule = useMemo(() => {
+    const P = simPrincipal > 0 ? simPrincipal : 0;
+    const r = (simRate > 0 ? simRate : 0) / 100;
+    const m = Math.min(Math.max(simTenure, 1), 60);
+
+    const schedule: Array<{
+      month: number;
+      opening: number;
+      baseInterest: number;
+      interestOnInterest: number;
+      monthTotalInterest: number;
+      closing: number;
+    }> = [];
+
+    let currentBalance = P;
+    const baseInterest = P * r;
+
+    for (let i = 1; i <= m; i++) {
+      const opening = currentBalance;
+      const accruedPreviousInterest = Math.max(0, opening - P);
+      const interestOnInterest = isCompound ? accruedPreviousInterest * r : 0;
+      const monthTotalInterest = baseInterest + interestOnInterest;
+      const closing = opening + monthTotalInterest;
+      currentBalance = closing;
+
+      schedule.push({
+        month: i,
+        opening,
+        baseInterest,
+        interestOnInterest,
+        monthTotalInterest,
+        closing,
+      });
+    }
+
+    const firstMonthInterest = schedule[0]?.monthTotalInterest || 0;
+    const lastMonth = schedule[schedule.length - 1];
+    const lastMonthInterest = lastMonth?.monthTotalInterest || 0;
+    const lastMonthInterestOnInterest = lastMonth?.interestOnInterest || 0;
+    const totalInterestOnInterest = schedule.reduce((sum, item) => sum + item.interestOnInterest, 0);
+    const totalBaseInterest = baseInterest * m;
+
+    return {
+      rows: schedule,
+      firstMonthInterest,
+      lastMonthInterest,
+      lastMonthInterestOnInterest,
+      totalInterestOnInterest,
+      totalBaseInterest,
+    };
+  }, [simPrincipal, simRate, simTenure, isCompound]);
 
   // Calculator Math
   const calcResults = useMemo(() => {
@@ -747,30 +801,186 @@ export function LoansInterestView() {
 
           {/* Results Boxes */}
           <div className="pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="bg-[#f8fafc] p-3 rounded-xl border border-slate-200/80">
-              <span className="text-[10px] text-[#76777d] block uppercase tracking-wider font-semibold">Monthly Interest</span>
-              <span className="font-serif text-base md:text-lg text-[#9a761e] font-bold block mt-0.5">
-                ₹{calcResults.monthly.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </span>
-              <span className="text-[11px] text-[#76777d] mt-0.5 block">Monthly income</span>
+            {/* Monthly Interest Card */}
+            <div className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-[#76777d] block uppercase tracking-wider font-semibold">
+                    {isCompound ? 'Monthly Interest (Compounding)' : 'Monthly Interest'}
+                  </span>
+                  {isCompound && (
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200">
+                      Grows monthly
+                    </span>
+                  )}
+                </div>
+
+                {isCompound && simTenure > 1 ? (
+                  <div className="mt-1 flex flex-col gap-1">
+                    <div className="flex items-baseline justify-between gap-1">
+                      <span className="text-xs text-[#76777d]">1st Month:</span>
+                      <span className="font-serif text-base font-bold text-[#9a761e]">
+                        ₹{monthlySchedule.firstMonthInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+
+                    <div className="flex items-baseline justify-between gap-1 pt-1 border-t border-slate-200/60">
+                      <span className="text-xs text-[#0f172a] font-semibold">Month {simTenure}:</span>
+                      <span className="font-serif text-base font-bold text-[#0f172a]">
+                        ₹{monthlySchedule.lastMonthInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-[10px] text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60 mt-0.5">
+                      <span>+ Interest on Interest:</span>
+                      <span className="font-bold">
+                        +₹{monthlySchedule.lastMonthInterestOnInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <span className="font-serif text-base md:text-lg text-[#9a761e] font-bold block mt-0.5">
+                      ₹{monthlySchedule.firstMonthInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-[11px] text-[#76777d] mt-0.5 block">
+                      {isCompound ? 'Month 1 base rate' : 'Monthly income (Fixed)'}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-2 pt-1 border-t border-slate-200/40 text-[11px] text-[#76777d] flex items-center justify-between">
+                <span>
+                  {isCompound && simTenure > 1
+                    ? `Avg: ₹${calcResults.monthly.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mo`
+                    : '1st Month Base'}
+                </span>
+                {isCompound && (
+                  <button
+                    type="button"
+                    onClick={() => setShowSchedule(!showSchedule)}
+                    className="text-[10px] font-semibold text-[#9a761e] hover:underline cursor-pointer flex items-center gap-0.5"
+                  >
+                    <span>{showSchedule ? 'Hide detail' : 'View breakdown'}</span>
+                    <span className="material-symbols-outlined text-[12px]">
+                      {showSchedule ? 'expand_less' : 'expand_more'}
+                    </span>
+                  </button>
+                )}
+              </div>
             </div>
 
-            <div className="bg-[#f8fafc] p-3 rounded-xl border border-slate-200/80">
-              <span className="text-[10px] text-[#76777d] block uppercase tracking-wider font-semibold">Total Interest</span>
-              <span className="font-serif text-base md:text-lg text-[#0f172a] font-bold block mt-0.5">
-                +₹{calcResults.totalInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </span>
-              <span className="text-[11px] text-[#76777d] mt-0.5 block">Total interest earned</span>
+            {/* Total Interest Card */}
+            <div className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] text-[#76777d] block uppercase tracking-wider font-semibold">Total Interest</span>
+                <span className="font-serif text-base md:text-lg text-[#0f172a] font-bold block mt-0.5">
+                  +₹{calcResults.totalInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+                {isCompound && monthlySchedule.totalInterestOnInterest > 0 ? (
+                  <div className="mt-1 flex flex-col gap-0.5 text-[10px]">
+                    <span className="text-slate-600">
+                      Base Interest: ₹{monthlySchedule.totalBaseInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-emerald-700 font-bold">
+                      +₹{monthlySchedule.totalInterestOnInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} on interest
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-[11px] text-[#76777d] mt-0.5 block">Total interest earned</span>
+                )}
+              </div>
+              <div className="mt-2 pt-1 border-t border-slate-200/40 text-[10px] text-slate-500">
+                Yield: {((calcResults.totalInterest / (simPrincipal || 1)) * 100).toFixed(1)}% total return
+              </div>
             </div>
 
-            <div className="bg-[#f8fafc] p-3 rounded-xl border border-slate-200/80">
-              <span className="text-[10px] text-[#76777d] block uppercase tracking-wider font-semibold">Total You Get Back</span>
-              <span className="font-serif text-base md:text-lg text-[#0f172a] font-extrabold block mt-0.5">
-                ₹{calcResults.gross.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </span>
-              <span className="text-[11px] text-[#76777d] mt-0.5 block">Principal + interest</span>
+            {/* Total You Get Back Card */}
+            <div className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 flex flex-col justify-between">
+              <div>
+                <span className="text-[10px] text-[#76777d] block uppercase tracking-wider font-semibold">Total You Get Back</span>
+                <span className="font-serif text-base md:text-lg text-[#0f172a] font-extrabold block mt-0.5">
+                  ₹{calcResults.gross.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+                <span className="text-[11px] text-[#76777d] mt-0.5 block">
+                  Principal (₹{simPrincipal.toLocaleString('en-IN')}) + Interest
+                </span>
+              </div>
+              <div className="mt-2 pt-1 border-t border-slate-200/40 text-[10px] text-slate-500">
+                Maturity in {simTenure} months
+              </div>
             </div>
           </div>
+
+          {/* Month-by-Month Compounding Schedule Table */}
+          {showSchedule && isCompound && (
+            <div className="mt-3 pt-3 border-t border-slate-200 flex flex-col gap-2 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between flex-wrap gap-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-sm text-[#9a761e]">table_rows</span>
+                  <span className="text-xs font-bold text-[#0f172a]">
+                    Month-by-Month Compounding Breakdown ({simTenure} Months)
+                  </span>
+                </div>
+                <span className="text-[10px] text-slate-500 font-medium">
+                  Base rate: {simRate}% on ₹{simPrincipal.toLocaleString('en-IN')} (₹{(simPrincipal * (simRate / 100)).toLocaleString('en-IN')}/mo)
+                </span>
+              </div>
+
+              <div className="overflow-x-auto max-h-52 border border-slate-200 rounded-xl bg-white shadow-2xs">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead className="sticky top-0 bg-slate-50 border-b border-slate-200 text-[#76777d] text-[10px] uppercase font-bold tracking-wider">
+                    <tr>
+                      <th className="py-2 px-3">Month</th>
+                      <th className="py-2 px-3">Opening Principal</th>
+                      <th className="py-2 px-3">1st Mo Base Int.</th>
+                      <th className="py-2 px-3 text-emerald-800">+ Int. on Interest</th>
+                      <th className="py-2 px-3">Total Month Payout</th>
+                      <th className="py-2 px-3 text-right">Closing Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-[11px]">
+                    {monthlySchedule.rows.map((row) => (
+                      <tr key={row.month} className="hover:bg-slate-50/70">
+                        <td className="py-2 px-3 font-bold text-[#0f172a]">Month {row.month}</td>
+                        <td className="py-2 px-3 text-slate-600 font-mono">
+                          ₹{row.opening.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                        <td className="py-2 px-3 text-slate-700 font-mono font-medium">
+                          ₹{row.baseInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                        <td className="py-2 px-3 font-mono">
+                          {row.interestOnInterest > 0 ? (
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/50">
+                              +₹{row.interestOnInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 font-normal">₹0.00 (Base)</span>
+                          )}
+                        </td>
+                        <td className="py-2 px-3 font-bold font-mono text-[#9a761e]">
+                          ₹{row.monthTotalInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                        <td className="py-2 px-3 text-right font-bold font-mono text-[#0f172a]">
+                          ₹{row.closing.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 px-2.5 py-2 rounded-lg bg-[#fdf8ea] border border-[#d4af37]/30 text-[11px] text-[#0f172a] font-medium">
+                <span>
+                  Compound Formula: <code className="font-mono text-[10px] bg-white px-1.5 py-0.5 rounded border border-[#d4af37]/30">₹{simPrincipal.toLocaleString('en-IN')} × (1 + {simRate}%)^{simTenure}</code>
+                </span>
+                <span className="font-bold text-[#9a761e]">
+                  Extra Earned from Compounding: +₹{monthlySchedule.totalInterestOnInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right: Visual Growth Trend & Next Due (5 cols) */}
