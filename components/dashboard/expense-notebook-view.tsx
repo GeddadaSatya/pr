@@ -548,6 +548,8 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           {dateGroups.map((group) => {
             if (group.items.length === 0) return null;
 
+            const displayedItems = group.items.slice(0, 5);
+
             return (
               <div key={group.dateKey} className="flex flex-col gap-3">
                 {/* Date Group Header */}
@@ -579,20 +581,12 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                         </span>
                       )}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => onOpenDayLedger(group.dateKey)}
-                      className="text-xs font-semibold text-[#b48e28] hover:text-[#8c6b12] flex items-center gap-0.5 transition-colors cursor-pointer"
-                    >
-                      <span>View Day Ledger</span>
-                      <span className="material-symbols-outlined text-sm">chevron_right</span>
-                    </button>
                   </div>
                 </div>
 
-                {/* Items in this date group */}
+                {/* Items in this date group: only show recent 5 */}
                 <div className="flex flex-col gap-2.5">
-                  {group.items.map((item) => (
+                  {displayedItems.map((item) => (
                     <div
                       key={item.id}
                       className="bg-white rounded-xl p-3.5 sm:p-4 border border-slate-200/80 hover:border-slate-300 shadow-xs hover:shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
@@ -622,10 +616,6 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
                               {item.tag}
                             </span>
-                            <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200/60">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                              <span>{item.statusBadge}</span>
-                            </span>
                           </div>
 
                           {/* Subtitle details */}
@@ -652,6 +642,27 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                       </div>
                     </div>
                   ))}
+                </div>
+
+                {/* Bottom of Day Group: View Day Ledger (kept at bottom of every day) */}
+                <div className="pt-0.5 flex items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={() => onOpenDayLedger(group.dateKey)}
+                    className="w-full py-2 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-xs font-semibold text-slate-700 hover:text-slate-950 flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs group"
+                  >
+                    <span className="material-symbols-outlined text-sm text-[#b48e28] group-hover:translate-x-0.5 transition-transform">
+                      menu_book
+                    </span>
+                    <span>
+                      {group.items.length > 5
+                        ? `View All (${group.items.length} Entries) in Day Ledger`
+                        : 'View Day Ledger'}
+                    </span>
+                    <span className="material-symbols-outlined text-sm text-slate-400 group-hover:text-slate-700 transition-colors">
+                      chevron_right
+                    </span>
+                  </button>
                 </div>
               </div>
             );
