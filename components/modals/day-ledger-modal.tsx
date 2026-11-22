@@ -162,19 +162,8 @@ export function DayLedgerModal({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ paddingLeft: '2.625rem' }}
-              className={`w-full h-10 ${searchTerm ? 'pr-9' : 'pr-3'} text-xs md:text-sm bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-slate-200/90 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#d4af37]/40 text-slate-900 placeholder:text-slate-400 transition-all`}
+              className="w-full h-10 pr-3 text-xs md:text-sm bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-slate-200/90 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#d4af37]/40 text-slate-900 placeholder:text-slate-400 transition-all"
             />
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={() => setSearchTerm('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
-                title="Clear search"
-                aria-label="Clear search"
-              >
-                <span className="material-symbols-outlined text-sm leading-none">close</span>
-              </button>
-            )}
           </div>
 
           {/* Center / Right: Filters & Action Buttons */}

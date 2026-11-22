@@ -562,18 +562,6 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                 <span className="material-symbols-outlined text-sm text-slate-500">expand_more</span>
               </button>
 
-              {selectedDateFilter !== 'all' && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedDateFilter('all')}
-                  className="h-9 w-7 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
-                  title="Clear date filter"
-                  aria-label="Clear date filter"
-                >
-                  <span className="material-symbols-outlined text-xs">close</span>
-                </button>
-              )}
-
               {isDateFilterOpen && (
                 <div className="absolute left-0 mt-1 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-30 animate-fade-in top-full">
                   {[
@@ -659,7 +647,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                       )}
                     </span>
 
-                    {/* Search Box with Individual Clear Button */}
+                    {/* Search Box */}
                     <div className="relative flex items-center">
                       <span className="material-symbols-outlined absolute left-2.5 text-slate-400 text-sm pointer-events-none">
                         search
@@ -667,62 +655,39 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                       <input
                         value={dayFilter.search}
                         onChange={(e) => handleDaySearchChange(group.dateKey, e.target.value)}
-                        className={`h-7.5 pl-8.5 ${dayFilter.search ? 'pr-7' : 'pr-2.5'} text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-36 sm:w-52 shadow-2xs`}
+                        className="h-7.5 pl-8.5 pr-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-36 sm:w-52 shadow-2xs"
                         style={{ paddingLeft: '2.125rem' }}
                         placeholder="Search transactions..."
                         type="text"
                       />
-                      {dayFilter.search && (
-                        <button
-                          type="button"
-                          onClick={() => handleDaySearchChange(group.dateKey, '')}
-                          className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer flex items-center justify-center p-0.5"
-                          title="Clear search"
-                        >
-                          <span className="material-symbols-outlined text-xs leading-none">close</span>
-                        </button>
-                      )}
                     </div>
                   </div>
 
                   {/* Right: Category Dropdown & Clear Filters */}
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1">
-                      <div className="relative flex items-center">
-                        <span className="material-symbols-outlined absolute left-2 text-slate-500 text-xs pointer-events-none">
-                          filter_list
-                        </span>
-                        <select
-                          value={dayFilter.category}
-                          onChange={(e) => handleDayCategoryChange(group.dateKey, e.target.value)}
-                          className={`h-7.5 pl-6 pr-6 text-xs font-semibold rounded-lg border transition-all shadow-2xs cursor-pointer ${
-                            dayFilter.category !== 'all'
-                              ? 'bg-amber-50/80 border-amber-300 text-amber-950 font-bold'
-                              : 'bg-white border-slate-200 text-slate-700 hover:border-[#d4af37]'
-                          }`}
-                        >
-                          <option value="all">All Categories</option>
-                          <option value="Dining">Dining</option>
-                          <option value="Travel">Travel &amp; Logistics</option>
-                          <option value="Hardware">Hardware &amp; Tech</option>
-                          <option value="Tech">Tech &amp; Infra</option>
-                          <option value="Hosting">Client Hosting</option>
-                          <option value="Legal">Legal &amp; Retainers</option>
-                          <option value="Real Estate">Real Estate &amp; Maintenance</option>
-                          <option value="Wellness">Wellness</option>
-                        </select>
-                      </div>
-
-                      {dayFilter.category !== 'all' && (
-                        <button
-                          type="button"
-                          onClick={() => handleDayCategoryChange(group.dateKey, 'all')}
-                          className="h-7.5 w-6 rounded-lg border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 flex items-center justify-center transition-colors cursor-pointer shadow-2xs shrink-0"
-                          title="Clear category filter"
-                        >
-                          <span className="material-symbols-outlined text-xs">close</span>
-                        </button>
-                      )}
+                    <div className="relative flex items-center">
+                      <span className="material-symbols-outlined absolute left-2 text-slate-500 text-xs pointer-events-none">
+                        filter_list
+                      </span>
+                      <select
+                        value={dayFilter.category}
+                        onChange={(e) => handleDayCategoryChange(group.dateKey, e.target.value)}
+                        className={`h-7.5 pl-6 pr-6 text-xs font-semibold rounded-lg border transition-all shadow-2xs cursor-pointer ${
+                          dayFilter.category !== 'all'
+                            ? 'bg-amber-50/80 border-amber-300 text-amber-950 font-bold'
+                            : 'bg-white border-slate-200 text-slate-700 hover:border-[#d4af37]'
+                        }`}
+                      >
+                        <option value="all">All Categories</option>
+                        <option value="Dining">Dining</option>
+                        <option value="Travel">Travel &amp; Logistics</option>
+                        <option value="Hardware">Hardware &amp; Tech</option>
+                        <option value="Tech">Tech &amp; Infra</option>
+                        <option value="Hosting">Client Hosting</option>
+                        <option value="Legal">Legal &amp; Retainers</option>
+                        <option value="Real Estate">Real Estate &amp; Maintenance</option>
+                        <option value="Wellness">Wellness</option>
+                      </select>
                     </div>
 
                     <button
