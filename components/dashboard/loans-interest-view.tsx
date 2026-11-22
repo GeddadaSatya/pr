@@ -791,18 +791,7 @@ export function LoansInterestView() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
             {/* Loan Amount */}
             <div className="flex flex-col gap-1.5">
-              <div className="flex justify-between items-center">
-                <label className="text-[11px] text-[#45464d] uppercase font-semibold">Loan Amount</label>
-                {simPrincipal !== '' && (
-                  <button
-                    type="button"
-                    onClick={() => setSimPrincipal('')}
-                    className="text-[10px] text-slate-400 hover:text-slate-700 cursor-pointer"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
+              <label className="text-[11px] text-[#45464d] uppercase font-semibold">Loan Amount</label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#0f172a] font-bold">₹</span>
                 <input
@@ -814,18 +803,8 @@ export function LoansInterestView() {
                     const clean = e.target.value.replace(/[^0-9]/g, '');
                     setSimPrincipal(clean);
                   }}
-                  className="w-full h-10 bg-[#f8fafc] border border-slate-200 pl-7 pr-8 rounded-xl text-xs md:text-sm font-semibold text-[#0f172a] focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white transition-all"
+                  className="w-full h-10 bg-[#f8fafc] border border-slate-200 pl-7 pr-3 rounded-xl text-xs md:text-sm font-semibold text-[#0f172a] focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white transition-all"
                 />
-                {simPrincipal !== '' && (
-                  <button
-                    type="button"
-                    onClick={() => setSimPrincipal('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
-                    title="Clear input"
-                  >
-                    <span className="material-symbols-outlined text-xs">close</span>
-                  </button>
-                )}
               </div>
               <span className="text-[11px] text-[#76777d]">Principal sum</span>
             </div>
@@ -834,20 +813,9 @@ export function LoansInterestView() {
             <div className="flex flex-col gap-1.5">
               <div className="flex justify-between items-center">
                 <label className="text-[11px] text-[#45464d] uppercase font-semibold">Interest Rate</label>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] text-[#9a761e] font-semibold">
-                    {parsedRate > 0 ? `${parsedRate.toFixed(2)}% / mo` : '0% / mo'}
-                  </span>
-                  {simRate !== '' && (
-                    <button
-                      type="button"
-                      onClick={() => setSimRate('')}
-                      className="text-[10px] text-slate-400 hover:text-slate-700 cursor-pointer"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
+                <span className="text-[11px] text-[#9a761e] font-semibold">
+                  {parsedRate > 0 ? `${parsedRate.toFixed(2)}% / mo` : '0% / mo'}
+                </span>
               </div>
               <div className="relative">
                 <input
@@ -859,21 +827,9 @@ export function LoansInterestView() {
                     const clean = e.target.value.replace(/[^0-9.]/g, '');
                     setSimRate(clean);
                   }}
-                  className="w-full h-10 bg-[#f8fafc] border border-slate-200 px-3 pr-16 rounded-xl text-xs md:text-sm font-semibold text-[#0f172a] focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white transition-all"
+                  className="w-full h-10 bg-[#f8fafc] border border-slate-200 px-3 pr-14 rounded-xl text-xs md:text-sm font-semibold text-[#0f172a] focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white transition-all"
                 />
-                <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                  {simRate !== '' && (
-                    <button
-                      type="button"
-                      onClick={() => setSimRate('')}
-                      className="w-5 h-5 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
-                      title="Clear input"
-                    >
-                      <span className="material-symbols-outlined text-xs">close</span>
-                    </button>
-                  )}
-                  <span className="text-[11px] text-[#76777d] pointer-events-none">% / mo</span>
-                </div>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-[#76777d] pointer-events-none">% / mo</span>
               </div>
               <span className="text-[11px] text-[#76777d]">Monthly rate</span>
             </div>
@@ -882,20 +838,9 @@ export function LoansInterestView() {
             <div className="flex flex-col gap-1.5">
               <div className="flex justify-between items-center">
                 <label className="text-[11px] text-[#45464d] uppercase font-semibold">Duration</label>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] text-[#0f172a] font-semibold">
-                    {parsedTenure > 0 ? `${parsedTenure} Months` : '0 Months'}
-                  </span>
-                  {simTenure !== '' && (
-                    <button
-                      type="button"
-                      onClick={() => setSimTenure('')}
-                      className="text-[10px] text-slate-400 hover:text-slate-700 cursor-pointer"
-                    >
-                      Clear
-                    </button>
-                  )}
-                </div>
+                <span className="text-[11px] text-[#0f172a] font-semibold">
+                  {parsedTenure > 0 ? `${parsedTenure} Months` : '0 Months'}
+                </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="relative flex-1">
@@ -908,21 +853,9 @@ export function LoansInterestView() {
                       const clean = e.target.value.replace(/[^0-9]/g, '');
                       setSimTenure(clean);
                     }}
-                    className="w-full h-10 bg-[#f8fafc] border border-slate-200 px-3 pr-12 rounded-xl text-xs md:text-sm font-semibold text-[#0f172a] focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white transition-all"
+                    className="w-full h-10 bg-[#f8fafc] border border-slate-200 px-3 pr-10 rounded-xl text-xs md:text-sm font-semibold text-[#0f172a] focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white transition-all"
                   />
-                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                    {simTenure !== '' && (
-                      <button
-                        type="button"
-                        onClick={() => setSimTenure('')}
-                        className="w-4 h-4 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
-                        title="Clear input"
-                      >
-                        <span className="material-symbols-outlined text-[11px]">close</span>
-                      </button>
-                    )}
-                    <span className="text-[11px] text-[#76777d] pointer-events-none">Mo</span>
-                  </div>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-[#76777d] pointer-events-none">Mo</span>
                 </div>
                 <button
                   type="button"
