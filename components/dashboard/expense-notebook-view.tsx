@@ -564,11 +564,20 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-medium text-slate-500 font-label-numeric flex items-baseline gap-1">
+                    <span className="text-xs font-medium text-slate-500 flex items-baseline gap-1">
                       <span>Total:</span>
-                      <span className="text-sm font-bold text-slate-900">
-                        {privacyMode ? '••••••' : `₹${group.total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-                      </span>
+                      {privacyMode ? (
+                        <span className="text-sm font-bold text-slate-900 font-serif">••••••</span>
+                      ) : (
+                        <span className="inline-flex items-baseline gap-0.5">
+                          <span className="text-sm font-bold text-slate-900 font-serif">
+                            ₹{Math.floor(group.total).toLocaleString('en-IN')}
+                          </span>
+                          <span className="font-label-numeric text-xs text-slate-500 font-medium">
+                            .{(group.total % 1).toFixed(2).split('.')[1] || '00'}
+                          </span>
+                        </span>
+                      )}
                     </span>
                     <button
                       type="button"
@@ -628,9 +637,18 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
 
                       {/* Right Side: Amount */}
                       <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
-                        <span className="text-base font-bold text-slate-900 tracking-tight font-label-numeric">
-                          {privacyMode ? '••••••' : `-₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-                        </span>
+                        {privacyMode ? (
+                          <span className="text-base font-bold text-slate-900 tracking-tight font-serif">••••••</span>
+                        ) : (
+                          <div className="flex items-baseline gap-0.5">
+                            <span className="text-base font-bold text-slate-900 tracking-tight font-serif">
+                              -₹{Math.floor(item.amount).toLocaleString('en-IN')}
+                            </span>
+                            <span className="font-label-numeric text-xs text-slate-500 font-medium">
+                              .{(item.amount % 1).toFixed(2).split('.')[1] || '00'}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

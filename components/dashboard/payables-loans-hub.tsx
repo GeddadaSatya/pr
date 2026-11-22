@@ -34,9 +34,18 @@ export function PayablesLoansHub() {
             </div>
           </div>
           <div className="mt-3">
-            <span className="font-label-numeric text-base font-bold text-slate-900">
-              {privacyMode ? '••••••' : `₹${totalPayables.toLocaleString('en-IN')}${totalPayables === 0 ? '.00' : ''}`}
-            </span>
+            {privacyMode ? (
+              <span className="font-serif text-base font-bold text-slate-900">••••••</span>
+            ) : (
+              <div className="flex items-baseline gap-0.5">
+                <span className="font-serif text-base font-bold text-slate-900">
+                  ₹{Math.floor(totalPayables).toLocaleString('en-IN')}
+                </span>
+                <span className="font-label-numeric text-xs font-medium text-slate-400">
+                  .00
+                </span>
+              </div>
+            )}
             {totalPayables === 0 ? (
               <div className="flex items-center gap-1.5 font-body-sm text-xs text-slate-500 mt-1">
                 <span className="w-2 h-2 rounded-full bg-[#fed65b] inline-block shrink-0" />
@@ -62,9 +71,18 @@ export function PayablesLoansHub() {
             </div>
           </div>
           <div className="mt-3">
-            <span className="font-label-numeric text-base font-bold text-slate-900">
-              {privacyMode ? '••••••' : `₹${totalLoans.toLocaleString('en-IN')}${totalLoans === 0 ? '.00' : ''}`}
-            </span>
+            {privacyMode ? (
+              <span className="font-serif text-base font-bold text-slate-900">••••••</span>
+            ) : (
+              <div className="flex items-baseline gap-0.5">
+                <span className="font-serif text-base font-bold text-slate-900">
+                  ₹{Math.floor(totalLoans).toLocaleString('en-IN')}
+                </span>
+                <span className="font-label-numeric text-xs font-medium text-slate-400">
+                  .00
+                </span>
+              </div>
+            )}
             {totalLoans === 0 ? (
               <div className="flex items-center gap-1.5 font-body-sm text-xs text-slate-500 mt-1">
                 <span className="w-2 h-2 rounded-full bg-slate-300 inline-block shrink-0" />
@@ -151,9 +169,18 @@ export function PayablesLoansHub() {
                     </div>
 
                     <div className="flex flex-col items-end">
-                      <span className="font-extrabold text-xs text-slate-900">
-                        {formatCurrency(item.amount, privacyMode)}
-                      </span>
+                      {privacyMode ? (
+                        <span className="font-serif font-bold text-sm text-slate-900">••••••</span>
+                      ) : (
+                        <div className="flex items-baseline gap-0.5">
+                          <span className="font-serif font-bold text-sm text-slate-900 tracking-tight">
+                            ₹{Math.floor(item.amount).toLocaleString('en-IN')}
+                          </span>
+                          <span className="font-label-numeric text-[11px] font-medium text-slate-400">
+                            .{(item.amount % 1).toFixed(2).split('.')[1] || '00'}
+                          </span>
+                        </div>
+                      )}
                       <span
                         className={`text-[10px] font-semibold flex items-center gap-0.5 ${
                           item.urgencyBadge?.includes('Due in')
@@ -247,9 +274,18 @@ export function PayablesLoansHub() {
                     </div>
 
                     <div className="flex flex-col items-end">
-                      <span className="font-extrabold text-xs text-slate-900">
-                        {formatCurrency(loan.principalAmount, privacyMode)}
-                      </span>
+                      {privacyMode ? (
+                        <span className="font-serif font-bold text-sm text-slate-900">••••••</span>
+                      ) : (
+                        <div className="flex items-baseline gap-0.5">
+                          <span className="font-serif font-bold text-sm text-slate-900 tracking-tight">
+                            ₹{Math.floor(loan.principalAmount).toLocaleString('en-IN')}
+                          </span>
+                          <span className="font-label-numeric text-[11px] font-medium text-slate-400">
+                            .{(loan.principalAmount % 1).toFixed(2).split('.')[1] || '00'}
+                          </span>
+                        </div>
+                      )}
                       <span className="text-[11px] text-[#b48e28] font-semibold">
                         +{privacyMode ? '••••' : `₹${Math.round(loan.monthlyInterest).toLocaleString('en-IN')}`}/mo interest
                       </span>
@@ -262,7 +298,15 @@ export function PayablesLoansHub() {
 
           <div className="mt-4 pt-3 flex items-center justify-between text-xs text-slate-500 border-t border-slate-100">
             <span>
-              Total interest collected: {privacyMode ? '••••' : '₹11,400.00'}
+              Total interest collected:{' '}
+              {privacyMode ? (
+                '••••'
+              ) : (
+                <span className="inline-flex items-baseline gap-0.5 font-semibold text-slate-900">
+                  <span className="font-serif font-bold">₹11,400</span>
+                  <span className="font-label-numeric text-[11px] text-slate-400 font-medium">.00</span>
+                </span>
+              )}
             </span>
             <button
               onClick={() => openModal('loan')}

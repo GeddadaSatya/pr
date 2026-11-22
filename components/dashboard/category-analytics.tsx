@@ -183,9 +183,18 @@ export function CategoryAnalytics() {
                   <span className="font-label-caps text-[10px] text-slate-400 tracking-wider uppercase font-semibold">
                     Total Spent
                   </span>
-                  <span className="font-label-numeric text-lg font-bold text-slate-900 mt-0.5">
-                    {privacyMode ? '••••••' : `₹${totalSpent.toLocaleString('en-IN')}`}
-                  </span>
+                  {privacyMode ? (
+                    <span className="font-serif text-lg font-bold text-slate-900 mt-0.5">••••••</span>
+                  ) : (
+                    <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                      <span className="font-serif text-lg font-bold text-slate-900 tracking-tight">
+                        ₹{Math.floor(totalSpent).toLocaleString('en-IN')}
+                      </span>
+                      <span className="font-label-numeric text-xs text-slate-400 font-medium">
+                        .00
+                      </span>
+                    </div>
+                  )}
                   <span className="font-label-caps text-[10px] text-[#735c00] font-bold mt-0.5">
                     8 Sectors
                   </span>
@@ -202,9 +211,14 @@ export function CategoryAnalytics() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="font-label-numeric text-slate-400 text-xs">30%</span>
-                  <span className="font-label-numeric font-medium text-slate-900">
-                    {privacyMode ? '••••' : '₹5,835.00'}
-                  </span>
+                  {privacyMode ? (
+                    <span className="font-serif font-bold text-xs text-slate-900">••••</span>
+                  ) : (
+                    <div className="flex items-baseline gap-0.5">
+                      <span className="font-serif font-bold text-xs text-slate-900">₹5,835</span>
+                      <span className="font-label-numeric text-[10px] text-slate-400 font-medium">.00</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -215,9 +229,14 @@ export function CategoryAnalytics() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="font-label-numeric text-slate-400 text-xs">20%</span>
-                  <span className="font-label-numeric font-medium text-slate-900">
-                    {privacyMode ? '••••' : '₹3,890.00'}
-                  </span>
+                  {privacyMode ? (
+                    <span className="font-serif font-bold text-xs text-slate-900">••••</span>
+                  ) : (
+                    <div className="flex items-baseline gap-0.5">
+                      <span className="font-serif font-bold text-xs text-slate-900">₹3,890</span>
+                      <span className="font-label-numeric text-[10px] text-slate-400 font-medium">.00</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -228,9 +247,14 @@ export function CategoryAnalytics() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="font-label-numeric text-slate-400 text-xs">9%</span>
-                  <span className="font-label-numeric font-medium text-slate-900">
-                    {privacyMode ? '••••' : '₹1,750.50'}
-                  </span>
+                  {privacyMode ? (
+                    <span className="font-serif font-bold text-xs text-slate-900">••••</span>
+                  ) : (
+                    <div className="flex items-baseline gap-0.5">
+                      <span className="font-serif font-bold text-xs text-slate-900">₹1,750</span>
+                      <span className="font-label-numeric text-[10px] text-slate-400 font-medium">.50</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -241,9 +265,14 @@ export function CategoryAnalytics() {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="font-label-numeric text-slate-400 text-xs">6%</span>
-                  <span className="font-label-numeric font-medium text-slate-900">
-                    {privacyMode ? '••••' : '₹1,167.00'}
-                  </span>
+                  {privacyMode ? (
+                    <span className="font-serif font-bold text-xs text-slate-900">••••</span>
+                  ) : (
+                    <div className="flex items-baseline gap-0.5">
+                      <span className="font-serif font-bold text-xs text-slate-900">₹1,167</span>
+                      <span className="font-label-numeric text-[10px] text-slate-400 font-medium">.00</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -480,9 +509,18 @@ export function CategoryAnalytics() {
                     <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
                       Total Spent
                     </span>
-                    <span className="font-title-md text-base font-bold text-slate-900">
-                      {formatCurrency(totalSpent, privacyMode)}
-                    </span>
+                    {privacyMode ? (
+                      <span className="font-serif text-lg font-bold text-slate-900">••••••</span>
+                    ) : (
+                      <div className="flex items-baseline justify-center gap-0.5">
+                        <span className="font-headline-sm font-serif font-bold text-slate-900">
+                          ₹{Math.floor(totalSpent).toLocaleString('en-IN')}
+                        </span>
+                        <span className="font-label-numeric text-xs text-slate-500 font-medium">
+                          .00
+                        </span>
+                      </div>
+                    )}
                     <span className="text-[10px] px-2 py-0.5 mt-0.5 rounded-full bg-slate-200/60 text-slate-600 font-medium">
                       8 Sectors
                     </span>
@@ -526,9 +564,18 @@ export function CategoryAnalytics() {
                       </div>
                       <div className="flex items-center justify-between text-[11px]">
                         <span className="text-slate-400">Ledger Sum</span>
-                        <span className="text-slate-900 font-semibold">
-                          {formatCurrency(cat.amount, privacyMode)}
-                        </span>
+                        {privacyMode ? (
+                          <span className="text-slate-900 font-bold font-serif text-xs">••••</span>
+                        ) : (
+                          <div className="flex items-baseline gap-0.5">
+                            <span className="text-slate-900 font-bold font-serif text-xs">
+                              ₹{Math.floor(cat.amount).toLocaleString('en-IN')}
+                            </span>
+                            <span className="font-label-numeric text-[10px] text-slate-400 font-medium">
+                              .{(cat.amount % 1).toFixed(2).split('.')[1] || '00'}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

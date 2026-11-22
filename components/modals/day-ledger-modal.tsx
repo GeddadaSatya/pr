@@ -477,9 +477,18 @@ export function DayLedgerModal({
 
                   {/* Right Side: Amount */}
                   <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
-                    <span className="text-base font-bold text-slate-900 tracking-tight font-label-numeric">
-                      {privacyMode ? '••••••' : `-₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-                    </span>
+                    {privacyMode ? (
+                      <span className="text-base font-bold text-slate-900 tracking-tight font-serif">••••••</span>
+                    ) : (
+                      <div className="flex items-baseline gap-0.5">
+                        <span className="text-base font-bold text-slate-900 tracking-tight font-serif">
+                          -₹{Math.floor(item.amount).toLocaleString('en-IN')}
+                        </span>
+                        <span className="font-label-numeric text-xs text-slate-500 font-medium">
+                          .{(item.amount % 1).toFixed(2).split('.')[1] || '00'}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))

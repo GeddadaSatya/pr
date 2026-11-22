@@ -240,9 +240,18 @@ export function ExpenseTable() {
                   </div>
 
                   <div className="flex flex-col items-end shrink-0 pl-2">
-                    <span className="font-label-numeric text-sm font-semibold text-red-600">
-                      {privacyMode ? '••••••' : `-₹${exp.amount.toLocaleString('en-IN')}.00`}
-                    </span>
+                    {privacyMode ? (
+                      <span className="font-serif font-bold text-sm text-slate-900">••••••</span>
+                    ) : (
+                      <div className="inline-flex items-baseline justify-end gap-0.5">
+                        <span className="font-serif font-bold text-sm text-red-700 tracking-tight">
+                          -₹{Math.floor(exp.amount).toLocaleString('en-IN')}
+                        </span>
+                        <span className="font-label-numeric text-[11px] text-red-500 font-medium">
+                          .{(exp.amount % 1).toFixed(2).split('.')[1] || '00'}
+                        </span>
+                      </div>
+                    )}
                     <span className="font-label-numeric text-[11px] text-slate-400">
                       {exp.dateTime}
                     </span>
@@ -485,8 +494,19 @@ export function ExpenseTable() {
                         {exp.dateTime}
                       </td>
 
-                      <td className="py-3 px-4 text-right font-title-md text-sm font-bold text-slate-900">
-                        {privacyMode ? '••••' : `-${formatCurrency(exp.amount, false)}`}
+                      <td className="py-3 px-4 text-right">
+                        {privacyMode ? (
+                          <span className="font-serif font-bold text-sm text-slate-900">••••••</span>
+                        ) : (
+                          <div className="inline-flex items-baseline justify-end gap-0.5">
+                            <span className="font-serif font-bold text-sm text-red-700 tracking-tight">
+                              -₹{Math.floor(exp.amount).toLocaleString('en-IN')}
+                            </span>
+                            <span className="font-label-numeric text-xs text-red-500 font-medium">
+                              .{(exp.amount % 1).toFixed(2).split('.')[1] || '00'}
+                            </span>
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))}
