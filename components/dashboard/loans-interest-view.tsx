@@ -973,25 +973,25 @@ export function LoansInterestView() {
 
                 {isCompound && parsedTenure > 1 ? (
                   <div className="mt-0.5 flex flex-col gap-1">
-                    <div className="flex items-baseline justify-between gap-1">
-                      <span className="text-xs text-[#76777d]">1st Month:</span>
-                      <AmountDisplay amount={monthlySchedule.firstMonthInterest} color="text-[#9a761e]" size="base" />
+                    <div className="flex items-baseline justify-between gap-1.5 flex-nowrap whitespace-nowrap">
+                      <span className="text-xs text-[#76777d] shrink-0">1st Month:</span>
+                      <AmountDisplay amount={monthlySchedule.firstMonthInterest} color="text-[#9a761e]" size="sm" weight="semibold" className="shrink-0" />
                     </div>
 
-                    <div className="flex items-baseline justify-between gap-1 pt-1 border-t border-slate-200/60">
-                      <span className="text-xs text-[#0f172a] font-semibold">Month {parsedTenure}:</span>
-                      <AmountDisplay amount={monthlySchedule.lastMonthInterest} color="text-[#0f172a]" size="base" />
+                    <div className="flex items-baseline justify-between gap-1.5 pt-1 border-t border-slate-200/60 flex-nowrap whitespace-nowrap">
+                      <span className="text-xs text-[#0f172a] font-semibold shrink-0">Month {parsedTenure}:</span>
+                      <AmountDisplay amount={monthlySchedule.lastMonthInterest} color="text-[#0f172a]" size="sm" weight="semibold" className="shrink-0" />
                     </div>
 
-                    <div className="flex items-center justify-between text-[10px] text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60 mt-0.5">
-                      <span>+ Interest on Interest:</span>
-                      <AmountDisplay amount={monthlySchedule.lastMonthInterestOnInterest} prefix="+₹" color="text-emerald-800" size="xs" />
+                    <div className="flex items-center justify-between text-[10px] text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60 mt-0.5 flex-nowrap whitespace-nowrap">
+                      <span className="shrink-0">+ Interest on Interest:</span>
+                      <AmountDisplay amount={monthlySchedule.lastMonthInterestOnInterest} prefix="+₹" color="text-emerald-800" size="xs" className="shrink-0" />
                     </div>
                   </div>
                 ) : (
                   <div>
                     <div className="mt-0.5">
-                      <AmountDisplay amount={monthlySchedule.firstMonthInterest} color="text-[#9a761e]" size="lg" />
+                      <AmountDisplay amount={monthlySchedule.firstMonthInterest} color="text-[#9a761e]" size="base" />
                     </div>
                     <span className="text-[11px] text-[#76777d] mt-0.5 block">
                       {isCompound ? 'Month 1 base rate' : 'Monthly income (Fixed)'}
@@ -1000,10 +1000,10 @@ export function LoansInterestView() {
                 )}
               </div>
 
-              <div className="mt-2 pt-1 border-t border-slate-200/40 text-[11px] text-[#76777d] flex items-center justify-between">
-                <span>
+              <div className="mt-2 pt-1 border-t border-slate-200/40 text-[11px] text-[#76777d] flex items-center justify-between gap-1 flex-nowrap whitespace-nowrap">
+                <span className="shrink-0">
                   {isCompound && parsedTenure > 1 ? (
-                    <span className="inline-flex items-baseline gap-1">
+                    <span className="inline-flex items-baseline gap-1 flex-nowrap whitespace-nowrap">
                       <span>Avg:</span>
                       <AmountDisplay amount={calcResults.monthly} color="text-[#76777d]" size="xs" suffix="/mo" />
                     </span>
@@ -1015,7 +1015,7 @@ export function LoansInterestView() {
                   <button
                     type="button"
                     onClick={() => setShowSchedule(!showSchedule)}
-                    className="text-[10px] font-semibold text-[#9a761e] hover:text-[#78570f] transition-colors cursor-pointer flex items-center gap-0.5 select-none"
+                    className="text-[10px] font-semibold text-[#9a761e] hover:text-[#78570f] transition-colors cursor-pointer flex items-center gap-0.5 select-none shrink-0"
                   >
                     <span>{showSchedule ? 'Hide detail' : 'View breakdown'}</span>
                     <span className="material-symbols-outlined text-[12px]">
@@ -1031,7 +1031,7 @@ export function LoansInterestView() {
               <div>
                 <span className="text-[10px] text-[#76777d] block uppercase tracking-wider font-semibold">Total Interest</span>
                 <div className="mt-0.5">
-                  <AmountDisplay amount={calcResults.totalInterest} prefix="+₹" color="text-[#0f172a]" size="lg" />
+                  <AmountDisplay amount={calcResults.totalInterest} prefix="+₹" color="text-[#0f172a]" size="base" weight="bold" />
                 </div>
                 {isCompound && monthlySchedule.totalInterestOnInterest > 0 ? (
                   <div className="mt-1 flex flex-col gap-0.5 text-[10px]">
@@ -1057,7 +1057,7 @@ export function LoansInterestView() {
               <div>
                 <span className="text-[10px] text-[#76777d] block uppercase tracking-wider font-semibold">Total You Get Back</span>
                 <div className="mt-0.5">
-                  <AmountDisplay amount={calcResults.gross} color="text-[#0f172a]" size="lg" weight="extrabold" />
+                  <AmountDisplay amount={calcResults.gross} color="text-[#0f172a]" size="base" weight="bold" />
                 </div>
                 <span className="text-[11px] text-[#76777d] mt-0.5 block">
                   Principal (₹{parsedPrincipal.toLocaleString('en-IN')}) + Interest
@@ -1088,38 +1088,38 @@ export function LoansInterestView() {
                 <table className="w-full text-left border-collapse text-xs">
                   <thead className="sticky top-0 bg-slate-50 border-b border-slate-200 text-[#76777d] text-[10px] uppercase font-bold tracking-wider">
                     <tr>
-                      <th className="py-2 px-3">Month</th>
-                      <th className="py-2 px-3">Opening Principal</th>
-                      <th className="py-2 px-3">1st Mo Base Int.</th>
-                      <th className="py-2 px-3 text-emerald-800">+ Int. on Interest</th>
-                      <th className="py-2 px-3">Total Month Payout</th>
-                      <th className="py-2 px-3 text-right">Closing Balance</th>
+                      <th className="py-2 px-3 whitespace-nowrap">Month</th>
+                      <th className="py-2 px-3 whitespace-nowrap">Opening Principal</th>
+                      <th className="py-2 px-3 whitespace-nowrap">1st Mo Base Int.</th>
+                      <th className="py-2 px-3 text-emerald-800 whitespace-nowrap">+ Int. on Interest</th>
+                      <th className="py-2 px-3 whitespace-nowrap">Total Month Payout</th>
+                      <th className="py-2 px-3 text-right whitespace-nowrap">Closing Balance</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-[11px]">
                     {monthlySchedule.rows.map((row) => (
                       <tr key={row.month} className="hover:bg-slate-50/70">
-                        <td className="py-2 px-3 font-bold text-[#0f172a]">Month {row.month}</td>
-                        <td className="py-2 px-3 text-slate-600 font-mono">
-                          ₹{row.opening.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        <td className="py-2 px-3 font-bold text-[#0f172a] whitespace-nowrap">Month {row.month}</td>
+                        <td className="py-2 px-3 text-slate-600 whitespace-nowrap">
+                          <AmountDisplay amount={row.opening} color="text-slate-600" size="xs" />
                         </td>
-                        <td className="py-2 px-3 text-slate-700 font-mono font-medium">
-                          ₹{row.baseInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        <td className="py-2 px-3 text-slate-700 whitespace-nowrap">
+                          <AmountDisplay amount={row.baseInterest} color="text-slate-700" size="xs" />
                         </td>
-                        <td className="py-2 px-3 font-mono">
+                        <td className="py-2 px-3 whitespace-nowrap">
                           {row.interestOnInterest > 0 ? (
                             <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/50">
-                              +₹{row.interestOnInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              <AmountDisplay amount={row.interestOnInterest} prefix="+₹" color="text-emerald-700" size="xs" />
                             </span>
                           ) : (
                             <span className="text-slate-400 font-normal">₹0.00 (Base)</span>
                           )}
                         </td>
-                        <td className="py-2 px-3 font-bold font-mono text-[#9a761e]">
-                          ₹{row.monthTotalInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        <td className="py-2 px-3 font-bold whitespace-nowrap">
+                          <AmountDisplay amount={row.monthTotalInterest} color="text-[#9a761e]" size="xs" weight="bold" />
                         </td>
-                        <td className="py-2 px-3 text-right font-bold font-mono text-[#0f172a]">
-                          ₹{row.closing.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        <td className="py-2 px-3 text-right font-bold whitespace-nowrap">
+                          <AmountDisplay amount={row.closing} color="text-[#0f172a]" size="xs" weight="bold" />
                         </td>
                       </tr>
                     ))}
