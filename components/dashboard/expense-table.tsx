@@ -387,35 +387,68 @@ export function ExpenseTable() {
                 <input
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="h-9 pl-8 pr-3 text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-full sm:w-64 shadow-xs"
+                  className={`h-9 pl-8 ${searchTerm ? 'pr-8' : 'pr-3'} text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-full sm:w-64 shadow-xs`}
                   placeholder="Search transactions..."
                   type="text"
                 />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                    title="Clear search"
+                    aria-label="Clear search"
+                  >
+                    <span className="material-symbols-outlined text-sm leading-none">close</span>
+                  </button>
+                )}
               </div>
 
-              <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
-                <div className="relative flex items-center flex-1 sm:flex-initial">
-                  <span className="material-symbols-outlined absolute left-2.5 text-slate-500 text-sm pointer-events-none">
-                    filter_list
-                  </span>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="h-9 w-[145px] pl-8 pr-7 text-xs font-semibold bg-white border border-slate-200 rounded-lg text-slate-800 hover:border-[#d4af37] focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all shadow-xs cursor-pointer"
-                  >
-                    <option value="all">All Categories</option>
-                    <option value="travel">Travel &amp; Logistics</option>
-                    <option value="tech">Tech &amp; Infra</option>
-                    <option value="hosting">Client Hosting</option>
-                    <option value="legal">Legal &amp; Retainers</option>
-                    <option value="dining">Executive Dining</option>
-                  </select>
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                <div className="flex items-center gap-1.5 flex-1 sm:flex-initial">
+                  <div className="relative flex items-center flex-1 sm:flex-initial">
+                    <span className="material-symbols-outlined absolute left-2.5 text-slate-500 text-sm pointer-events-none">
+                      filter_list
+                    </span>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className={`h-9 w-full sm:w-[155px] pl-8 pr-7 text-xs font-semibold rounded-lg border transition-all shadow-xs cursor-pointer ${
+                        selectedCategory !== 'all'
+                          ? 'bg-amber-50/70 border-amber-300 text-amber-950 font-bold'
+                          : 'bg-white border-slate-200 text-slate-800 hover:border-[#d4af37]'
+                      }`}
+                    >
+                      <option value="all">All Categories</option>
+                      <option value="travel">Travel &amp; Logistics</option>
+                      <option value="tech">Tech &amp; Infra</option>
+                      <option value="hosting">Client Hosting</option>
+                      <option value="legal">Legal &amp; Retainers</option>
+                      <option value="dining">Executive Dining</option>
+                    </select>
+                  </div>
+
+                  {selectedCategory !== 'all' && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCategory('all')}
+                      className="h-9 w-9 rounded-lg border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 hover:text-amber-950 flex items-center justify-center transition-colors cursor-pointer shadow-xs shrink-0"
+                      title="Clear category filter"
+                      aria-label="Clear category filter"
+                    >
+                      <span className="material-symbols-outlined text-sm">close</span>
+                    </button>
+                  )}
                 </div>
 
                 <button
                   onClick={clearFilters}
-                  className="h-9 w-[145px] rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
-                  title="Clear filters"
+                  className={`h-9 px-3 rounded-lg border text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer ${
+                    searchTerm || selectedCategory !== 'all'
+                      ? 'border-amber-300 bg-[#fef9e7] hover:bg-[#fdf3ce] text-[#9a761e] font-bold'
+                      : 'border-slate-200 bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900'
+                  }`}
+                  title="Clear all filters"
                   type="button"
                 >
                   <span className="material-symbols-outlined text-sm">restart_alt</span>

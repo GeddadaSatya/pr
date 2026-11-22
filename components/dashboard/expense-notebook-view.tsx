@@ -77,12 +77,15 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
   const filteredEntries = entries.filter((item) => {
     const matchesCategory =
       selectedCategoryFilter === 'all' ||
-      item.category.toLowerCase().includes(selectedCategoryFilter.toLowerCase());
+      item.category.toLowerCase().includes(selectedCategoryFilter.toLowerCase()) ||
+      item.tag.toLowerCase().includes(selectedCategoryFilter.toLowerCase());
     const matchesSearch =
       searchTerm.trim() === '' ||
       item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.paidWith.toLowerCase().includes(searchTerm.toLowerCase());
+      item.paidWith.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.tag.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -519,19 +522,35 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           {/* Right Controls */}
           <div className="flex flex-wrap items-center gap-2">
             {/* Date Filter Dropdown */}
-            <div className="relative">
+            <div className="relative flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => setIsDateFilterOpen(!isDateFilterOpen)}
-                className="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  selectedDateFilter !== 'all'
+                    ? 'bg-amber-50 border-amber-300 text-amber-900 shadow-2xs'
+                    : 'bg-slate-100 hover:bg-slate-200/80 border-slate-200 text-slate-700'
+                }`}
               >
                 <span className="material-symbols-outlined text-sm text-[#b48e28]">calendar_today</span>
                 <span>{selectedDateFilterLabel}</span>
                 <span className="material-symbols-outlined text-sm text-slate-500">expand_more</span>
               </button>
 
+              {selectedDateFilter !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedDateFilter('all')}
+                  className="h-9 w-7 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
+                  title="Clear date filter"
+                  aria-label="Clear date filter"
+                >
+                  <span className="material-symbols-outlined text-xs">close</span>
+                </button>
+              )}
+
               {isDateFilterOpen && (
-                <div className="absolute left-0 mt-1 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-30 animate-fade-in">
+                <div className="absolute left-0 mt-1 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-30 animate-fade-in top-full">
                   {[
                     { key: 'all', label: 'All Dates' },
                     { key: '2026-10-28', label: 'Today (Oct 28)' },
@@ -558,11 +577,15 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
             </div>
 
             {/* Filter Dropdown */}
-            <div className="relative">
+            <div className="relative flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                className="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  selectedCategoryFilter !== 'all'
+                    ? 'bg-amber-50 border-amber-300 text-amber-900 shadow-2xs'
+                    : 'bg-slate-100 hover:bg-slate-200/80 border-slate-200 text-slate-700'
+                }`}
               >
                 <span>
                   {selectedCategoryFilter === 'all'
@@ -572,20 +595,42 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                 <span className="material-symbols-outlined text-sm text-slate-500">expand_more</span>
               </button>
 
+              {selectedCategoryFilter !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategoryFilter('all')}
+                  className="h-9 w-7 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
+                  title="Clear category filter"
+                  aria-label="Clear category filter"
+                >
+                  <span className="material-symbols-outlined text-xs">close</span>
+                </button>
+              )}
+
               {isCategoryOpen && (
-                <div className="absolute left-0 mt-1 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-30 animate-fade-in">
-                  {['all', 'Dining', 'Travel', 'Hardware', 'Wellness'].map((cat) => (
+                <div className="absolute left-0 mt-1 w-52 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-30 animate-fade-in top-full">
+                  {[
+                    { key: 'all', label: 'All Categories' },
+                    { key: 'Dining', label: 'Dining' },
+                    { key: 'Travel', label: 'Travel & Logistics' },
+                    { key: 'Hardware', label: 'Hardware & Tech' },
+                    { key: 'Tech', label: 'Tech & Infra' },
+                    { key: 'Hosting', label: 'Client Hosting' },
+                    { key: 'Legal', label: 'Legal & Retainers' },
+                    { key: 'Real Estate', label: 'Real Estate & Maint.' },
+                    { key: 'Wellness', label: 'Wellness' },
+                  ].map((cat) => (
                     <button
-                      key={cat}
+                      key={cat.key}
                       type="button"
                       onClick={() => {
-                        setSelectedCategoryFilter(cat);
+                        setSelectedCategoryFilter(cat.key);
                         setIsCategoryOpen(false);
                       }}
                       className="w-full px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 flex items-center justify-between cursor-pointer"
                     >
-                      <span>{cat === 'all' ? 'All Categories' : cat}</span>
-                      {selectedCategoryFilter === cat && (
+                      <span>{cat.label}</span>
+                      {selectedCategoryFilter === cat.key && (
                         <span className="material-symbols-outlined text-sm text-[#b48e28]">check</span>
                       )}
                     </button>
@@ -626,56 +671,141 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           </div>
         </div>
 
-        {/* Search & Category Filter Controls Bar (Matching Reference Design) */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
-          <div className="relative flex items-center w-full sm:w-auto">
-            <span className="material-symbols-outlined absolute left-2.5 text-slate-400 text-base pointer-events-none">
-              search
-            </span>
-            <input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-9 pl-8 pr-3 text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-full sm:w-64 shadow-xs"
-              placeholder="Search transactions..."
-              type="text"
-            />
-          </div>
-
-          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
-            <div className="relative flex items-center flex-1 sm:flex-initial">
-              <span className="material-symbols-outlined absolute left-2.5 text-slate-500 text-sm pointer-events-none">
-                filter_list
+        {/* Search & Category Filter Controls Bar (Matching Reference Design with Individual Clear Controls) */}
+        <div className="flex flex-col gap-2 pt-1">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            {/* Search Box with Individual Clear Button */}
+            <div className="relative flex items-center w-full sm:w-auto">
+              <span className="material-symbols-outlined absolute left-2.5 text-slate-400 text-base pointer-events-none">
+                search
               </span>
-              <select
-                value={selectedCategoryFilter}
-                onChange={(e) => setSelectedCategoryFilter(e.target.value)}
-                className="h-9 w-[155px] pl-8 pr-7 text-xs font-semibold bg-white border border-slate-200 rounded-lg text-slate-800 hover:border-[#d4af37] focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all shadow-xs cursor-pointer"
-              >
-                <option value="all">All Categories</option>
-                <option value="Dining">Dining</option>
-                <option value="Travel">Travel &amp; Logistics</option>
-                <option value="Hardware">Hardware &amp; Tech</option>
-                <option value="Tech">Tech &amp; Infra</option>
-                <option value="Hosting">Client Hosting</option>
-                <option value="Legal">Legal &amp; Retainers</option>
-                <option value="Wellness">Wellness</option>
-              </select>
+              <input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className={`h-9 pl-8 ${searchTerm ? 'pr-8' : 'pr-3'} text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-full sm:w-64 shadow-xs`}
+                placeholder="Search transactions..."
+                type="text"
+              />
+              {searchTerm && (
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                  title="Clear search"
+                  aria-label="Clear search"
+                >
+                  <span className="material-symbols-outlined text-sm leading-none">close</span>
+                </button>
+              )}
             </div>
 
-            <button
-              onClick={() => {
-                setSelectedCategoryFilter('all');
-                setSelectedDateFilter('all');
-                setSearchTerm('');
-              }}
-              className="h-9 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
-              title="Clear filters"
-              type="button"
-            >
-              <span className="material-symbols-outlined text-sm">restart_alt</span>
-              <span>Clear Filters</span>
-            </button>
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+              {/* Category Filter with Individual Clear Button */}
+              <div className="flex items-center gap-1.5 flex-1 sm:flex-initial">
+                <div className="relative flex items-center flex-1 sm:flex-initial">
+                  <span className="material-symbols-outlined absolute left-2.5 text-slate-500 text-sm pointer-events-none">
+                    filter_list
+                  </span>
+                  <select
+                    value={selectedCategoryFilter}
+                    onChange={(e) => setSelectedCategoryFilter(e.target.value)}
+                    className={`h-9 w-full sm:w-[155px] pl-8 pr-7 text-xs font-semibold rounded-lg border transition-all shadow-xs cursor-pointer ${
+                      selectedCategoryFilter !== 'all'
+                        ? 'bg-amber-50/70 border-amber-300 text-amber-950 font-bold'
+                        : 'bg-white border-slate-200 text-slate-800 hover:border-[#d4af37]'
+                    }`}
+                  >
+                    <option value="all">All Categories</option>
+                    <option value="Dining">Dining</option>
+                    <option value="Travel">Travel &amp; Logistics</option>
+                    <option value="Hardware">Hardware &amp; Tech</option>
+                    <option value="Tech">Tech &amp; Infra</option>
+                    <option value="Hosting">Client Hosting</option>
+                    <option value="Legal">Legal &amp; Retainers</option>
+                    <option value="Real Estate">Real Estate &amp; Maintenance</option>
+                    <option value="Wellness">Wellness</option>
+                  </select>
+                </div>
+
+                {selectedCategoryFilter !== 'all' && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCategoryFilter('all')}
+                    className="h-9 w-9 rounded-lg border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 hover:text-amber-950 flex items-center justify-center transition-colors cursor-pointer shadow-xs shrink-0"
+                    title="Clear category filter"
+                    aria-label="Clear category filter"
+                  >
+                    <span className="material-symbols-outlined text-sm">close</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Combined Master Clear Filters */}
+              <button
+                onClick={() => {
+                  setSelectedCategoryFilter('all');
+                  setSelectedDateFilter('all');
+                  setSearchTerm('');
+                }}
+                className={`h-9 px-3 rounded-lg border text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer ${
+                  searchTerm || selectedCategoryFilter !== 'all' || selectedDateFilter !== 'all'
+                    ? 'border-amber-300 bg-[#fef9e7] hover:bg-[#fdf3ce] text-[#9a761e] font-bold'
+                    : 'border-slate-200 bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900'
+                }`}
+                title="Clear all filters"
+                type="button"
+              >
+                <span className="material-symbols-outlined text-sm">restart_alt</span>
+                <span>Clear Filters</span>
+              </button>
+            </div>
           </div>
+
+          {/* Active Filter Tags / Indicator */}
+          {(searchTerm || selectedCategoryFilter !== 'all' || selectedDateFilter !== 'all') && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs text-slate-500">
+              <span className="text-[11px] font-medium text-slate-400">Active filters:</span>
+              {searchTerm && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-800 text-[11px] font-medium">
+                  <span>Search: &ldquo;{searchTerm}&rdquo;</span>
+                  <button
+                    type="button"
+                    onClick={() => setSearchTerm('')}
+                    className="hover:text-red-600 cursor-pointer flex items-center"
+                    title="Clear search"
+                  >
+                    <span className="material-symbols-outlined text-xs">close</span>
+                  </button>
+                </span>
+              )}
+              {selectedCategoryFilter !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-medium">
+                  <span>Category: {selectedCategoryFilter}</span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCategoryFilter('all')}
+                    className="hover:text-red-600 cursor-pointer flex items-center"
+                    title="Clear category filter"
+                  >
+                    <span className="material-symbols-outlined text-xs">close</span>
+                  </button>
+                </span>
+              )}
+              {selectedDateFilter !== 'all' && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 border border-blue-200 text-blue-900 text-[11px] font-medium">
+                  <span>Date: {selectedDateFilterLabel}</span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedDateFilter('all')}
+                    className="hover:text-red-600 cursor-pointer flex items-center"
+                    title="Clear date filter"
+                  >
+                    <span className="material-symbols-outlined text-xs">close</span>
+                  </button>
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Date-Grouped Daywise Tables */}
@@ -799,6 +929,39 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
               </div>
             );
           })}
+
+          {/* Empty State when no transactions match */}
+          {visibleDateGroups.every((g) => g.items.length === 0) && (
+            <div className="py-12 px-4 text-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 flex flex-col items-center justify-center gap-3 animate-fade-in">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200/60 flex items-center justify-center text-[#b48e28]">
+                <span className="material-symbols-outlined text-2xl">search_off</span>
+              </div>
+              <div className="flex flex-col gap-1 max-w-sm">
+                <h4 className="text-sm font-semibold text-slate-800">No transactions found</h4>
+                <p className="text-xs text-slate-500">
+                  {searchTerm && selectedCategoryFilter !== 'all'
+                    ? `No transactions matched "${searchTerm}" in ${selectedCategoryFilter}.`
+                    : searchTerm
+                    ? `No transactions matched "${searchTerm}".`
+                    : selectedCategoryFilter !== 'all'
+                    ? `No transactions found under ${selectedCategoryFilter}.`
+                    : 'No transactions found for the selected date.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedCategoryFilter('all');
+                  setSelectedDateFilter('all');
+                }}
+                className="mt-1 h-8 px-3.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-slate-700 transition-colors shadow-xs cursor-pointer flex items-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-sm text-[#b48e28]">restart_alt</span>
+                <span>Reset All Filters</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Notebook Bottom Pagination */}
