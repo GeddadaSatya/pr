@@ -312,7 +312,7 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
           <button
             type="button"
             onClick={() => setShowPaymentModal(true)}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-[#d4af37] hover:bg-[#c29e2e] text-[#0f172a] rounded-lg text-xs font-bold shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3.5 py-1.5 bg-[#eed885] hover:bg-[#dec468] text-[#0f172a] border border-[#d4af37]/30 rounded-lg text-xs font-bold shadow-xs transition-all cursor-pointer active:scale-[0.98]"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -995,7 +995,7 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
           <button
             type="button"
             onClick={() => setShowUploadModal(true)}
-            className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-[#d4af37] hover:bg-[#c29e2e] text-[#0f172a] rounded-lg text-xs font-bold shadow-2xs transition cursor-pointer"
+            className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-[#eed885] hover:bg-[#dec468] text-[#0f172a] border border-[#d4af37]/30 rounded-lg text-xs font-bold shadow-2xs transition cursor-pointer active:scale-[0.98]"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -1254,7 +1254,7 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-[#d4af37] hover:bg-[#c29e2e] text-[#0f172a] shadow-xs transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-bold bg-[#eed885] hover:bg-[#dec468] text-[#0f172a] border border-[#d4af37]/30 shadow-xs transition cursor-pointer active:scale-[0.98]"
                 >
                   Confirm Payout Record
                 </button>
@@ -1311,7 +1311,7 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-[#d4af37] hover:bg-[#c29e2e] text-[#0f172a] shadow-xs transition cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-bold bg-[#eed885] hover:bg-[#dec468] text-[#0f172a] border border-[#d4af37]/30 shadow-xs transition cursor-pointer active:scale-[0.98]"
                 >
                   Upload &amp; Save
                 </button>

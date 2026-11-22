@@ -694,7 +694,7 @@ export function LoansInterestView() {
           <button
             type="button"
             onClick={() => setIsModalOpen(true)}
-            className="h-10 px-4 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] text-[#0f172a] text-xs md:text-sm font-bold flex items-center gap-1.5 shadow-2xs active:scale-[0.98] transition-all cursor-pointer"
+            className="h-10 px-4 rounded-xl bg-[#eed885] hover:bg-[#dec468] text-[#0f172a] border border-[#d4af37]/30 text-xs md:text-sm font-bold flex items-center gap-1.5 shadow-2xs active:scale-[0.98] transition-all cursor-pointer"
           >
             <span className="material-symbols-outlined text-base">add_circle</span>
             <span>Give New Loan</span>
@@ -1714,7 +1714,7 @@ export function LoansInterestView() {
                     <button
                       type="button"
                       onClick={() => handleMarkAsPaid(b.id, b.name)}
-                      className="px-3.5 py-1.5 rounded-full bg-[#d4af37] hover:bg-[#b48e28] text-[#0f172a] font-bold text-xs flex items-center gap-1 shadow-2xs transition-all cursor-pointer"
+                      className="px-3.5 py-1.5 rounded-full bg-[#eed885] hover:bg-[#dec468] text-[#0f172a] border border-[#d4af37]/30 font-bold text-xs flex items-center gap-1 shadow-2xs transition-all cursor-pointer"
                     >
                       <span className="material-symbols-outlined text-sm font-bold">check</span>
                       <span>{b.status === 'paid' ? 'Paid' : 'Mark as Paid'}</span>

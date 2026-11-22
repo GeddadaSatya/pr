@@ -556,7 +556,7 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile }: RepaymentsLe
             <span className="font-bold text-slate-900">{privacyMode ? '••••••' : '₹0'}</span>
           </div>
           <span className="text-slate-400 font-mono text-sm font-bold">=</span>
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-[#d4af37] text-[#0f172a] font-mono text-xs font-bold shadow-xs">
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-[#eed885] text-[#0f172a] border border-[#d4af37]/30 font-mono text-xs font-bold shadow-xs">
             <span className="uppercase tracking-wider">Total to Collect:</span>
             <span className="text-sm">{privacyMode ? '••••••' : '₹17,500'}</span>
           </div>
