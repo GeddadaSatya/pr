@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NotebookEntry, DAY_LEDGER_CONFIGS, INITIAL_NOTEBOOK_ENTRIES } from '@/lib/notebook-data';
 import { useFinance } from '@/components/context/finance-context';
+import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
 
 interface DayLedgerViewProps {
   selectedDateKey?: string;
@@ -17,7 +18,7 @@ export function DayLedgerView({
   previousTabTitle = 'Expense Notebook',
   onDateChange,
 }: DayLedgerViewProps) {
-  const { privacyMode, openModal, expenses } = useFinance();
+  const { privacyMode, openModal, expenses, setActiveTab } = useFinance();
   const [currentDateKey, setCurrentDateKey] = useState(selectedDateKey);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -137,34 +138,24 @@ export function DayLedgerView({
 
   return (
     <div className="flex flex-col gap-5 w-full animate-fade-in">
-      {/* Top Breadcrumb & Back Navigation Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3.5 sm:px-5 sm:py-3 rounded-2xl border border-slate-200/90 shadow-2xs">
-        <button
-          type="button"
-          onClick={onBack}
-          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-800 hover:text-slate-950 shadow-2xs transition-all cursor-pointer w-fit group"
-        >
-          <span className="material-symbols-outlined text-base text-[#b48e28] group-hover:-translate-x-1 transition-transform">
-            arrow_back
-          </span>
-          <span>Back to {previousTabTitle}</span>
-        </button>
-
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-slate-400">Navigation:</span>
-          <button
-            type="button"
-            onClick={onBack}
-            className="font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
-          >
-            {previousTabTitle}
-          </button>
-          <span className="text-slate-300">/</span>
-          <span className="font-semibold text-slate-900 bg-amber-50 text-amber-900 border border-amber-200/60 px-2.5 py-0.5 rounded-md">
-            Day Ledger ({dayConfig.formattedDate})
-          </span>
-        </div>
-      </div>
+      {/* Top Breadcrumb Navigation (Unboxed) */}
+      <AppBreadcrumb
+        className="mb-1"
+        segments={[
+          {
+            label: 'Overview',
+            onClick: () => {
+              onBack();
+              setActiveTab('overview');
+            },
+          },
+          {
+            label: previousTabTitle,
+            onClick: onBack,
+          },
+          { label: 'Day Ledger', badge: dayConfig.formattedDate },
+        ]}
+      />
 
       {/* Main Day Ledger Canvas Card */}
       <div className="bg-white rounded-2xl md:rounded-3xl shadow-sm border border-slate-200/90 p-5 md:p-8 flex flex-col gap-6">

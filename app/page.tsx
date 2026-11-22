@@ -23,10 +23,9 @@ import { PrivacyUnlockModal } from '@/components/modals/privacy-unlock-modal';
 import { useFinance } from '@/components/context/finance-context';
 
 function DashboardContent() {
-  const [activeTab, setActiveTab] = useState('overview');
+  const { activeTab, setActiveTab, isCollapsed } = useFinance();
   const [previousTab, setPreviousTab] = useState<'overview' | 'expenses'>('expenses');
   const [selectedDateKey, setSelectedDateKey] = useState('2026-10-28');
-  const { isCollapsed } = useFinance();
 
   const handleOpenDayLedger = (dateKey: string = '2026-10-28') => {
     setPreviousTab(activeTab === 'expenses' ? 'expenses' : 'overview');

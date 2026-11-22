@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { PayableItem } from '@/lib/types';
 import { AmountDisplay } from '@/components/ui/amount-display';
+import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
 
 export function PayablesDuesView() {
   const { payables, recordPayout, privacyMode, openModal } = useFinance();
@@ -80,6 +81,13 @@ export function PayablesDuesView() {
       {/* Top Header Row with Export and Add Bill */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
+          <AppBreadcrumb
+            className="mb-1"
+            segments={[
+              { label: 'Overview', tab: 'overview' },
+              { label: 'Payables & Dues' },
+            ]}
+          />
           <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 tracking-tight">
             Payables &amp; Dues
           </h1>

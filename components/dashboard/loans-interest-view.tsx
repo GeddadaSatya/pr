@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { BorrowerDetailView } from './borrower-detail-view';
 import { AmountDisplay } from '@/components/ui/amount-display';
+import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
 
 export interface BorrowerLoan {
   id: string;
@@ -671,11 +672,13 @@ export function LoansInterestView() {
       {/* Top Control Banner: Context, Date & Quick Action */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col">
-          <div className="flex items-center gap-1.5 mb-1">
-            <span className="text-[11px] uppercase tracking-wider text-[#d4af37] font-bold">Personal Lending</span>
-            <span className="text-[#76777d] text-xs">•</span>
-            <span className="text-[11px] text-[#45464d] uppercase font-semibold">Money Lent &amp; Interest</span>
-          </div>
+          <AppBreadcrumb
+            className="mb-1"
+            segments={[
+              { label: 'Overview', tab: 'overview' },
+              { label: 'Loans & Interest Ledger' },
+            ]}
+          />
           <h1 className="font-serif text-2xl md:text-3xl text-[#0f172a] font-normal tracking-tight">
             Money Given &amp; Interest Tracker
           </h1>

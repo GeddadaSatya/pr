@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { NotebookEntry, INITIAL_NOTEBOOK_ENTRIES } from '@/lib/notebook-data';
 import { AmountDisplay } from '@/components/ui/amount-display';
+import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
 
 interface ExpenseNotebookViewProps {
   onOpenDayLedger: (dateKey: string) => void;
@@ -338,6 +339,13 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
       {/* Top Header Row with "New Entry" button */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
+          <AppBreadcrumb
+            className="mb-1"
+            segments={[
+              { label: 'Overview', tab: 'overview' },
+              { label: 'Expense Notebook' },
+            ]}
+          />
           <h1 className="text-2xl md:text-3xl font-serif font-bold text-slate-900 tracking-tight">
             Expense Journal
           </h1>

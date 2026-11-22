@@ -5,6 +5,7 @@ import { useFinance } from '@/components/context/finance-context';
 import { BorrowerLoan } from './loans-interest-view';
 import { RepaymentsLedgerView } from './repayments-ledger-view';
 import { AmountDisplay } from '@/components/ui/amount-display';
+import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
 
 interface BorrowerDetailViewProps {
   borrower: BorrowerLoan;
@@ -41,7 +42,7 @@ interface DocumentItem {
 }
 
 export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: BorrowerDetailViewProps) {
-  const { privacyMode } = useFinance();
+  const { privacyMode, setActiveTab } = useFinance();
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState('2500');
@@ -230,39 +231,25 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
       )}
 
       {/* Breadcrumb Navigation (Unboxed) */}
-      <nav aria-label="Breadcrumb" className="flex items-center text-xs text-slate-500 space-x-2 flex-wrap">
-        <button
-          type="button"
-          onClick={onBack}
-          className="font-medium text-slate-500 hover:text-slate-900 transition-colors cursor-pointer flex items-center gap-1.5"
-          title="Return to Loans &amp; Interest Ledger"
-        >
-          <span>Loans &amp; Interest Ledger</span>
-        </button>
-
-        <span className="text-slate-300">/</span>
-
-        <span className="text-slate-600 font-medium">Borrower Dossier</span>
-
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-slate-400"
-        >
-          <path d="m9 18 6-6-6-6" />
-        </svg>
-
-        <span className="font-medium text-slate-800 font-mono bg-slate-100 px-1.5 py-0.5 rounded text-[11px]">
-          {borrowerIdCode}
-        </span>
-      </nav>
+      <AppBreadcrumb
+        segments={[
+          {
+            label: 'Overview',
+            onClick: () => {
+              onBack();
+              setActiveTab('overview');
+            },
+          },
+          {
+            label: 'Loans & Interest Ledger',
+            onClick: () => {
+              onBack();
+              setActiveTab('lending');
+            },
+          },
+          { label: 'Borrower Dossier', badge: borrowerIdCode },
+        ]}
+      />
 
       {/* Borrower Header Title Row with Action Buttons */}
       <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

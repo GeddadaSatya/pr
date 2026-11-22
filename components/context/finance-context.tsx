@@ -17,6 +17,8 @@ interface FinanceContextType {
   loans: LoanItem[];
   peerReceivables: PeerReceivableItem[];
   userProfile: UserProfile;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
   privacyMode: boolean;
   setPrivacyMode: (val: boolean) => void;
   togglePrivacyMode: () => void;
@@ -67,6 +69,12 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [modalInitialData, setModalInitialData] = useState<ModalInitialData | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  const [activeTab, setActiveTabState] = useState<string>('overview');
+
+  const setActiveTab = (tab: string) => {
+    setActiveTabState(tab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Auto collapse below 1100px screen width and support saved state
   useEffect(() => {
@@ -265,6 +273,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         loans,
         peerReceivables,
         userProfile,
+        activeTab,
+        setActiveTab,
         privacyMode,
         setPrivacyMode,
         togglePrivacyMode,

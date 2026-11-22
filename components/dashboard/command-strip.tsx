@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useFinance } from '@/components/context/finance-context';
+import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
 
 export function CommandStrip() {
   const { userProfile, openModal } = useFinance();
@@ -84,16 +85,13 @@ export function CommandStrip() {
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex flex-col">
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className="inline-flex w-2 h-2 rounded-full bg-[#d4af37]"></span>
-              <span className="text-[11px] text-[#b48e28] uppercase tracking-widest font-bold">
-                Personal Wealth Overview
-              </span>
-              <span className="text-slate-300 text-xs">/</span>
-              <span className="text-[11px] text-slate-600 font-semibold">
-                Real-time Balance
-              </span>
-            </div>
+            <AppBreadcrumb
+              className="mb-1"
+              segments={[
+                { label: 'Personal Wealth Command' },
+                { label: 'Overview & Net Worth' },
+              ]}
+            />
             <div className="flex items-baseline gap-2">
               <span className="font-headline-lg text-slate-900 font-semibold tracking-tight">
                 Your Total Wealth &amp; Overview
