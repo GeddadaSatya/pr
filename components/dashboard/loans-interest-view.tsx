@@ -1018,7 +1018,7 @@ export function LoansInterestView() {
                   <button
                     type="button"
                     onClick={() => setShowSchedule(!showSchedule)}
-                    className="text-[10px] font-semibold text-[#9a761e] hover:underline cursor-pointer flex items-center gap-0.5"
+                    className="text-[10px] font-semibold text-[#9a761e] hover:text-[#78570f] transition-colors cursor-pointer flex items-center gap-0.5 select-none"
                   >
                     <span>{showSchedule ? 'Hide detail' : 'View breakdown'}</span>
                     <span className="material-symbols-outlined text-[12px]">

@@ -998,7 +998,7 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
                 <button
                   type="button"
                   onClick={() => showToast('Full document vault opened')}
-                  className="text-[11px] text-slate-500 hover:text-slate-800 underline cursor-pointer"
+                  className="text-[11px] text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
                 >
                   View all
                 </button>
