@@ -54,3 +54,10 @@ next-env.d.ts
 /automation/reports/
 /automation/results/
 supabase/.temp/
+
+# Temporary test screenshots & showcase files
+docs/push-reports/*.png
+docs/push-reports/*.jpg
+docs/push-reports/icon_showcase.html
+public/icon_showcase.html
+
