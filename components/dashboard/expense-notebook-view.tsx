@@ -24,6 +24,8 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
   const [categoryHighlight, setCategoryHighlight] = useState(false);
   const [parsedQuickEntry, setParsedQuickEntry] = useState<{ title: string; amount: string } | null>(null);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
+  const [selectedDateFilter, setSelectedDateFilter] = useState('all');
+  const [isDateFilterOpen, setIsDateFilterOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
@@ -119,6 +121,22 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
       items: fridayItems,
     },
   ];
+
+  const selectedDateFilterLabel =
+    selectedDateFilter === 'all'
+      ? 'All Dates'
+      : selectedDateFilter === '2026-10-28'
+      ? 'Today (Oct 28)'
+      : selectedDateFilter === '2026-10-27'
+      ? 'Sunday (Oct 27)'
+      : selectedDateFilter === '2026-10-25'
+      ? 'Friday (Oct 25)'
+      : 'All Dates';
+
+  const visibleDateGroups =
+    selectedDateFilter === 'all'
+      ? dateGroups
+      : dateGroups.filter((g) => g.dateKey === selectedDateFilter);
 
   const initialNotebookIds = new Set(INITIAL_NOTEBOOK_ENTRIES.map((e) => e.id));
   const dynamicExpensesAdded = entries.filter((e) => !initialNotebookIds.has(e.id));
@@ -490,16 +508,55 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
             </div>
             <div>
               <h3 className="font-serif text-base md:text-lg font-bold text-slate-900">
-                Daily Expense Notebook
+                Expense Notebook
               </h3>
               <p className="text-xs text-slate-500">
-                Personal Diary & Verified Expenditures
+                Personal Diary &amp; Verified Expenditures
               </p>
             </div>
           </div>
 
           {/* Right Controls */}
           <div className="flex flex-wrap items-center gap-2">
+            {/* Date Filter Dropdown */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsDateFilterOpen(!isDateFilterOpen)}
+                className="h-9 px-3 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-sm text-[#b48e28]">calendar_today</span>
+                <span>{selectedDateFilterLabel}</span>
+                <span className="material-symbols-outlined text-sm text-slate-500">expand_more</span>
+              </button>
+
+              {isDateFilterOpen && (
+                <div className="absolute left-0 mt-1 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-30 animate-fade-in">
+                  {[
+                    { key: 'all', label: 'All Dates' },
+                    { key: '2026-10-28', label: 'Today (Oct 28)' },
+                    { key: '2026-10-27', label: 'Sunday (Oct 27)' },
+                    { key: '2026-10-25', label: 'Friday (Oct 25)' },
+                  ].map((d) => (
+                    <button
+                      key={d.key}
+                      type="button"
+                      onClick={() => {
+                        setSelectedDateFilter(d.key);
+                        setIsDateFilterOpen(false);
+                      }}
+                      className="w-full px-3 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 flex items-center justify-between cursor-pointer"
+                    >
+                      <span>{d.label}</span>
+                      {selectedDateFilter === d.key && (
+                        <span className="material-symbols-outlined text-sm text-[#b48e28]">check</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Filter Dropdown */}
             <div className="relative">
               <button
@@ -608,6 +665,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
             <button
               onClick={() => {
                 setSelectedCategoryFilter('all');
+                setSelectedDateFilter('all');
                 setSearchTerm('');
               }}
               className="h-9 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
@@ -622,7 +680,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
 
         {/* Date-Grouped Daywise Tables */}
         <div className="flex flex-col gap-6">
-          {dateGroups.map((group) => {
+          {visibleDateGroups.map((group) => {
             if (group.items.length === 0) return null;
 
             const displayedItems = group.items.slice(0, 5);
