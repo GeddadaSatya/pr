@@ -24,6 +24,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
   const [categoryHighlight, setCategoryHighlight] = useState(false);
   const [parsedQuickEntry, setParsedQuickEntry] = useState<{ title: string; amount: string } | null>(null);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -70,10 +71,17 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
     }
   }, [expenses]);
 
-  // Group entries by date
+  // Group entries by date and apply filters
   const filteredEntries = entries.filter((item) => {
-    if (selectedCategoryFilter === 'all') return true;
-    return item.category.toLowerCase() === selectedCategoryFilter.toLowerCase();
+    const matchesCategory =
+      selectedCategoryFilter === 'all' ||
+      item.category.toLowerCase().includes(selectedCategoryFilter.toLowerCase());
+    const matchesSearch =
+      searchTerm.trim() === '' ||
+      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.paidWith.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
   });
 
   const todayItems = filteredEntries.filter((e) => e.dateGroup === 'Today, October 28');
@@ -561,7 +569,58 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           </div>
         </div>
 
-        {/* Date-Grouped Timeline */}
+        {/* Search & Category Filter Controls Bar (Matching Reference Design) */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+          <div className="relative flex items-center w-full sm:w-auto">
+            <span className="material-symbols-outlined absolute left-2.5 text-slate-400 text-base pointer-events-none">
+              search
+            </span>
+            <input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-9 pl-8 pr-3 text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-full sm:w-64 shadow-xs"
+              placeholder="Search transactions..."
+              type="text"
+            />
+          </div>
+
+          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
+            <div className="relative flex items-center flex-1 sm:flex-initial">
+              <span className="material-symbols-outlined absolute left-2.5 text-slate-500 text-sm pointer-events-none">
+                filter_list
+              </span>
+              <select
+                value={selectedCategoryFilter}
+                onChange={(e) => setSelectedCategoryFilter(e.target.value)}
+                className="h-9 w-[155px] pl-8 pr-7 text-xs font-semibold bg-white border border-slate-200 rounded-lg text-slate-800 hover:border-[#d4af37] focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all shadow-xs cursor-pointer"
+              >
+                <option value="all">All Categories</option>
+                <option value="Dining">Dining</option>
+                <option value="Travel">Travel &amp; Logistics</option>
+                <option value="Hardware">Hardware &amp; Tech</option>
+                <option value="Tech">Tech &amp; Infra</option>
+                <option value="Hosting">Client Hosting</option>
+                <option value="Legal">Legal &amp; Retainers</option>
+                <option value="Wellness">Wellness</option>
+              </select>
+            </div>
+
+            <button
+              onClick={() => {
+                setSelectedCategoryFilter('all');
+                setSearchTerm('');
+              }}
+              className="h-9 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
+              title="Clear filters"
+              type="button"
+            >
+              <span className="material-symbols-outlined text-sm">restart_alt</span>
+              <span>Clear Filters</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Date-Grouped Daywise Tables */}
         <div className="flex flex-col gap-6">
           {dateGroups.map((group) => {
             if (group.items.length === 0) return null;
@@ -569,105 +628,95 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
             const displayedItems = group.items.slice(0, 5);
 
             return (
-              <div key={group.dateKey} className="flex flex-col gap-3">
-                {/* Date Group Header */}
-                <div className="flex items-center justify-between pt-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-slate-800">
-                      📅 {group.dateGroup}
-                    </span>
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-md border ${group.badgeColor}`}
-                    >
-                      {group.badge}
-                    </span>
-                  </div>
+              <div key={group.dateKey} className="flex flex-col rounded-xl border border-slate-200/80 overflow-hidden shadow-2xs">
+                {/* Day Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="text-slate-600 text-[11px] uppercase tracking-wider bg-slate-50 border-b border-slate-200/80">
+                        <th className="py-2.5 px-4 font-semibold text-slate-800 text-xs">
+                          {group.dateGroup} • {group.items.length} {group.items.length === 1 ? 'Entry' : 'Entries'} • Total: {privacyMode ? '••••••' : `₹${group.total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                        </th>
+                        <th className="py-2.5 px-4 text-center text-xs">CATEGORY</th>
+                        <th className="py-2.5 px-4 text-xs">PAID WITH</th>
+                        <th className="py-2.5 px-4 text-xs">DATE &amp; TIME</th>
+                        <th className="py-2.5 px-4 text-right text-xs">AMOUNT</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 bg-white">
+                      {displayedItems.map((item) => (
+                        <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                          {/* Item details */}
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-slate-700 shrink-0">
+                                <span className="material-symbols-outlined text-base">{item.icon}</span>
+                              </div>
+                              <div className="flex flex-col min-w-0">
+                                <span className="text-sm font-semibold text-slate-900 truncate">
+                                  {item.title}
+                                </span>
+                                <span className="text-xs text-slate-500 truncate">
+                                  {item.subtitle}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
 
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-medium text-slate-500 flex items-baseline gap-1">
-                      <span>Total:</span>
-                      {privacyMode ? (
-                        <span className="text-sm font-bold text-slate-900 font-serif">••••••</span>
-                      ) : (
-                        <span className="inline-flex items-baseline gap-0.5">
-                          <span className="text-sm font-bold text-slate-900 font-serif">
-                            ₹{Math.floor(group.total).toLocaleString('en-IN')}
-                          </span>
-                          <span className="font-label-numeric text-xs text-slate-500 font-medium">
-                            .{(group.total % 1).toFixed(2).split('.')[1] || '00'}
-                          </span>
-                        </span>
-                      )}
-                    </span>
-                  </div>
+                          {/* Category pill */}
+                          <td className="py-3 px-4 text-center">
+                            <span
+                              className={`inline-block px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                                item.category.includes('Travel')
+                                  ? 'bg-amber-100/70 text-amber-900 border border-amber-200/60'
+                                  : item.category.includes('Tech') || item.category.includes('Hardware')
+                                  ? 'bg-slate-100 text-slate-800 border border-slate-200/60'
+                                  : item.category.includes('Dining')
+                                  ? 'bg-blue-50/70 text-blue-900 border border-blue-200/60'
+                                  : 'bg-slate-100 text-slate-700 border border-slate-200/60'
+                              }`}
+                            >
+                              {item.category}
+                            </span>
+                          </td>
+
+                          {/* Paid With */}
+                          <td className="py-3 px-4 text-xs text-slate-600 font-medium whitespace-nowrap">
+                            {item.paidWith}
+                          </td>
+
+                          {/* Date & Time */}
+                          <td className="py-3 px-4 text-xs text-slate-500 whitespace-nowrap">
+                            {item.time || item.dateTime}
+                          </td>
+
+                          {/* Amount */}
+                          <td className="py-3 px-4 text-right whitespace-nowrap">
+                            {privacyMode ? (
+                              <span className="text-sm font-bold text-slate-900 tracking-tight font-serif">••••••</span>
+                            ) : (
+                              <div className="inline-flex items-baseline justify-end gap-0.5">
+                                <span className="font-serif font-bold text-sm text-red-700 tracking-tight">
+                                  -₹{Math.floor(item.amount).toLocaleString('en-IN')}
+                                </span>
+                                <span className="font-label-numeric text-xs text-red-500 font-medium">
+                                  .{(item.amount % 1).toFixed(2).split('.')[1] || '00'}
+                                </span>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
 
-                {/* Items in this date group: only show recent 5 */}
-                <div className="flex flex-col gap-2.5">
-                  {displayedItems.map((item) => (
-                    <div
-                      key={item.id}
-                      className="bg-white rounded-xl p-3.5 sm:p-4 border border-slate-200/80 hover:border-slate-300 shadow-xs hover:shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                    >
-                      <div className="flex items-start sm:items-center gap-3 min-w-0">
-                        {/* Category Icon Container */}
-                        <div
-                          className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                            item.category === 'Dining'
-                              ? 'bg-[#fef9e7] text-[#b48e28]'
-                              : item.category === 'Travel'
-                              ? 'bg-blue-50 text-blue-600'
-                              : item.category === 'Hardware'
-                              ? 'bg-amber-50 text-amber-700'
-                              : 'bg-purple-50 text-purple-600'
-                          }`}
-                        >
-                          <span className="material-symbols-outlined text-lg">{item.icon}</span>
-                        </div>
-
-                        <div className="flex flex-col min-w-0">
-                          {/* Title & Badges */}
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-sm font-semibold text-slate-900 truncate">
-                              {item.title}
-                            </span>
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
-                              {item.tag}
-                            </span>
-                          </div>
-
-                          {/* Subtitle details */}
-                          <span className="text-xs text-slate-500 mt-1 truncate">
-                            {item.subtitle}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Right Side: Amount */}
-                      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
-                        {privacyMode ? (
-                          <span className="text-base font-bold text-slate-900 tracking-tight font-serif">••••••</span>
-                        ) : (
-                          <div className="flex items-baseline gap-0.5">
-                            <span className="text-base font-bold text-slate-900 tracking-tight font-serif">
-                              -₹{Math.floor(item.amount).toLocaleString('en-IN')}
-                            </span>
-                            <span className="font-label-numeric text-xs text-slate-500 font-medium">
-                              .{(item.amount % 1).toFixed(2).split('.')[1] || '00'}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Bottom of Day Group: View Day Ledger (kept at bottom of every day) */}
-                <div className="pt-0.5 flex items-center justify-center">
+                {/* Bottom of Day Group: View Day Ledger */}
+                <div className="p-2 bg-slate-50/50 border-t border-slate-100 flex items-center justify-center">
                   <button
                     type="button"
                     onClick={() => onOpenDayLedger(group.dateKey)}
-                    className="w-full py-2 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-xs font-semibold text-slate-700 hover:text-slate-950 flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs group"
+                    className="w-full py-2 px-3 rounded-xl bg-white hover:bg-slate-100 border border-slate-200/80 text-xs font-semibold text-slate-700 hover:text-slate-950 flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs group"
                   >
                     <span className="material-symbols-outlined text-sm text-[#b48e28] group-hover:translate-x-0.5 transition-transform">
                       menu_book
