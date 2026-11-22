@@ -120,10 +120,10 @@ export function KpiCarousel() {
             <div className="flex flex-col">
               <span className="font-label-caps text-[11px] uppercase text-slate-500">Total Property &amp; Assets</span>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-kpi-val text-slate-900 tracking-tight">
+                <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                   {privacyMode ? '••••••' : '₹6,20,000'}
                 </span>
-                <span className="font-label-numeric text-xs text-slate-500">{privacyMode ? '' : '.00'}</span>
+                <span className="font-label-numeric text-xs text-slate-500 font-medium">{privacyMode ? '' : '.00'}</span>
               </div>
             </div>
             <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-[#735c00]">
@@ -156,10 +156,10 @@ export function KpiCarousel() {
                 </span>
               </div>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-kpi-val text-red-700 tracking-tight">
+                <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-red-700 font-semibold tracking-tight">
                   {privacyMode ? '••••••' : `₹${totalPayables.toLocaleString('en-IN')}`}
                 </span>
-                <span className="font-label-numeric text-xs text-slate-500">{privacyMode ? '' : '.00'}</span>
+                <span className="font-label-numeric text-xs text-red-500 font-medium">{privacyMode ? '' : '.00'}</span>
               </div>
             </div>
             <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-600">
@@ -195,10 +195,10 @@ export function KpiCarousel() {
                 </span>
               </div>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-kpi-val text-slate-900 tracking-tight">
+                <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                   {privacyMode ? '••••••' : `₹${totalLoans.toLocaleString('en-IN')}`}
                 </span>
-                <span className="font-label-numeric text-xs text-slate-500">{privacyMode ? '' : '.00'}</span>
+                <span className="font-label-numeric text-xs text-slate-500 font-medium">{privacyMode ? '' : '.00'}</span>
               </div>
             </div>
             <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-700">
@@ -218,7 +218,7 @@ export function KpiCarousel() {
             <div className="flex flex-col">
               <span className="font-label-caps text-[11px] uppercase text-slate-500">This Month&apos;s Expenses</span>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-kpi-val text-slate-900 tracking-tight">
+                <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                   {formatCurrency(totalExpenses, privacyMode)}
                 </span>
               </div>

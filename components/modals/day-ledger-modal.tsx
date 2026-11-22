@@ -312,7 +312,7 @@ export function DayLedgerModal({
                     TODAY&apos;S INFLOW
                   </span>
                   <div className="flex items-baseline gap-1 mt-1">
-                    <span className="font-kpi-val text-slate-900 tracking-tight">
+                    <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                       {privacyMode ? '••••••' : `₹${Math.floor(dayConfig.inflow).toLocaleString('en-IN')}`}
                     </span>
                     <span className="font-label-numeric text-xs text-slate-400 font-medium">
@@ -353,10 +353,10 @@ export function DayLedgerModal({
                     TODAY&apos;S OUTFLOW
                   </span>
                   <div className="flex items-baseline gap-1 mt-1">
-                    <span className="font-kpi-val text-slate-900 tracking-tight">
+                    <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-red-700 font-semibold tracking-tight">
                       {privacyMode ? '••••••' : `₹${Math.floor(dayConfig.outflow).toLocaleString('en-IN')}`}
                     </span>
-                    <span className="font-label-numeric text-xs text-slate-500 font-medium">
+                    <span className="font-label-numeric text-xs text-red-400 font-medium">
                       {privacyMode ? '' : '.00'}
                     </span>
                   </div>

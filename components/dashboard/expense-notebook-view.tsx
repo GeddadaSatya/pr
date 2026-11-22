@@ -271,7 +271,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           </div>
           <div>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="font-kpi-val text-slate-900 tracking-tight">
+              <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                 {privacyMode ? '••••••' : '₹228'}
               </span>
               <span className="font-label-numeric text-xs text-slate-500 font-medium">
@@ -297,10 +297,10 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           </div>
           <div>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="font-kpi-val text-slate-900 tracking-tight">
+              <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-red-700 font-semibold tracking-tight">
                 {privacyMode ? '••••••' : `₹${Math.floor(totalSpentThisMonth).toLocaleString('en-IN')}`}
               </span>
-              <span className="font-label-numeric text-xs text-slate-500 font-medium">
+              <span className="font-label-numeric text-xs text-red-500 font-medium">
                 {privacyMode ? '' : `.${(totalSpentThisMonth % 1).toFixed(2).split('.')[1] || '40'}`}
               </span>
             </div>
@@ -325,10 +325,10 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           </div>
           <div>
             <div className="flex items-baseline gap-1 mt-1">
-              <span className="font-kpi-val text-slate-900 tracking-tight">
+              <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                 {totalNotebookEntriesCount}
               </span>
-              <span className="text-sm font-semibold text-slate-600 ml-1">Entries</span>
+              <span className="text-sm font-semibold text-slate-500 font-label-numeric ml-1">Entries</span>
             </div>
           </div>
           <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs text-slate-500 font-medium">

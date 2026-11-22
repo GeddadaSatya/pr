@@ -122,12 +122,12 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
                 Today&apos;s Inflow
               </span>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-kpi-val text-slate-900 tracking-tight">
+                <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight text-base sm:text-2xl md:text-3xl">
                   {privacyMode
                     ? '••••••'
                     : `₹${todayInflow.toLocaleString('en-IN')}`}
                 </span>
-                <span className="font-label-numeric text-xs text-slate-400">
+                <span className="font-label-numeric text-xs text-slate-500 font-medium">
                   {privacyMode ? '' : '.00'}
                 </span>
               </div>
@@ -184,12 +184,12 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
                 Today&apos;s Outflow
               </span>
               <div className="flex items-baseline gap-1 mt-1">
-                <span className="font-kpi-val text-red-700 tracking-tight">
+                <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-red-700 font-semibold tracking-tight text-base sm:text-2xl md:text-3xl">
                   {privacyMode
                     ? '••••••'
                     : `₹${todayOutflow.toLocaleString('en-IN')}`}
                 </span>
-                <span className="font-label-numeric text-xs text-red-400">
+                <span className="font-label-numeric text-xs text-red-500 font-medium">
                   {privacyMode ? '' : '.00'}
                 </span>
               </div>
@@ -275,7 +275,7 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
                 <>
                   <span className="text-xs text-slate-400">•</span>
                   <span className="text-xs text-slate-600 font-medium">To get back:</span>
-                  <span className="text-xs font-bold font-kpi-val text-emerald-800">
+                  <span className="text-xs font-bold font-label-numeric text-emerald-800">
                     {privacyMode
                       ? '••••••'
                       : `₹${totalPendingReceivables.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
@@ -327,7 +327,7 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold text-xs text-slate-900">{item.friendName}</span>
                       <span className="text-[11px] text-slate-400">•</span>
-                      <span className="font-bold text-xs font-kpi-val text-slate-900">
+                      <span className="font-bold text-xs font-label-numeric text-slate-900">
                         {privacyMode
                           ? '••••'
                           : `₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
