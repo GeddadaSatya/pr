@@ -402,7 +402,8 @@ export function ExpenseTable() {
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className={`h-9 w-full sm:w-[155px] pl-8 pr-7 text-xs font-semibold rounded-lg border transition-all shadow-xs cursor-pointer ${
+                    style={{ paddingLeft: '2.125rem' }}
+                    className={`h-9 w-full sm:w-[165px] pr-7 text-xs font-semibold rounded-lg border transition-all shadow-xs cursor-pointer ${
                       selectedCategory !== 'all'
                         ? 'bg-amber-50/70 border-amber-300 text-amber-950 font-bold'
                         : 'bg-white border-slate-200 text-slate-800 hover:border-[#d4af37]'

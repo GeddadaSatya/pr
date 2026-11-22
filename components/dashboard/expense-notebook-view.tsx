@@ -28,6 +28,10 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
+  // Top-level (all-level / global) filters
+  const [topSearch, setTopSearch] = useState('');
+  const [topCategory, setTopCategory] = useState('all');
+
   // Per-day search and category filters
   const [dayFilters, setDayFilters] = useState<Record<string, { search: string; category: string }>>({
     '2026-10-28': { search: '', category: 'all' },
@@ -35,26 +39,59 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
     '2026-10-25': { search: '', category: 'all' },
   });
 
+  // When user sets top search: reset individual and set that all level as individual also!
+  const handleTopSearchChange = (val: string) => {
+    setTopSearch(val);
+    setDayFilters((prev) => {
+      const next = { ...prev };
+      Object.keys(next).forEach((key) => {
+        next[key] = {
+          ...next[key],
+          search: val,
+        };
+      });
+      return next;
+    });
+  };
+
+  // When user sets top category: reset individual and set that all level as individual also!
+  const handleTopCategoryChange = (val: string) => {
+    setTopCategory(val);
+    setDayFilters((prev) => {
+      const next = { ...prev };
+      Object.keys(next).forEach((key) => {
+        next[key] = {
+          ...next[key],
+          category: val,
+        };
+      });
+      return next;
+    });
+  };
+
+  // When user sets individual search: individual only!
   const handleDaySearchChange = (dateKey: string, search: string) => {
     setDayFilters((prev) => ({
       ...prev,
       [dateKey]: {
+        ...prev[dateKey],
         search,
-        category: prev[dateKey]?.category || 'all',
       },
     }));
   };
 
+  // When user sets individual category: individual only!
   const handleDayCategoryChange = (dateKey: string, category: string) => {
     setDayFilters((prev) => ({
       ...prev,
       [dateKey]: {
-        search: prev[dateKey]?.search || '',
+        ...prev[dateKey],
         category,
       },
     }));
   };
 
+  // User resets individual day filters
   const handleClearDayFilters = (dateKey: string) => {
     setDayFilters((prev) => ({
       ...prev,
@@ -64,6 +101,25 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
       },
     }));
   };
+
+  // User resets all filters (top + all individual days)
+  const handleClearAllFilters = () => {
+    setTopSearch('');
+    setTopCategory('all');
+    setSelectedDateFilter('all');
+    setDayFilters({
+      '2026-10-28': { search: '', category: 'all' },
+      '2026-10-27': { search: '', category: 'all' },
+      '2026-10-25': { search: '', category: 'all' },
+    });
+  };
+
+  const isAnyFilterActive = Boolean(
+    topSearch ||
+    topCategory !== 'all' ||
+    selectedDateFilter !== 'all' ||
+    Object.values(dayFilters).some((f) => f.search || f.category !== 'all')
+  );
 
   // Sync any newly added expenses from FinanceContext into notebook entries
   useEffect(() => {
@@ -544,8 +600,50 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
             </div>
           </div>
 
-          {/* Right Controls */}
+          {/* Right Controls: Top/All-Level Search, Category, Date, Reset All, Sort, PDF, CSV */}
           <div className="flex flex-wrap items-center gap-2">
+            {/* Top/All-Level Search Input with comfortable icon gap */}
+            <div className="relative flex items-center">
+              <span className="material-symbols-outlined absolute left-2.5 text-slate-400 text-sm pointer-events-none">
+                search
+              </span>
+              <input
+                value={topSearch}
+                onChange={(e) => handleTopSearchChange(e.target.value)}
+                className="h-9 pr-3 text-xs bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-36 sm:w-48 shadow-2xs"
+                style={{ paddingLeft: '2.125rem' }}
+                placeholder="Search all days..."
+                type="text"
+              />
+            </div>
+
+            {/* Top/All-Level Category Filter Dropdown with comfortable icon gap */}
+            <div className="relative flex items-center">
+              <span className="material-symbols-outlined absolute left-2.5 text-slate-500 text-xs pointer-events-none">
+                filter_list
+              </span>
+              <select
+                value={topCategory}
+                onChange={(e) => handleTopCategoryChange(e.target.value)}
+                style={{ paddingLeft: '2.125rem' }}
+                className={`h-9 pr-7 text-xs font-semibold rounded-xl border transition-all shadow-2xs cursor-pointer ${
+                  topCategory !== 'all'
+                    ? 'bg-amber-50 border-amber-300 text-amber-950 font-bold'
+                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700 hover:border-[#d4af37]'
+                }`}
+              >
+                <option value="all">All Categories</option>
+                <option value="Dining">Dining</option>
+                <option value="Travel">Travel &amp; Logistics</option>
+                <option value="Hardware">Hardware &amp; Tech</option>
+                <option value="Tech">Tech &amp; Infra</option>
+                <option value="Hosting">Client Hosting</option>
+                <option value="Legal">Legal &amp; Retainers</option>
+                <option value="Real Estate">Real Estate &amp; Maintenance</option>
+                <option value="Wellness">Wellness</option>
+              </select>
+            </div>
+
             {/* Date Filter Dropdown */}
             <div className="relative flex items-center gap-1">
               <button
@@ -554,7 +652,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                 className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
                   selectedDateFilter !== 'all'
                     ? 'bg-amber-50 border-amber-300 text-amber-900 shadow-2xs'
-                    : 'bg-slate-100 hover:bg-slate-200/80 border-slate-200 text-slate-700'
+                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
                 }`}
               >
                 <span className="material-symbols-outlined text-sm text-[#b48e28]">calendar_today</span>
@@ -588,6 +686,19 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                 </div>
               )}
             </div>
+
+            {/* Top-Level Reset All Filters Button */}
+            {isAnyFilterActive && (
+              <button
+                type="button"
+                onClick={handleClearAllFilters}
+                className="h-9 px-3 rounded-xl border border-amber-300 bg-[#fef9e7] hover:bg-[#fdf3ce] text-[#9a761e] text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                title="Reset all filters"
+              >
+                <span className="material-symbols-outlined text-sm">restart_alt</span>
+                <span>Reset All</span>
+              </button>
+            )}
 
             {/* Sort Toggle */}
             <button
@@ -666,13 +777,14 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                   {/* Right: Category Dropdown & Clear Filters */}
                   <div className="flex items-center gap-2">
                     <div className="relative flex items-center">
-                      <span className="material-symbols-outlined absolute left-2 text-slate-500 text-xs pointer-events-none">
+                      <span className="material-symbols-outlined absolute left-2.5 text-slate-500 text-xs pointer-events-none">
                         filter_list
                       </span>
                       <select
                         value={dayFilter.category}
                         onChange={(e) => handleDayCategoryChange(group.dateKey, e.target.value)}
-                        className={`h-7.5 pl-6 pr-6 text-xs font-semibold rounded-lg border transition-all shadow-2xs cursor-pointer ${
+                        style={{ paddingLeft: '2.125rem' }}
+                        className={`h-7.5 pr-7 text-xs font-semibold rounded-lg border transition-all shadow-2xs cursor-pointer ${
                           dayFilter.category !== 'all'
                             ? 'bg-amber-50/80 border-amber-300 text-amber-950 font-bold'
                             : 'bg-white border-slate-200 text-slate-700 hover:border-[#d4af37]'
