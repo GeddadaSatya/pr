@@ -259,12 +259,47 @@ export function LoansInterestView() {
   const [formInterestType, setFormInterestType] = useState('Simple Monthly');
   const [formDuration, setFormDuration] = useState('12');
 
-  // Interactive Calculator State
-  const [simPrincipal, setSimPrincipal] = useState<number>(25000);
-  const [simRate, setSimRate] = useState<number>(1.5);
-  const [simTenure, setSimTenure] = useState<number>(12);
-  const [isCompound, setIsCompound] = useState<boolean>(false);
+  // Interactive Calculator State (stored as strings so inputs can be cleared completely without '01' glitches)
+  const [simPrincipal, setSimPrincipal] = useState<string>('25000');
+  const [simRate, setSimRate] = useState<string>('10');
+  const [simTenure, setSimTenure] = useState<string>('2');
+  const [isCompound, setIsCompound] = useState<boolean>(true);
   const [showSchedule, setShowSchedule] = useState<boolean>(true);
+
+  // Parsed numeric values for calculation
+  const parsedPrincipal = useMemo(() => {
+    if (!simPrincipal.trim()) return 0;
+    const clean = simPrincipal.replace(/[^0-9.]/g, '');
+    return clean ? parseFloat(clean) : 0;
+  }, [simPrincipal]);
+
+  const parsedRate = useMemo(() => {
+    if (!simRate.trim()) return 0;
+    const clean = simRate.replace(/[^0-9.]/g, '');
+    return clean ? parseFloat(clean) : 0;
+  }, [simRate]);
+
+  const parsedTenure = useMemo(() => {
+    if (!simTenure.trim()) return 0;
+    const clean = simTenure.replace(/[^0-9]/g, '');
+    return clean ? parseInt(clean, 10) : 0;
+  }, [simTenure]);
+
+  // Handle Clear All Calculator inputs
+  const handleClearAllCalculator = () => {
+    setSimPrincipal('');
+    setSimRate('');
+    setSimTenure('');
+    showToast('Cleared all calculator inputs');
+  };
+
+  // Handle Reset Calculator to standard defaults
+  const handleResetCalculator = () => {
+    setSimPrincipal('25000');
+    setSimRate('10');
+    setSimTenure('2');
+    showToast('Reset calculator to defaults');
+  };
 
   // Notification Toast
   const [notification, setNotification] = useState<string | null>(null);
@@ -276,9 +311,20 @@ export function LoansInterestView() {
 
   // Month-by-month Compounding & Schedule Breakdown
   const monthlySchedule = useMemo(() => {
-    const P = simPrincipal > 0 ? simPrincipal : 0;
-    const r = (simRate > 0 ? simRate : 0) / 100;
-    const m = Math.min(Math.max(simTenure, 1), 60);
+    const P = parsedPrincipal;
+    const r = parsedRate / 100;
+    const m = Math.min(Math.max(parsedTenure, 0), 60);
+
+    if (P === 0 || m === 0) {
+      return {
+        rows: [],
+        firstMonthInterest: 0,
+        lastMonthInterest: 0,
+        lastMonthInterestOnInterest: 0,
+        totalInterestOnInterest: 0,
+        totalBaseInterest: 0,
+      };
+    }
 
     const schedule: Array<{
       month: number;
@@ -325,13 +371,21 @@ export function LoansInterestView() {
       totalInterestOnInterest,
       totalBaseInterest,
     };
-  }, [simPrincipal, simRate, simTenure, isCompound]);
+  }, [parsedPrincipal, parsedRate, parsedTenure, isCompound]);
 
   // Calculator Math
   const calcResults = useMemo(() => {
-    const P = simPrincipal > 0 ? simPrincipal : 0;
-    const r = (simRate > 0 ? simRate : 0) / 100;
-    const m = simTenure > 0 ? simTenure : 1;
+    const P = parsedPrincipal;
+    const r = parsedRate / 100;
+    const m = parsedTenure;
+
+    if (P === 0 || m === 0) {
+      return {
+        monthly: 0,
+        totalInterest: 0,
+        gross: P,
+      };
+    }
 
     let monthly = 0;
     let totalInterest = 0;
@@ -352,7 +406,7 @@ export function LoansInterestView() {
       totalInterest,
       gross,
     };
-  }, [simPrincipal, simRate, simTenure, isCompound]);
+  }, [parsedPrincipal, parsedRate, parsedTenure, isCompound]);
 
   // Aggregate Metrics
   const totalPrincipalLent = useMemo(() => {
@@ -687,26 +741,49 @@ export function LoansInterestView() {
               </div>
             </div>
 
-            {/* Simple vs Compound Mode */}
-            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200/60">
+            {/* Actions: Clear All & Simple vs Compound Mode */}
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 type="button"
-                onClick={() => setIsCompound(false)}
-                className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                  !isCompound ? 'bg-[#0f172a] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
-                }`}
+                onClick={handleClearAllCalculator}
+                className="h-8 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-semibold flex items-center gap-1 shadow-2xs transition-colors cursor-pointer"
+                title="Clear all calculator inputs to 0"
               >
-                Simple
+                <span className="material-symbols-outlined text-sm text-slate-500">backspace</span>
+                <span>Clear All</span>
               </button>
+
               <button
                 type="button"
-                onClick={() => setIsCompound(true)}
-                className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                  isCompound ? 'bg-[#0f172a] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
-                }`}
+                onClick={handleResetCalculator}
+                className="h-8 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-semibold flex items-center gap-1 shadow-2xs transition-colors cursor-pointer"
+                title="Reset to 25k, 10%, 2mo"
               >
-                Compound
+                <span className="material-symbols-outlined text-sm text-[#9a761e]">restart_alt</span>
+                <span>Reset</span>
               </button>
+
+              {/* Simple vs Compound Mode */}
+              <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200/60">
+                <button
+                  type="button"
+                  onClick={() => setIsCompound(false)}
+                  className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                    !isCompound ? 'bg-[#0f172a] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Simple
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsCompound(true)}
+                  className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                    isCompound ? 'bg-[#0f172a] text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Compound
+                </button>
+              </div>
             </div>
           </div>
 
@@ -714,17 +791,41 @@ export function LoansInterestView() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
             {/* Loan Amount */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] text-[#45464d] uppercase font-semibold">Loan Amount</label>
+              <div className="flex justify-between items-center">
+                <label className="text-[11px] text-[#45464d] uppercase font-semibold">Loan Amount</label>
+                {simPrincipal !== '' && (
+                  <button
+                    type="button"
+                    onClick={() => setSimPrincipal('')}
+                    className="text-[10px] text-slate-400 hover:text-slate-700 cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[#0f172a] font-bold">₹</span>
                 <input
-                  type="number"
-                  min="1000"
-                  step="500"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="0"
                   value={simPrincipal}
-                  onChange={(e) => setSimPrincipal(parseFloat(e.target.value) || 0)}
-                  className="w-full h-10 bg-[#f8fafc] border border-slate-200 pl-7 pr-3 rounded-xl text-xs md:text-sm font-semibold text-[#0f172a] focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white transition-all"
+                  onChange={(e) => {
+                    const clean = e.target.value.replace(/[^0-9]/g, '');
+                    setSimPrincipal(clean);
+                  }}
+                  className="w-full h-10 bg-[#f8fafc] border border-slate-200 pl-7 pr-8 rounded-xl text-xs md:text-sm font-semibold text-[#0f172a] focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white transition-all"
                 />
+                {simPrincipal !== '' && (
+                  <button
+                    type="button"
+                    onClick={() => setSimPrincipal('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
+                    title="Clear input"
+                  >
+                    <span className="material-symbols-outlined text-xs">close</span>
+                  </button>
+                )}
               </div>
               <span className="text-[11px] text-[#76777d]">Principal sum</span>
             </div>
@@ -733,18 +834,46 @@ export function LoansInterestView() {
             <div className="flex flex-col gap-1.5">
               <div className="flex justify-between items-center">
                 <label className="text-[11px] text-[#45464d] uppercase font-semibold">Interest Rate</label>
-                <span className="text-[11px] text-[#9a761e] font-semibold">{simRate.toFixed(2)}% / mo</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] text-[#9a761e] font-semibold">
+                    {parsedRate > 0 ? `${parsedRate.toFixed(2)}% / mo` : '0% / mo'}
+                  </span>
+                  {simRate !== '' && (
+                    <button
+                      type="button"
+                      onClick={() => setSimRate('')}
+                      className="text-[10px] text-slate-400 hover:text-slate-700 cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="relative">
                 <input
-                  type="number"
-                  min="0.1"
-                  step="0.1"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="0"
                   value={simRate}
-                  onChange={(e) => setSimRate(parseFloat(e.target.value) || 0)}
-                  className="w-full h-10 bg-[#f8fafc] border border-slate-200 px-3 pr-12 rounded-xl text-xs md:text-sm font-semibold text-[#0f172a] focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white transition-all"
+                  onChange={(e) => {
+                    const clean = e.target.value.replace(/[^0-9.]/g, '');
+                    setSimRate(clean);
+                  }}
+                  className="w-full h-10 bg-[#f8fafc] border border-slate-200 px-3 pr-16 rounded-xl text-xs md:text-sm font-semibold text-[#0f172a] focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white transition-all"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-[#76777d]">% / mo</span>
+                <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                  {simRate !== '' && (
+                    <button
+                      type="button"
+                      onClick={() => setSimRate('')}
+                      className="w-5 h-5 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
+                      title="Clear input"
+                    >
+                      <span className="material-symbols-outlined text-xs">close</span>
+                    </button>
+                  )}
+                  <span className="text-[11px] text-[#76777d] pointer-events-none">% / mo</span>
+                </div>
               </div>
               <span className="text-[11px] text-[#76777d]">Monthly rate</span>
             </div>
@@ -753,43 +882,71 @@ export function LoansInterestView() {
             <div className="flex flex-col gap-1.5">
               <div className="flex justify-between items-center">
                 <label className="text-[11px] text-[#45464d] uppercase font-semibold">Duration</label>
-                <span className="text-[11px] text-[#0f172a] font-semibold">{simTenure} Months</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] text-[#0f172a] font-semibold">
+                    {parsedTenure > 0 ? `${parsedTenure} Months` : '0 Months'}
+                  </span>
+                  {simTenure !== '' && (
+                    <button
+                      type="button"
+                      onClick={() => setSimTenure('')}
+                      className="text-[10px] text-slate-400 hover:text-slate-700 cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="flex items-center gap-1.5">
                 <div className="relative flex-1">
                   <input
-                    type="number"
-                    min="1"
-                    max="60"
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="0"
                     value={simTenure}
-                    onChange={(e) => setSimTenure(parseInt(e.target.value, 10) || 1)}
-                    className="w-full h-10 bg-[#f8fafc] border border-slate-200 px-3 pr-8 rounded-xl text-xs md:text-sm font-semibold text-[#0f172a] focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white transition-all"
+                    onChange={(e) => {
+                      const clean = e.target.value.replace(/[^0-9]/g, '');
+                      setSimTenure(clean);
+                    }}
+                    className="w-full h-10 bg-[#f8fafc] border border-slate-200 px-3 pr-12 rounded-xl text-xs md:text-sm font-semibold text-[#0f172a] focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white transition-all"
                   />
-                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-[#76777d]">Mo</span>
+                  <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    {simTenure !== '' && (
+                      <button
+                        type="button"
+                        onClick={() => setSimTenure('')}
+                        className="w-4 h-4 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
+                        title="Clear input"
+                      >
+                        <span className="material-symbols-outlined text-[11px]">close</span>
+                      </button>
+                    )}
+                    <span className="text-[11px] text-[#76777d] pointer-events-none">Mo</span>
+                  </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setSimTenure(6)}
+                  onClick={() => setSimTenure('6')}
                   className={`h-10 px-2 rounded-xl text-xs font-semibold cursor-pointer transition-colors ${
-                    simTenure === 6 ? 'bg-[#fdf8ea] border border-[#d4af37]/40 text-[#0f172a] font-bold' : 'bg-slate-100 text-slate-600 hover:text-slate-900'
+                    simTenure === '6' ? 'bg-[#fdf8ea] border border-[#d4af37]/40 text-[#0f172a] font-bold' : 'bg-slate-100 text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   6M
                 </button>
                 <button
                   type="button"
-                  onClick={() => setSimTenure(12)}
+                  onClick={() => setSimTenure('12')}
                   className={`h-10 px-2 rounded-xl text-xs font-semibold cursor-pointer transition-colors ${
-                    simTenure === 12 ? 'bg-[#fdf8ea] border border-[#d4af37]/40 text-[#0f172a] font-bold' : 'bg-slate-100 text-slate-600 hover:text-slate-900'
+                    simTenure === '12' ? 'bg-[#fdf8ea] border border-[#d4af37]/40 text-[#0f172a] font-bold' : 'bg-slate-100 text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   12M
                 </button>
                 <button
                   type="button"
-                  onClick={() => setSimTenure(24)}
+                  onClick={() => setSimTenure('24')}
                   className={`h-10 px-2 rounded-xl text-xs font-semibold cursor-pointer transition-colors ${
-                    simTenure === 24 ? 'bg-[#fdf8ea] border border-[#d4af37]/40 text-[#0f172a] font-bold' : 'bg-slate-100 text-slate-600 hover:text-slate-900'
+                    simTenure === '24' ? 'bg-[#fdf8ea] border border-[#d4af37]/40 text-[#0f172a] font-bold' : 'bg-slate-100 text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   24M
@@ -815,7 +972,7 @@ export function LoansInterestView() {
                   )}
                 </div>
 
-                {isCompound && simTenure > 1 ? (
+                {isCompound && parsedTenure > 1 ? (
                   <div className="mt-1 flex flex-col gap-1">
                     <div className="flex items-baseline justify-between gap-1">
                       <span className="text-xs text-[#76777d]">1st Month:</span>
@@ -825,7 +982,7 @@ export function LoansInterestView() {
                     </div>
 
                     <div className="flex items-baseline justify-between gap-1 pt-1 border-t border-slate-200/60">
-                      <span className="text-xs text-[#0f172a] font-semibold">Month {simTenure}:</span>
+                      <span className="text-xs text-[#0f172a] font-semibold">Month {parsedTenure}:</span>
                       <span className="font-serif text-base font-bold text-[#0f172a]">
                         ₹{monthlySchedule.lastMonthInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
@@ -852,7 +1009,7 @@ export function LoansInterestView() {
 
               <div className="mt-2 pt-1 border-t border-slate-200/40 text-[11px] text-[#76777d] flex items-center justify-between">
                 <span>
-                  {isCompound && simTenure > 1
+                  {isCompound && parsedTenure > 1
                     ? `Avg: ₹${calcResults.monthly.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mo`
                     : '1st Month Base'}
                 </span>
@@ -892,7 +1049,7 @@ export function LoansInterestView() {
                 )}
               </div>
               <div className="mt-2 pt-1 border-t border-slate-200/40 text-[10px] text-slate-500">
-                Yield: {((calcResults.totalInterest / (simPrincipal || 1)) * 100).toFixed(1)}% total return
+                Yield: {((calcResults.totalInterest / (parsedPrincipal || 1)) * 100).toFixed(1)}% total return
               </div>
             </div>
 
@@ -904,11 +1061,11 @@ export function LoansInterestView() {
                   ₹{calcResults.gross.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
                 <span className="text-[11px] text-[#76777d] mt-0.5 block">
-                  Principal (₹{simPrincipal.toLocaleString('en-IN')}) + Interest
+                  Principal (₹{parsedPrincipal.toLocaleString('en-IN')}) + Interest
                 </span>
               </div>
               <div className="mt-2 pt-1 border-t border-slate-200/40 text-[10px] text-slate-500">
-                Maturity in {simTenure} months
+                Maturity in {parsedTenure} months
               </div>
             </div>
           </div>
@@ -920,11 +1077,11 @@ export function LoansInterestView() {
                 <div className="flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-sm text-[#9a761e]">table_rows</span>
                   <span className="text-xs font-bold text-[#0f172a]">
-                    Month-by-Month Compounding Breakdown ({simTenure} Months)
+                    Month-by-Month Compounding Breakdown ({parsedTenure} Months)
                   </span>
                 </div>
                 <span className="text-[10px] text-slate-500 font-medium">
-                  Base rate: {simRate}% on ₹{simPrincipal.toLocaleString('en-IN')} (₹{(simPrincipal * (simRate / 100)).toLocaleString('en-IN')}/mo)
+                  Base rate: {parsedRate}% on ₹{parsedPrincipal.toLocaleString('en-IN')} (₹{(parsedPrincipal * (parsedRate / 100)).toLocaleString('en-IN')}/mo)
                 </span>
               </div>
 
@@ -973,7 +1130,7 @@ export function LoansInterestView() {
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 px-2.5 py-2 rounded-lg bg-[#fdf8ea] border border-[#d4af37]/30 text-[11px] text-[#0f172a] font-medium">
                 <span>
-                  Compound Formula: <code className="font-mono text-[10px] bg-white px-1.5 py-0.5 rounded border border-[#d4af37]/30">₹{simPrincipal.toLocaleString('en-IN')} × (1 + {simRate}%)^{simTenure}</code>
+                  Compound Formula: <code className="font-mono text-[10px] bg-white px-1.5 py-0.5 rounded border border-[#d4af37]/30">₹{parsedPrincipal.toLocaleString('en-IN')} × (1 + {parsedRate}%)^{parsedTenure}</code>
                 </span>
                 <span className="font-bold text-[#9a761e]">
                   Extra Earned from Compounding: +₹{monthlySchedule.totalInterestOnInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
