@@ -48,97 +48,21 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
     };
   }, [isDateFilterOpen]);
 
-  // Top-level (all-level / global) filters
+  // Search and Category filters
   const [topSearch, setTopSearch] = useState('');
   const [topCategory, setTopCategory] = useState('all');
 
-  // Per-day search and category filters
-  const [dayFilters, setDayFilters] = useState<Record<string, { search: string; category: string }>>({
-    '2026-10-28': { search: '', category: 'all' },
-    '2026-10-27': { search: '', category: 'all' },
-    '2026-10-25': { search: '', category: 'all' },
-  });
-
-  // When user sets top search: reset individual and set that all level as individual also!
-  const handleTopSearchChange = (val: string) => {
-    setTopSearch(val);
-    setDayFilters((prev) => {
-      const next = { ...prev };
-      Object.keys(next).forEach((key) => {
-        next[key] = {
-          ...next[key],
-          search: val,
-        };
-      });
-      return next;
-    });
-  };
-
-  // When user sets top category: reset individual and set that all level as individual also!
-  const handleTopCategoryChange = (val: string) => {
-    setTopCategory(val);
-    setDayFilters((prev) => {
-      const next = { ...prev };
-      Object.keys(next).forEach((key) => {
-        next[key] = {
-          ...next[key],
-          category: val,
-        };
-      });
-      return next;
-    });
-  };
-
-  // When user sets individual search: individual only!
-  const handleDaySearchChange = (dateKey: string, search: string) => {
-    setDayFilters((prev) => ({
-      ...prev,
-      [dateKey]: {
-        ...prev[dateKey],
-        search,
-      },
-    }));
-  };
-
-  // When user sets individual category: individual only!
-  const handleDayCategoryChange = (dateKey: string, category: string) => {
-    setDayFilters((prev) => ({
-      ...prev,
-      [dateKey]: {
-        ...prev[dateKey],
-        category,
-      },
-    }));
-  };
-
-  // User resets individual day filters
-  const handleClearDayFilters = (dateKey: string) => {
-    setDayFilters((prev) => ({
-      ...prev,
-      [dateKey]: {
-        search: '',
-        category: 'all',
-      },
-    }));
-  };
-
-  // User resets all filters (top + all individual days)
+  // User resets all filters
   const handleClearAllFilters = () => {
     setTopSearch('');
     setTopCategory('all');
     setSelectedDateFilter('all');
-    setDayFilters({
-      '2026-10-28': { search: '', category: 'all' },
-      '2026-10-27': { search: '', category: 'all' },
-      '2026-10-25': { search: '', category: 'all' },
-    });
   };
 
   const isAnyFilterActive = Boolean(
-    topSearch ||
+    topSearch.trim() !== '' ||
     topCategory !== 'all' ||
-    selectedDateFilter !== 'all' ||
-    Object.values(dayFilters).some((f) => f.search || f.category !== 'all')
+    selectedDateFilter !== 'all'
   );
 
   // Sync any newly added expenses from FinanceContext into notebook entries
@@ -168,11 +92,11 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
             category: exp.category,
             statusBadge: 'Verified Receipt',
             paidWith: exp.paidWith || 'Direct Payment',
-            dateTime: 'Today, Just now',
+            dateTime: exp.dateTime || 'Today, Just now',
             amount: exp.amount,
             icon,
-            dateGroup: 'Today, October 28',
-            dateKey: '2026-10-28',
+            dateGroup: exp.dateTime?.includes('Oct 27') || exp.dateTime?.includes('Yesterday') ? 'Sunday, October 27' : 'Today, October 28',
+            dateKey: exp.dateTime?.includes('Oct 27') || exp.dateTime?.includes('Yesterday') ? '2026-10-27' : '2026-10-28',
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           });
         }
@@ -182,69 +106,6 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
       }
     }
   }, [expenses]);
-
-  const filterDayItems = (dateKey: string, rawItems: NotebookEntry[]) => {
-    const filter = dayFilters[dateKey] || { search: '', category: 'all' };
-    return rawItems.filter((item) => {
-      const matchesCategory =
-        filter.category === 'all' ||
-        item.category.toLowerCase().includes(filter.category.toLowerCase()) ||
-        item.tag.toLowerCase().includes(filter.category.toLowerCase());
-      const matchesSearch =
-        filter.search.trim() === '' ||
-        item.title.toLowerCase().includes(filter.search.toLowerCase()) ||
-        item.subtitle.toLowerCase().includes(filter.search.toLowerCase()) ||
-        item.paidWith.toLowerCase().includes(filter.search.toLowerCase()) ||
-        item.category.toLowerCase().includes(filter.search.toLowerCase()) ||
-        item.tag.toLowerCase().includes(filter.search.toLowerCase());
-      return matchesCategory && matchesSearch;
-    });
-  };
-
-  const rawTodayItems = entries.filter((e) => e.dateGroup === 'Today, October 28' || e.dateKey === '2026-10-28');
-  const rawSundayItems = entries.filter((e) => e.dateGroup === 'Sunday, October 27' || e.dateKey === '2026-10-27');
-  const rawFridayItems = entries.filter((e) => e.dateGroup === 'Friday, October 25' || e.dateKey === '2026-10-25');
-
-  const standardGroups = [
-    {
-      dateGroup: 'TODAY, OCTOBER 28',
-      dateKey: '2026-10-28',
-      rawItems: rawTodayItems,
-    },
-    {
-      dateGroup: 'SUNDAY, OCTOBER 27',
-      dateKey: '2026-10-27',
-      rawItems: rawSundayItems,
-    },
-    {
-      dateGroup: 'FRIDAY, OCTOBER 25',
-      dateKey: '2026-10-25',
-      rawItems: rawFridayItems,
-    },
-  ];
-
-  const standardKeys = new Set(['2026-10-28', '2026-10-27', '2026-10-25']);
-  const otherKeys = Array.from(new Set(entries.map((e) => e.dateKey).filter((k) => k && !standardKeys.has(k))));
-  const otherGroups = otherKeys.map((key) => {
-    const rawItems = entries.filter((e) => e.dateKey === key);
-    let title = key;
-    try {
-      const [y, m, d] = key.split('-').map(Number);
-      const date = new Date(y, m - 1, d);
-      const weekday = date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
-      const month = date.toLocaleDateString('en-US', { month: 'long' }).toUpperCase();
-      title = `${weekday}, ${month} ${d}`;
-    } catch {
-      title = key;
-    }
-    return {
-      dateGroup: title,
-      dateKey: key,
-      rawItems,
-    };
-  });
-
-  const dateGroups = [...standardGroups, ...otherGroups];
 
   const formatDateDisplay = (dateStr: string) => {
     try {
@@ -272,23 +133,75 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
     return 'All Dates';
   })();
 
-  const visibleDateGroups = (() => {
+  const getCategoryPillClass = (category: string) => {
+    const c = category.toLowerCase();
+    if (c.includes('travel')) {
+      return 'bg-[#fef9e7] text-[#9a761e] border border-[#d4af37]/40';
+    }
+    if (c.includes('tech') || c.includes('infra')) {
+      return 'bg-[#f1f5f9] text-[#334155] border border-slate-200/80';
+    }
+    if (c.includes('client') || c.includes('hosting')) {
+      return 'bg-[#eff6ff] text-[#1e40af] border border-blue-200/60';
+    }
+    if (c.includes('legal') || c.includes('retainer')) {
+      return 'bg-[#eef2ff] text-[#4338ca] border border-indigo-200/60';
+    }
+    if (c.includes('real estate') || c.includes('maintenance')) {
+      return 'bg-[#ecfdf5] text-[#047857] border border-emerald-200/70';
+    }
+    if (c.includes('dining')) {
+      return 'bg-[#fff7ed] text-[#c2410c] border border-amber-200/60';
+    }
+    if (c.includes('hardware')) {
+      return 'bg-[#f8fafc] text-[#334155] border border-slate-200';
+    }
+    if (c.includes('wellness')) {
+      return 'bg-[#f0fdfa] text-[#0f766e] border border-teal-200/60';
+    }
+    return 'bg-slate-100 text-slate-700 border border-slate-200';
+  };
+
+  // Filter all entries into a single list (Table only, not individual days)
+  const filteredEntries = entries.filter((item) => {
+    const q = topSearch.toLowerCase().trim();
+    const matchesSearch =
+      q === '' ||
+      item.title.toLowerCase().includes(q) ||
+      item.subtitle.toLowerCase().includes(q) ||
+      item.paidWith.toLowerCase().includes(q) ||
+      item.category.toLowerCase().includes(q) ||
+      item.tag.toLowerCase().includes(q);
+
+    const matchesCategory =
+      topCategory === 'all' ||
+      item.category.toLowerCase().includes(topCategory.toLowerCase()) ||
+      item.tag.toLowerCase().includes(topCategory.toLowerCase());
+
+    let matchesDate = true;
     if (selectedDateFilter === 'all') {
-      return dateGroups;
-    }
-    if (selectedDateFilter === 'custom-single') {
-      return dateGroups.filter((g) => g.dateKey === customSingleDate);
-    }
-    if (selectedDateFilter === 'custom-range') {
+      matchesDate = true;
+    } else if (selectedDateFilter === 'custom-single') {
+      matchesDate = (item.dateKey || '2026-10-28') === customSingleDate;
+    } else if (selectedDateFilter === 'custom-range') {
       const from = customRangeFrom <= customRangeTo ? customRangeFrom : customRangeTo;
       const to = customRangeFrom <= customRangeTo ? customRangeTo : customRangeFrom;
-      return dateGroups.filter((g) => g.dateKey >= from && g.dateKey <= to);
+      const k = item.dateKey || '2026-10-28';
+      matchesDate = k >= from && k <= to;
+    } else {
+      matchesDate = (item.dateKey || '2026-10-28') === selectedDateFilter;
     }
-    return dateGroups.filter((g) => g.dateKey === selectedDateFilter);
-  })();
 
-  const sortedDateGroups =
-    sortOrder === 'oldest' ? [...visibleDateGroups].reverse() : visibleDateGroups;
+    return matchesSearch && matchesCategory && matchesDate;
+  });
+
+  const sortedEntries = [...filteredEntries].sort((a, b) => {
+    if (sortOrder === 'oldest') {
+      return (a.dateKey || '').localeCompare(b.dateKey || '');
+    } else {
+      return (b.dateKey || '').localeCompare(a.dateKey || '');
+    }
+  });
 
   const initialNotebookIds = new Set(INITIAL_NOTEBOOK_ENTRIES.map((e) => e.id));
   const dynamicExpensesAdded = entries.filter((e) => !initialNotebookIds.has(e.id));
@@ -668,50 +581,8 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
             </div>
           </div>
 
-          {/* Right Controls: Top/All-Level Search, Category, Date, Reset All, Sort, PDF, CSV */}
+          {/* Right Controls: Date Filter, Sort, PDF Folio, CSV / Excel */}
           <div className="flex flex-wrap items-center gap-2">
-            {/* Top/All-Level Search Input with comfortable icon gap */}
-            <div className="relative flex items-center">
-              <span className="material-symbols-outlined absolute left-2.5 text-slate-400 text-sm pointer-events-none">
-                search
-              </span>
-              <input
-                value={topSearch}
-                onChange={(e) => handleTopSearchChange(e.target.value)}
-                className="h-9 pr-3 text-xs bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-36 sm:w-48 shadow-2xs"
-                style={{ paddingLeft: '2.125rem' }}
-                placeholder="Search all days..."
-                type="text"
-              />
-            </div>
-
-            {/* Top/All-Level Category Filter Dropdown with comfortable icon gap */}
-            <div className="relative flex items-center">
-              <span className="material-symbols-outlined absolute left-2.5 text-slate-500 text-xs pointer-events-none">
-                filter_list
-              </span>
-              <select
-                value={topCategory}
-                onChange={(e) => handleTopCategoryChange(e.target.value)}
-                style={{ paddingLeft: '2.125rem' }}
-                className={`h-9 pr-7 text-xs font-semibold rounded-xl border transition-all shadow-2xs cursor-pointer ${
-                  topCategory !== 'all'
-                    ? 'bg-amber-50 border-amber-300 text-amber-950 font-bold'
-                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700 hover:border-[#d4af37]'
-                }`}
-              >
-                <option value="all">All Categories</option>
-                <option value="Dining">Dining</option>
-                <option value="Travel">Travel &amp; Logistics</option>
-                <option value="Hardware">Hardware &amp; Tech</option>
-                <option value="Tech">Tech &amp; Infra</option>
-                <option value="Hosting">Client Hosting</option>
-                <option value="Legal">Legal &amp; Retainers</option>
-                <option value="Real Estate">Real Estate &amp; Maintenance</option>
-                <option value="Wellness">Wellness</option>
-              </select>
-            </div>
-
             {/* Date Filter Dropdown with Presets, Custom Single Date, & Custom Date Range */}
             <div className="relative flex items-center gap-1" ref={dateDropdownRef}>
               <button
@@ -866,19 +737,6 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
               )}
             </div>
 
-            {/* Top-Level Reset All Filters Button */}
-            {isAnyFilterActive && (
-              <button
-                type="button"
-                onClick={handleClearAllFilters}
-                className="h-9 px-3 rounded-xl border border-amber-300 bg-[#fef9e7] hover:bg-[#fdf3ce] text-[#9a761e] text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
-                title="Reset all filters"
-              >
-                <span className="material-symbols-outlined text-sm">restart_alt</span>
-                <span>Reset All</span>
-              </button>
-            )}
-
             {/* Sort Toggle */}
             <button
               type="button"
@@ -911,259 +769,173 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           </div>
         </div>
 
-        {/* Date-Grouped Daywise Tables (Matching Reference Design: Each day has its own header with search & category filters) */}
-        <div className="flex flex-col gap-6">
-          {sortedDateGroups.length === 0 ? (
-            <div className="py-12 px-4 text-center bg-slate-50/70 rounded-2xl border border-dashed border-slate-200 flex flex-col items-center justify-center">
-              <div className="w-12 h-12 rounded-full bg-amber-50 border border-amber-200/60 flex items-center justify-center text-[#b48e28] mb-3">
-                <span className="material-symbols-outlined text-2xl">event_busy</span>
+        {/* Single Unified Expense Table (Table only, not individual day) */}
+        <div className="rounded-xl border border-slate-200/80 overflow-hidden shadow-2xs bg-white">
+          {/* Table Header Filter Bar matching reference design */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-white border-b border-slate-100">
+            {/* Search transactions input */}
+            <div className="relative flex items-center w-full sm:w-auto">
+              <span className="material-symbols-outlined absolute left-3 text-slate-400 text-base pointer-events-none">
+                search
+              </span>
+              <input
+                value={topSearch}
+                onChange={(e) => setTopSearch(e.target.value)}
+                className="h-9 pl-9 pr-3 text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-full sm:w-64 shadow-2xs"
+                placeholder="Search transactions..."
+                type="text"
+              />
+            </div>
+
+            {/* Category Filter and Clear Filters button */}
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+              <div className="relative flex items-center">
+                <span className="material-symbols-outlined absolute left-2.5 text-slate-500 text-sm pointer-events-none">
+                  filter_list
+                </span>
+                <select
+                  value={topCategory}
+                  onChange={(e) => setTopCategory(e.target.value)}
+                  style={{ paddingLeft: '2rem' }}
+                  className="h-9.5 pr-8 text-xs font-semibold bg-white border border-slate-200 rounded-lg text-slate-800 hover:border-[#d4af37] focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all shadow-2xs cursor-pointer appearance-none"
+                >
+                  <option value="all">All Categories</option>
+                  <option value="Travel">Travel &amp; Logistics</option>
+                  <option value="Tech">Tech &amp; Infra</option>
+                  <option value="Hosting">Client Hosting</option>
+                  <option value="Legal">Legal &amp; Retainers</option>
+                  <option value="Real Estate">Real Estate &amp; Maintenance</option>
+                  <option value="Dining">Dining</option>
+                  <option value="Hardware">Hardware</option>
+                  <option value="Wellness">Wellness</option>
+                </select>
+                <span className="material-symbols-outlined absolute right-2 text-slate-400 text-sm pointer-events-none">
+                  expand_more
+                </span>
               </div>
-              <h4 className="text-sm font-bold text-slate-800 mb-1">
-                No Transactions Found
-              </h4>
-              <p className="text-xs text-slate-500 max-w-sm">
-                No ledger entries match the selected date filter ({selectedDateFilterLabel}). Select another date or reset your filter.
-              </p>
+
               <button
                 type="button"
                 onClick={handleClearAllFilters}
-                className="mt-4 px-4 py-1.5 rounded-xl bg-[#fef9e7] hover:bg-[#fdf3ce] border border-amber-300 text-xs font-bold text-[#9a761e] shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
+                className="h-9.5 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-semibold flex items-center gap-1 shadow-2xs transition-colors cursor-pointer"
+                title="Clear filters"
               >
                 <span className="material-symbols-outlined text-sm">restart_alt</span>
-                <span>Reset Date Filter</span>
+                <span>Clear Filters</span>
               </button>
             </div>
-          ) : (
-            sortedDateGroups.map((group) => {
-            const dayFilter = dayFilters[group.dateKey] || { search: '', category: 'all' };
-            const dayItems = filterDayItems(group.dateKey, group.rawItems);
-            const displayedItems = dayItems.slice(0, 5);
-            const dayTotal = dayItems.reduce((sum, item) => sum + item.amount, 0);
-            const isDayFiltered = Boolean(dayFilter.search || dayFilter.category !== 'all');
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse table-fixed min-w-[760px]">
+              <colgroup>
+                <col className="w-[38%]" />
+                <col className="w-[18%]" />
+                <col className="w-[18%]" />
+                <col className="w-[12%]" />
+                <col className="w-[14%]" />
+              </colgroup>
+              <thead>
+                <tr className="text-slate-500 text-[11px] uppercase tracking-wider bg-slate-50 border-b border-slate-200/80 font-bold">
+                  <th className="py-2.5 px-4 w-[38%] text-xs font-semibold text-left">EXPENSE ITEM</th>
+                  <th className="py-2.5 px-4 w-[18%] text-xs font-semibold text-center">CATEGORY</th>
+                  <th className="py-2.5 px-4 w-[18%] text-xs font-semibold text-left">PAID WITH</th>
+                  <th className="py-2.5 px-4 w-[12%] text-xs font-semibold text-left">DATE &amp; TIME</th>
+                  <th className="py-2.5 px-4 w-[14%] text-xs font-semibold text-right">AMOUNT</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 bg-white">
+                {sortedEntries.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-12 px-4 text-center">
+                      <div className="flex flex-col items-center justify-center gap-2">
+                        <div className="w-10 h-10 rounded-full bg-amber-50 border border-amber-200/60 flex items-center justify-center text-[#b48e28]">
+                          <span className="material-symbols-outlined text-xl">search_off</span>
+                        </div>
+                        <span className="text-sm font-bold text-slate-800">No transactions match your search or filters</span>
+                        <p className="text-xs text-slate-500 max-w-sm">
+                          Try adjusting your search query, selecting another category or date, or clear your filters.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={handleClearAllFilters}
+                          className="mt-2 px-3.5 py-1.5 rounded-lg bg-[#fef9e7] hover:bg-[#fdf3ce] border border-amber-300 text-xs font-bold text-[#9a761e] transition-colors cursor-pointer flex items-center gap-1.5"
+                        >
+                          <span className="material-symbols-outlined text-sm">restart_alt</span>
+                          <span>Clear Filters</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  sortedEntries.map((item, idx) => (
+                    <tr key={`${item.id}-${idx}`} className="hover:bg-slate-50/80 transition-colors">
+                      {/* Expense Item */}
+                      <td className="w-[38%] py-3.5 px-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-slate-700 shrink-0">
+                            <span className="material-symbols-outlined text-base">{item.icon}</span>
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                            <span className="text-sm font-semibold text-slate-900 truncate">
+                              {item.title}
+                            </span>
+                            <span className="text-xs text-slate-500 truncate">
+                              {item.subtitle}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
 
-            return (
-              <div key={group.dateKey} className="flex flex-col rounded-xl border border-slate-200/80 overflow-hidden shadow-2xs bg-white">
-                {/* Day Header Bar: Date Title on left with search; Category & Clear Filters on right */}
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 px-4 py-3 bg-white border-b border-slate-200/80">
-                  {/* Left: Date Group Title & Search input */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-[11px] sm:text-xs font-bold text-slate-800 uppercase tracking-wider">
-                      {group.dateGroup} • {dayItems.length} {dayItems.length === 1 ? 'ENTRY' : 'ENTRIES'} • TOTAL:{' '}
-                      {privacyMode ? (
-                        '••••••'
-                      ) : (
-                        <span className="font-serif font-bold text-slate-900">
-                          ₹{dayTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      {/* Category Pill */}
+                      <td className="w-[18%] py-3.5 px-4 text-center">
+                        <span
+                          className={`inline-flex items-center justify-center text-center px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap shadow-2xs ${getCategoryPillClass(
+                            item.category
+                          )}`}
+                        >
+                          {item.category}
                         </span>
-                      )}
-                    </span>
+                      </td>
 
-                    {/* Search Box */}
-                    <div className="relative flex items-center">
-                      <span className="material-symbols-outlined absolute left-2.5 text-slate-400 text-sm pointer-events-none">
-                        search
-                      </span>
-                      <input
-                        value={dayFilter.search}
-                        onChange={(e) => handleDaySearchChange(group.dateKey, e.target.value)}
-                        className="h-7.5 pl-8.5 pr-2.5 text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-36 sm:w-52 shadow-2xs"
-                        style={{ paddingLeft: '2.125rem' }}
-                        placeholder="Search transactions..."
-                        type="text"
-                      />
-                    </div>
-                  </div>
+                      {/* Paid With */}
+                      <td className="w-[18%] py-3.5 px-4 text-xs font-medium text-slate-600 truncate">
+                        {item.paidWith}
+                      </td>
 
-                  {/* Right: Category Dropdown & Clear Filters */}
-                  <div className="flex items-center gap-2">
-                    <div className="relative flex items-center">
-                      <span className="material-symbols-outlined absolute left-2.5 text-slate-500 text-xs pointer-events-none">
-                        filter_list
-                      </span>
-                      <select
-                        value={dayFilter.category}
-                        onChange={(e) => handleDayCategoryChange(group.dateKey, e.target.value)}
-                        style={{ paddingLeft: '2.125rem' }}
-                        className={`h-7.5 pr-7 text-xs font-semibold rounded-lg border transition-all shadow-2xs cursor-pointer ${
-                          dayFilter.category !== 'all'
-                            ? 'bg-amber-50/80 border-amber-300 text-amber-950 font-bold'
-                            : 'bg-white border-slate-200 text-slate-700 hover:border-[#d4af37]'
-                        }`}
-                      >
-                        <option value="all">All Categories</option>
-                        <option value="Dining">Dining</option>
-                        <option value="Travel">Travel &amp; Logistics</option>
-                        <option value="Hardware">Hardware &amp; Tech</option>
-                        <option value="Tech">Tech &amp; Infra</option>
-                        <option value="Hosting">Client Hosting</option>
-                        <option value="Legal">Legal &amp; Retainers</option>
-                        <option value="Real Estate">Real Estate &amp; Maintenance</option>
-                        <option value="Wellness">Wellness</option>
-                      </select>
-                    </div>
+                      {/* Date & Time */}
+                      <td className="w-[12%] py-3.5 px-4 text-xs font-medium text-slate-600 truncate">
+                        <button
+                          type="button"
+                          onClick={() => onOpenDayLedger(item.dateKey || '2026-10-28')}
+                          className="hover:text-[#b48e28] hover:underline transition-colors text-left cursor-pointer"
+                          title="Open Day Ledger"
+                        >
+                          {item.dateTime || `${item.dateGroup}, ${item.time}`}
+                        </button>
+                      </td>
 
-                    <button
-                      onClick={() => handleClearDayFilters(group.dateKey)}
-                      className={`h-7.5 px-2.5 rounded-lg border text-xs font-semibold transition-colors flex items-center justify-center gap-1 shadow-2xs shrink-0 cursor-pointer ${
-                        isDayFiltered
-                          ? 'border-amber-300 bg-[#fef9e7] hover:bg-[#fdf3ce] text-[#9a761e] font-bold'
-                          : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900'
-                      }`}
-                      title="Clear filters"
-                      type="button"
-                    >
-                      <span className="material-symbols-outlined text-xs">restart_alt</span>
-                      <span>Clear Filters</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Day Table */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse table-fixed min-w-[760px]">
-                    <colgroup>
-                      <col className="w-[38%]" />
-                      <col className="w-[18%]" />
-                      <col className="w-[18%]" />
-                      <col className="w-[12%]" />
-                      <col className="w-[14%]" />
-                    </colgroup>
-                    <thead>
-                      <tr className="text-slate-500 text-[11px] uppercase tracking-wider bg-slate-50/70 border-b border-slate-200/80">
-                        <th className="w-[38%] py-2.5 px-4 font-semibold text-xs text-left">
-                          EXPENSE TITLE
-                        </th>
-                        <th className="w-[18%] py-2.5 px-4 text-center text-xs font-semibold">
-                          CATEGORY
-                        </th>
-                        <th className="w-[18%] py-2.5 px-4 text-xs font-semibold text-left">
-                          PAID WITH
-                        </th>
-                        <th className="w-[12%] py-2.5 px-4 text-xs font-semibold text-left">
-                          DATE &amp; TIME
-                        </th>
-                        <th className="w-[14%] py-2.5 px-4 text-right text-xs font-semibold">
-                          AMOUNT
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 bg-white">
-                      {displayedItems.length === 0 ? (
-                        <tr>
-                          <td colSpan={5} className="py-8 text-center text-xs text-slate-500">
-                            <div className="flex flex-col items-center justify-center gap-1.5">
-                              <span className="material-symbols-outlined text-slate-400 text-lg">search_off</span>
-                              <span>No transactions match your search or filter criteria for this day.</span>
-                              <button
-                                type="button"
-                                onClick={() => handleClearDayFilters(group.dateKey)}
-                                className="text-[11px] text-[#b48e28] hover:underline font-semibold mt-0.5 cursor-pointer"
-                              >
-                                Reset day filters
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ) : (
-                        displayedItems.map((item, idx) => (
-                          <tr key={`${group.dateKey}-${item.id}-${idx}`} className="hover:bg-slate-50/80 transition-colors">
-                            {/* Item details */}
-                            <td className="w-[38%] py-3 px-4">
-                              <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-slate-700 shrink-0">
-                                  <span className="material-symbols-outlined text-base">{item.icon}</span>
-                                </div>
-                                <div className="flex flex-col min-w-0">
-                                  <span className="text-sm font-semibold text-slate-900 truncate">
-                                    {item.title}
-                                  </span>
-                                  <span className="text-xs text-slate-500 truncate">
-                                    {item.subtitle}
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-
-                            {/* Category pill */}
-                            <td className="w-[18%] py-3 px-4 text-center">
-                              <span
-                                className={`inline-flex items-center justify-center text-center px-2.5 h-7 rounded-full text-xs font-medium whitespace-nowrap w-[185px] shadow-2xs ${
-                                  item.category.includes('Travel')
-                                    ? 'bg-amber-100/70 text-amber-900 border border-amber-200/60'
-                                    : item.category.includes('Tech') || item.category.includes('Hardware')
-                                    ? 'bg-slate-100 text-slate-800 border border-slate-200/60'
-                                    : item.category.includes('Dining')
-                                    ? 'bg-blue-50/70 text-blue-900 border border-blue-200/60'
-                                    : item.category.includes('Hosting')
-                                    ? 'bg-slate-100 text-slate-700 border border-slate-200/60'
-                                    : item.category.includes('Legal')
-                                    ? 'bg-indigo-50/70 text-indigo-900 border border-indigo-200/60'
-                                    : item.category.includes('Real Estate')
-                                    ? 'bg-emerald-50/70 text-emerald-900 border border-emerald-200/60'
-                                    : 'bg-teal-50/70 text-teal-900 border border-teal-200/60'
-                                }`}
-                              >
-                                {item.category}
-                              </span>
-                            </td>
-
-                            {/* Paid With */}
-                            <td className="w-[18%] py-3 px-4 text-xs text-slate-600 font-medium whitespace-nowrap truncate">
-                              {item.paidWith}
-                            </td>
-
-                            {/* Date & Time */}
-                            <td className="w-[12%] py-3 px-4 text-xs text-slate-500 whitespace-nowrap truncate">
-                              {item.time || item.dateTime}
-                            </td>
-
-                            {/* Amount */}
-                            <td className="w-[14%] py-3 px-4 text-right whitespace-nowrap">
-                              {privacyMode ? (
-                                <span className="text-sm font-bold text-slate-900 tracking-tight font-serif">••••••</span>
-                              ) : (
-                                <div className="inline-flex items-baseline justify-end gap-0.5">
-                                  <span className="font-serif font-bold text-sm text-red-700 tracking-tight">
-                                    -₹{Math.floor(item.amount).toLocaleString('en-IN')}
-                                  </span>
-                                  <span className="font-label-numeric text-xs text-red-500 font-medium">
-                                    .{(item.amount % 1).toFixed(2).split('.')[1] || '00'}
-                                  </span>
-                                </div>
-                              )}
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Bottom of Day Group: View Day Ledger */}
-                <div className="p-2 bg-slate-50/50 border-t border-slate-100 flex items-center justify-center">
-                  <button
-                    type="button"
-                    onClick={() => onOpenDayLedger(group.dateKey)}
-                    className="w-full py-2 px-3 rounded-xl bg-white hover:bg-slate-100 border border-slate-200/80 text-xs font-semibold text-slate-700 hover:text-slate-950 flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs group"
-                  >
-                    <span className="material-symbols-outlined text-sm text-[#b48e28] group-hover:translate-x-0.5 transition-transform">
-                      menu_book
-                    </span>
-                    <span>View Day Ledger</span>
-                    <span className="material-symbols-outlined text-sm text-slate-400 group-hover:text-slate-700 transition-colors">
-                      chevron_right
-                    </span>
-                  </button>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
+                      {/* Amount */}
+                      <td className="w-[14%] py-3.5 px-4 text-right whitespace-nowrap">
+                        <span className="font-serif font-bold text-red-600 text-sm md:text-base">
+                          {privacyMode
+                            ? '••••••'
+                            : `-₹${item.amount.toLocaleString('en-IN', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}`}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
         {/* Notebook Bottom Pagination */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100 text-xs text-slate-500">
-          <span>Displaying 5 of 42 diary notes in October</span>
+          <span>Displaying {sortedEntries.length} of {entries.length} entries in October</span>
           <button
             type="button"
             className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold flex items-center gap-1 transition-colors cursor-pointer"
