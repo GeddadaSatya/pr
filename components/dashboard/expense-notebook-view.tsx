@@ -9,10 +9,10 @@ interface ExpenseNotebookViewProps {
 }
 
 const QUICK_CATEGORIES = [
-  { name: 'Dining', tag: '#Dining', icon: 'restaurant' },
-  { name: 'Travel', tag: '#Travel', icon: 'directions_car' },
-  { name: 'Hardware', tag: '#Hardware', icon: 'laptop_mac' },
-  { name: 'Wellness', tag: '#Wellness', icon: 'fitness_center' },
+  { name: 'Dining', tag: 'Dining', icon: 'restaurant' },
+  { name: 'Travel', tag: 'Travel', icon: 'directions_car' },
+  { name: 'Hardware', tag: 'Hardware', icon: 'laptop_mac' },
+  { name: 'Wellness', tag: 'Wellness', icon: 'fitness_center' },
 ];
 
 export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProps) {
@@ -51,7 +51,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
             id: exp.id,
             title: exp.title,
             subtitle: exp.subtitle || `Manual ledger entry • ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-            tag: `#${exp.category.split(' ')[0]}`,
+            tag: exp.category.split(' ')[0],
             category: exp.category,
             statusBadge: 'Verified Receipt',
             paidWith: exp.paidWith || 'Direct Payment',
@@ -174,7 +174,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
   };
 
   const saveExpenseDirectly = (title: string, amount: number, category: string) => {
-    let tag = `#${category}`;
+    let tag = category;
     let icon = 'restaurant';
     if (category === 'Travel') icon = 'directions_car';
     else if (category === 'Hardware') icon = 'laptop_mac';
