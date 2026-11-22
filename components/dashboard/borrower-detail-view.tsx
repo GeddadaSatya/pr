@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { BorrowerLoan } from './loans-interest-view';
+import { RepaymentsLedgerView } from './repayments-ledger-view';
 
 interface BorrowerDetailViewProps {
   borrower: BorrowerLoan;
@@ -46,6 +47,7 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
   const [paymentNote, setPaymentNote] = useState('');
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadDocTitle, setUploadDocTitle] = useState('');
+  const [showLedgerView, setShowLedgerView] = useState(false);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -202,6 +204,18 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
     setDocuments((prev) => prev.filter((d) => d.id !== id));
     showToast(`Deleted "${title}"`);
   };
+
+  if (showLedgerView) {
+    return (
+      <RepaymentsLedgerView
+        borrower={borrower}
+        onBackToProfile={() => {
+          setShowLedgerView(false);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+    );
+  }
 
   return (
     <div className="w-full flex flex-col gap-6 font-sans text-slate-800 antialiased animate-fadeIn">
@@ -743,8 +757,12 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
           </div>
           <button
             type="button"
-            onClick={() => showToast('Full chronological ledger view expanded')}
-            className="inline-flex items-center space-x-1 text-xs font-medium text-slate-900 hover:text-[#b8860b] transition cursor-pointer"
+            onClick={() => {
+              setShowLedgerView(true);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="inline-flex items-center space-x-1 text-xs font-semibold text-slate-900 hover:text-[#b8860b] transition cursor-pointer"
+            title="Open Repayments Ledger & Summary Breakdown"
           >
             <span>View all &gt;</span>
           </button>
@@ -795,8 +813,12 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
             </h3>
             <button
               type="button"
-              onClick={() => showToast('All installment records opened')}
-              className="text-xs text-slate-500 hover:text-slate-900 font-medium flex items-center cursor-pointer"
+              onClick={() => {
+                setShowLedgerView(true);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="text-xs text-slate-500 hover:text-slate-900 font-semibold flex items-center cursor-pointer"
+              title="Open Repayments Ledger & Summary Breakdown"
             >
               <span>View all</span>
               <svg
