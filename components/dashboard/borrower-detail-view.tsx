@@ -11,6 +11,7 @@ interface BorrowerDetailViewProps {
   borrower: BorrowerLoan;
   onBack: () => void;
   onRecordPayment?: (id: string, amount: number) => void;
+  initialShowLedger?: boolean;
 }
 
 interface AdvanceRow {
@@ -41,7 +42,12 @@ interface DocumentItem {
   iconType: 'pdf' | 'image' | 'user' | 'bill';
 }
 
-export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: BorrowerDetailViewProps) {
+export function BorrowerDetailView({
+  borrower,
+  onBack,
+  onRecordPayment,
+  initialShowLedger = false,
+}: BorrowerDetailViewProps) {
   const { privacyMode, setActiveTab } = useFinance();
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -49,7 +55,7 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
   const [paymentNote, setPaymentNote] = useState('');
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadDocTitle, setUploadDocTitle] = useState('');
-  const [showLedgerView, setShowLedgerView] = useState(false);
+  const [showLedgerView, setShowLedgerView] = useState(initialShowLedger);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);

@@ -302,6 +302,7 @@ export function LoansInterestView() {
 
   // Selected Borrower for Dossier / Customer Profile View
   const [selectedBorrower, setSelectedBorrower] = useState<BorrowerLoan | null>(null);
+  const [showLedgerDirectly, setShowLedgerDirectly] = useState(false);
 
   // View Mode: 'cards' or 'table'
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
@@ -636,8 +637,10 @@ export function LoansInterestView() {
     return (
       <BorrowerDetailView
         borrower={selectedBorrower}
+        initialShowLedger={showLedgerDirectly}
         onBack={() => {
           setSelectedBorrower(null);
+          setShowLedgerDirectly(false);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onRecordPayment={(id, amt) => {
@@ -1694,22 +1697,38 @@ export function LoansInterestView() {
                     </div>
                   </div>
 
-                  {/* Right Actions */}
+                  {/* Right Actions: Eye symbol (View Dossier) & View Payment/s */}
                   <div className="flex items-center gap-2 self-start lg:self-center">
+                    {/* Eye Symbol Button (like Image 2) */}
                     <button
                       type="button"
-                      onClick={() => handleMarkAsPaid(b.id, b.name)}
-                      className="px-3.5 py-1.5 rounded-full bg-[#eed885] hover:bg-[#dec468] text-[#0f172a] border border-[#d4af37]/30 font-bold text-xs flex items-center gap-1 shadow-2xs transition-all cursor-pointer"
+                      onClick={() => {
+                        setShowLedgerDirectly(false);
+                        setSelectedBorrower(b);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 text-emerald-700 flex items-center justify-center transition shadow-2xs cursor-pointer"
+                      title={`View ${b.name}'s Profile & Dossier`}
                     >
-                      <span className="material-symbols-outlined text-sm font-bold">check</span>
-                      <span>{b.status === 'paid' ? 'Paid' : 'Mark as Paid'}</span>
+                      <span className="material-symbols-outlined text-base">visibility</span>
                     </button>
+
+                    {/* View Payment (if due) / View Payments (if paid) (styled like Image 3) */}
                     <button
                       type="button"
-                      onClick={() => handlePayPart(b.id, b.name)}
-                      className="px-2.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-[#0f172a] text-xs font-semibold transition-all cursor-pointer"
+                      onClick={() => {
+                        setShowLedgerDirectly(true);
+                        setSelectedBorrower(b);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                      title={`View ${b.name}'s ${b.status === 'paid' || b.receivedAmount >= b.totalReceivable ? 'payments history' : 'payment details'}`}
                     >
-                      Pay Part
+                      <span>
+                        {b.status === 'paid' || b.receivedAmount >= b.totalReceivable
+                          ? 'View Payments'
+                          : 'View Payment'}
+                      </span>
                     </button>
                   </div>
                 </div>
