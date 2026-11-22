@@ -86,7 +86,7 @@ export function CategoryAnalytics() {
               <button
                 onClick={() => openModal('expense')}
                 type="button"
-                className="w-full h-11 rounded-xl bg-[#fed65b] hover:bg-[#eac446] active:scale-[0.99] text-[#735c00] text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer"
+                className="w-full h-11 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] active:scale-[0.99] text-slate-950 font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs hover:shadow transition-all cursor-pointer"
               >
                 <span className="material-symbols-outlined text-base">add</span>
                 <span>Record First Expense</span>
@@ -122,7 +122,7 @@ export function CategoryAnalytics() {
                       setIsDropdownOpen(false);
                     }}
                     className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold ${
-                      selectedFilter === opt ? 'bg-[#fed65b]/40 text-[#745c00]' : 'text-slate-700 hover:bg-white'
+                      selectedFilter === opt ? 'bg-[#fef9e7] text-amber-950 font-bold' : 'text-slate-700 hover:bg-white'
                     }`}
                   >
                     {opt}
@@ -335,7 +335,7 @@ export function CategoryAnalytics() {
               <button
                 onClick={() => openModal('expense')}
                 type="button"
-                className="h-10 px-6 rounded-xl bg-[#fed65b] hover:bg-[#eac446] active:scale-[0.99] text-[#735c00] text-xs font-semibold flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+                className="h-10 px-6 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] active:scale-[0.99] text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-xs hover:shadow transition-all cursor-pointer"
               >
                 <span className="material-symbols-outlined text-base">add</span>
                 <span>Record First Expense</span>

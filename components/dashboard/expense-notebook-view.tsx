@@ -604,12 +604,12 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                   onClick={() => handleCategoryChipClick(cat.name)}
                   className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
                     isSelected
-                      ? 'bg-[#fed65b] text-slate-950 shadow-xs border border-[#d4af37]'
+                      ? 'bg-[#d4af37] text-slate-950 font-bold shadow-xs border border-[#b48e28]'
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200/60'
                   }`}
                 >
                   {isSelected && (
-                    <span className="material-symbols-outlined text-xs text-[#745c00]">check</span>
+                    <span className="material-symbols-outlined text-xs text-slate-950 font-bold">check</span>
                   )}
                   <span className="material-symbols-outlined text-xs">{cat.icon}</span>
                   <span>{cat.tag}</span>

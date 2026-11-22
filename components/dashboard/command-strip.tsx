@@ -27,7 +27,7 @@ export function CommandStrip() {
           {/* Golden Primary Action */}
           <button
             onClick={() => openModal('expense')}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#fed65b] text-[#745c00] shadow-sm hover:brightness-105 active:scale-95 transition-all shrink-0 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold shadow-xs hover:shadow active:scale-95 transition-all shrink-0 cursor-pointer"
             type="button"
           >
             <span
@@ -36,7 +36,7 @@ export function CommandStrip() {
             >
               add_circle
             </span>
-            <span className="font-title-md text-sm font-semibold tracking-tight">+ Add Transaction</span>
+            <span className="font-title-md text-sm font-bold tracking-tight">+ Add Transaction</span>
           </button>
 
           {/* Crisp Sub-actions */}

@@ -175,3 +175,15 @@ body {
   letter-spacing: -0.01em;
   font-weight: 500;
 }
+
+/* Golden Primary Action Button Utility matching Save Expense */
+.btn-gold {
+  background-color: #d4af37;
+  color: #020617;
+  font-weight: 700;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-gold:hover {
+  background-color: #b48e28;
+}

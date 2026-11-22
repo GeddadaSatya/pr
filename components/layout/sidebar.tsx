@@ -121,7 +121,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         <div className={`mb-5 flex justify-center overflow-hidden ${isCollapsed ? 'px-0' : 'px-3'}`}>
           <button
             onClick={() => openModal('expense')}
-            className={`h-10 rounded-xl flex items-center bg-[#d4af37] text-slate-950 font-semibold transition-all duration-300 ease-in-out cursor-pointer hover:brightness-105 active:scale-[0.98] overflow-hidden whitespace-nowrap shadow-xs ${
+            className={`h-10 rounded-xl flex items-center bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold transition-all duration-300 ease-in-out cursor-pointer hover:shadow active:scale-[0.98] overflow-hidden whitespace-nowrap shadow-xs ${
               isCollapsed
                 ? 'w-10 justify-center px-0'
                 : 'w-full justify-start px-3 gap-2.5'

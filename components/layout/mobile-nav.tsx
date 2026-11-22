@@ -60,7 +60,7 @@ export function MobileNav({ activeTab, setActiveTab }: MobileNavProps) {
               className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 active:bg-slate-100 transition-colors text-left group cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#fed65b]/30 text-[#745c00] flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
+                <div className="w-8 h-8 rounded-lg bg-[#d4af37]/20 text-[#b48e28] flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform">
                   <span className="material-symbols-outlined text-lg leading-none">bolt</span>
                 </div>
                 <div className="flex flex-col">
@@ -68,7 +68,7 @@ export function MobileNav({ activeTab, setActiveTab }: MobileNavProps) {
                   <span className="font-body-sm text-xs text-slate-500">Immediate outflow entry</span>
                 </div>
               </div>
-              <span className="px-2 py-0.5 rounded-md bg-[#fed65b]/40 text-[#745c00] font-label-numeric text-[11px] font-semibold">
+              <span className="px-2 py-0.5 rounded-md bg-[#d4af37]/20 text-[#b48e28] font-label-numeric text-[11px] font-bold">
                 +3
               </span>
             </button>
@@ -95,23 +95,23 @@ export function MobileNav({ activeTab, setActiveTab }: MobileNavProps) {
             {/* 3. Ask AI Assistant / Advisor (Highlighted State) */}
             <button
               onClick={() => handleAction('ai')}
-              className="w-full flex items-center justify-between p-2.5 rounded-xl bg-[#fed65b]/20 hover:bg-[#fed65b]/30 active:bg-[#fed65b]/40 transition-colors text-left group cursor-pointer"
+              className="w-full flex items-center justify-between p-2.5 rounded-xl bg-[#d4af37]/15 hover:bg-[#d4af37]/25 active:bg-[#d4af37]/35 transition-colors text-left group cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#fed65b] text-[#745c00] flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform shadow-xs">
+                <div className="w-8 h-8 rounded-lg bg-[#d4af37] text-slate-950 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition-transform shadow-xs">
                   <span className="material-symbols-outlined text-lg leading-none">chat_bubble</span>
                 </div>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1.5">
                     <span className="font-title-md text-sm font-bold text-slate-900">Ask AI Advisor</span>
-                    <span className="px-1.5 py-0.2 rounded-full bg-[#fed65b] text-[#745c00] text-[9px] font-semibold uppercase tracking-wider">
+                    <span className="px-1.5 py-0.2 rounded-full bg-[#d4af37] text-slate-950 text-[9px] font-bold uppercase tracking-wider">
                       Fast
                     </span>
                   </div>
                   <span className="font-body-sm text-xs text-slate-500">Portfolio stewardship query</span>
                 </div>
               </div>
-              <span className="px-2 py-0.5 rounded-md bg-[#fed65b]/50 text-[#745c00] font-label-numeric text-[11px] font-bold">
+              <span className="px-2 py-0.5 rounded-md bg-[#d4af37] text-slate-950 font-label-numeric text-[11px] font-bold">
                 PRO
               </span>
             </button>
