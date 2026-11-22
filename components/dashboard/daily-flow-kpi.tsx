@@ -240,60 +240,63 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
 
       {/* PENDING FRIEND ADVANCES (LOCATED BELOW KPI CARDS) */}
       <div className="w-full bg-[#f0fdf4]/80 border border-emerald-200/90 rounded-2xl p-3 sm:p-3.5 shadow-xs flex flex-col gap-2.5 transition-all">
-        {/* Top Header Strip with Total Pending */}
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-sm">schedule</span>
+        {/* Header Strip with Total Pending & Action Buttons */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          {/* Status Label & Amount */}
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-sm">schedule</span>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-bold text-slate-800">
+                {pendingReceivables.length > 0
+                  ? `${pendingReceivables.length} ${pendingReceivables.length === 1 ? 'Advance' : 'Advances'} Pending`
+                  : 'Friend Advances (Recoverable)'}
+              </span>
+              {pendingReceivables.length > 0 && (
+                <>
+                  <span className="text-xs text-slate-400">•</span>
+                  <span className="text-xs text-slate-600 font-medium">To get back:</span>
+                  <span className="text-xs font-bold font-serif text-emerald-800">
+                    {privacyMode
+                      ? '••••••'
+                      : `₹${totalPendingReceivables.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
+                  </span>
+                </>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-bold text-slate-800">
-              {pendingReceivables.length > 0
-                ? `${pendingReceivables.length} ${pendingReceivables.length === 1 ? 'Advance' : 'Advances'} Pending`
-                : 'Friend Advances (Recoverable)'}
-            </span>
-            {pendingReceivables.length > 0 && (
-              <>
-                <span className="text-xs text-slate-400">•</span>
-                <span className="text-xs text-slate-600 font-medium">To get back:</span>
-                <span className="text-xs font-bold font-serif text-emerald-800">
-                  {privacyMode
-                    ? '••••••'
-                    : `₹${totalPendingReceivables.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-                </span>
-              </>
-            )}
-          </div>
-        </div>
 
-        {/* Action Buttons Row */}
-        <div className="flex items-center justify-between gap-2 pt-0.5">
-          {/* Quick "+ Log Recoverable" Button */}
-          <button
-            type="button"
-            onClick={() => openModal('receive')}
-            className="h-8 px-3 rounded-xl bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
-            title="Record money given to a friend awaiting return"
-          >
-            <span className="material-symbols-outlined text-sm text-emerald-600">handshake</span>
-            <span>+ Log Recoverable</span>
-          </button>
-
-          {/* Collapse / Expand Toggle: By default COLLAPSED */}
-          {pendingReceivables.length > 0 && (
+          {/* Action Buttons: On desktop they sit on top on the right; on mobile they are full width / side-by-side */}
+          <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+            {/* Quick "+ Log Recoverable" Button */}
             <button
               type="button"
-              onClick={() => setIsPendingExpanded(!isPendingExpanded)}
-              className="h-8 text-xs font-semibold text-slate-700 hover:text-slate-900 flex items-center gap-1 px-3 rounded-xl bg-white border border-slate-200 shadow-2xs cursor-pointer transition-colors"
+              onClick={() => openModal('receive')}
+              className="h-8 px-3 rounded-xl bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+              title="Record money given to a friend awaiting return"
             >
-              <span>{isPendingExpanded ? 'Collapse' : `View All (${pendingReceivables.length})`}</span>
-              <span
-                className="material-symbols-outlined text-sm transition-transform duration-200"
-                style={{ transform: isPendingExpanded ? 'rotate(180deg)' : 'none' }}
-              >
-                expand_more
-              </span>
+              <span className="material-symbols-outlined text-sm text-emerald-600">handshake</span>
+              <span>+ Log Recoverable</span>
             </button>
-          )}
+
+            {/* Collapse / Expand Toggle: By default COLLAPSED */}
+            {pendingReceivables.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setIsPendingExpanded(!isPendingExpanded)}
+                className="h-8 text-xs font-semibold text-slate-700 hover:text-slate-900 flex items-center gap-1 px-3 rounded-xl bg-white border border-slate-200 shadow-2xs cursor-pointer transition-colors"
+              >
+                <span>{isPendingExpanded ? 'Collapse' : `View All (${pendingReceivables.length})`}</span>
+                <span
+                  className="material-symbols-outlined text-sm transition-transform duration-200"
+                  style={{ transform: isPendingExpanded ? 'rotate(180deg)' : 'none' }}
+                >
+                  expand_more
+                </span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Detailed Advances List (ONLY shown when expanded - COLLAPSED BY DEFAULT ON ALL SCREENS) */}
