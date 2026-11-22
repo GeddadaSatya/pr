@@ -17,6 +17,7 @@ import { ExpenseNotebookView } from '@/components/dashboard/expense-notebook-vie
 import { DayLedgerView } from '@/components/dashboard/day-ledger-view';
 import { TransactionModal } from '@/components/modals/transaction-modal';
 import { AuthModal } from '@/components/modals/auth-modal';
+import { PrivacyUnlockModal } from '@/components/modals/privacy-unlock-modal';
 
 import { useFinance } from '@/components/context/finance-context';
 
@@ -94,6 +95,7 @@ function DashboardContent() {
       {/* Interactive Modals */}
       <TransactionModal />
       <AuthModal />
+      <PrivacyUnlockModal />
     </div>
   );
 }

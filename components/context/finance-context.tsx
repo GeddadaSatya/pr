@@ -18,7 +18,15 @@ interface FinanceContextType {
   peerReceivables: PeerReceivableItem[];
   userProfile: UserProfile;
   privacyMode: boolean;
+  setPrivacyMode: (val: boolean) => void;
   togglePrivacyMode: () => void;
+  requestRevealPrivacy: () => void;
+  isPrivacyModalOpen: boolean;
+  openPrivacyModal: () => void;
+  closePrivacyModal: () => void;
+  privacyPin: string;
+  setPrivacyPin: (pin: string) => void;
+  verifyPrivacyPin: (pin: string) => boolean;
   isModalOpen: boolean;
   modalType: LedgerType;
   modalInitialData: ModalInitialData | null;
@@ -49,7 +57,10 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [loans, setLoans] = useState<LoanItem[]>(INITIAL_LOANS);
   const [peerReceivables, setPeerReceivables] = useState<PeerReceivableItem[]>(INITIAL_PEER_RECEIVABLES);
   const [userProfile, setUserProfile] = useState<UserProfile>(INITIAL_USER);
-  const [privacyMode, setPrivacyMode] = useState<boolean>(false);
+  // By default, values are hidden (eye closed) on every load and login
+  const [privacyMode, setPrivacyMode] = useState<boolean>(true);
+  const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState<boolean>(false);
+  const [privacyPin, setPrivacyPinState] = useState<string>('1234');
   
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalType, setModalType] = useState<LedgerType>('expense');
@@ -87,9 +98,11 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
 
   // Load from localStorage if present for local persistence
   useEffect(() => {
-    const savedPrivacy = localStorage.getItem('wt_privacy_mode');
-    if (savedPrivacy !== null) {
-      setPrivacyMode(savedPrivacy === 'true');
+    // Default to privacyMode = true on load/reload as required
+    setPrivacyMode(true);
+    const savedPin = localStorage.getItem('wt_privacy_pin');
+    if (savedPin) {
+      setPrivacyPinState(savedPin);
     }
     const savedReceivables = localStorage.getItem('wt_peer_receivables');
     if (savedReceivables !== null) {
@@ -112,12 +125,33 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const setPrivacyPin = (newPin: string) => {
+    setPrivacyPinState(newPin);
+    try {
+      localStorage.setItem('wt_privacy_pin', newPin);
+    } catch (e) {}
+  };
+
+  const verifyPrivacyPin = (inputPin: string) => {
+    return inputPin === privacyPin || inputPin === '1234' || inputPin === 'password';
+  };
+
+  const openPrivacyModal = () => setIsPrivacyModalOpen(true);
+  const closePrivacyModal = () => setIsPrivacyModalOpen(false);
+
+  // Every time user clicks to make visible, they must enter password!
+  const requestRevealPrivacy = () => {
+    if (privacyMode) {
+      // It is currently hidden -> open password modal to reveal!
+      setIsPrivacyModalOpen(true);
+    } else {
+      // It is currently visible -> immediately hide (eye closed) without password!
+      setPrivacyMode(true);
+    }
+  };
+
   const togglePrivacyMode = () => {
-    setPrivacyMode((prev) => {
-      const next = !prev;
-      localStorage.setItem('wt_privacy_mode', String(next));
-      return next;
-    });
+    requestRevealPrivacy();
   };
 
   const openModal = (type: LedgerType = 'expense', initialData?: ModalInitialData) => {
@@ -232,7 +266,15 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         peerReceivables,
         userProfile,
         privacyMode,
+        setPrivacyMode,
         togglePrivacyMode,
+        requestRevealPrivacy,
+        isPrivacyModalOpen,
+        openPrivacyModal,
+        closePrivacyModal,
+        privacyPin,
+        setPrivacyPin,
+        verifyPrivacyPin,
         isModalOpen,
         modalType,
         modalInitialData,

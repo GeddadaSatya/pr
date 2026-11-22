@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 
 export function Header() {
-  const { userProfile, openAuthModal, isCollapsed } = useFinance();
+  const { userProfile, openAuthModal, isCollapsed, privacyMode, requestRevealPrivacy } = useFinance();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -47,6 +47,22 @@ export function Header() {
             >
               <span className="material-symbols-outlined text-xl">notifications</span>
               <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#d4af37] ring-2 ring-white"></span>
+            </button>
+            {/* Privacy Mode Eye Toggle */}
+            <button
+              onClick={requestRevealPrivacy}
+              className={`w-9 h-9 rounded-lg border flex items-center justify-center transition-all cursor-pointer shadow-xs ${
+                privacyMode
+                  ? 'bg-amber-50 border-amber-300 text-[#b48e28]'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+              }`}
+              title={privacyMode ? "Privacy Mode: Values Hidden (Click to enter password and reveal)" : "Privacy Mode: Values Visible (Click to hide)"}
+              aria-label="Toggle Privacy Mode"
+              type="button"
+            >
+              <span className="material-symbols-outlined text-lg">
+                {privacyMode ? 'visibility_off' : 'visibility'}
+              </span>
             </button>
           </div>
 

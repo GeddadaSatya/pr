@@ -4,7 +4,7 @@ import React from 'react';
 import { useFinance } from '@/components/context/finance-context';
 
 export function MobileHeader() {
-  const { userProfile, openAuthModal } = useFinance();
+  const { userProfile, openAuthModal, privacyMode, requestRevealPrivacy } = useFinance();
 
   return (
     <header className="fixed top-0 w-full z-40 bg-[#f7f9fb]/90 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.03)] border-b border-slate-200/40 md:hidden">
@@ -21,9 +21,26 @@ export function MobileHeader() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Privacy Mode Eye Toggle Button for Mobile Navbar */}
+          <button
+            onClick={requestRevealPrivacy}
+            className={`w-9 h-9 rounded-xl border flex items-center justify-center transition-all cursor-pointer shadow-2xs ${
+              privacyMode
+                ? 'bg-amber-50/80 border-amber-300/80 text-[#b48e28]'
+                : 'bg-white border-slate-200 text-slate-700 hover:text-slate-950'
+            }`}
+            title={privacyMode ? "Privacy Mode: Values Hidden (Click to enter password and reveal)" : "Privacy Mode: Values Visible (Click to hide)"}
+            aria-label="Toggle Privacy Mode"
+            type="button"
+          >
+            <span className="material-symbols-outlined text-xl">
+              {privacyMode ? 'visibility_off' : 'visibility'}
+            </span>
+          </button>
+
           <button
             aria-label="Notifications"
-            className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors"
+            className="w-9 h-9 flex items-center justify-center text-slate-500 hover:text-slate-800 transition-colors"
             type="button"
           >
             <span className="material-symbols-outlined text-2xl">notifications</span>

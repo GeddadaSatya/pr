@@ -5,7 +5,7 @@ import { useFinance } from '@/components/context/finance-context';
 import { createClient } from '@/lib/supabase/client';
 
 export function AuthModal() {
-  const { isAuthModalOpen, closeAuthModal, userProfile } = useFinance();
+  const { isAuthModalOpen, closeAuthModal, userProfile, setPrivacyMode } = useFinance();
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState<'email' | 'otp'>('email');
@@ -62,12 +62,14 @@ export function AuthModal() {
         setMessage(`Invalid code: ${error.message}`);
       } else {
         setMessage('Successfully authenticated! Welcome back.');
+        setPrivacyMode(true); // By default, hide values (eye closed) after every login
         setTimeout(() => {
           closeAuthModal();
         }, 800);
       }
     } catch {
       setMessage('Authenticated! (Demo Mode)');
+      setPrivacyMode(true); // By default, hide values (eye closed) after every login
       setTimeout(() => {
         closeAuthModal();
       }, 800);
