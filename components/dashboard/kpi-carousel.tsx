@@ -1,22 +1,51 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { formatCurrency } from '@/lib/utils';
 
 export function KpiCarousel() {
   const { privacyMode, payables, loans, expenses } = useFinance();
   const carouselRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScrollPosition = useCallback(() => {
+    if (carouselRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+      setCanScrollLeft(scrollLeft > 4);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 4);
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+
+    checkScrollPosition();
+    el.addEventListener('scroll', checkScrollPosition, { passive: true });
+    window.addEventListener('resize', checkScrollPosition);
+
+    const timer = setTimeout(checkScrollPosition, 100);
+
+    return () => {
+      el.removeEventListener('scroll', checkScrollPosition);
+      window.removeEventListener('resize', checkScrollPosition);
+      clearTimeout(timer);
+    };
+  }, [checkScrollPosition]);
 
   const scrollLeft = () => {
-    if (carouselRef.current) {
+    if (carouselRef.current && canScrollLeft) {
       carouselRef.current.scrollBy({ left: -(carouselRef.current.clientWidth / 2), behavior: 'smooth' });
+      setTimeout(checkScrollPosition, 350);
     }
   };
 
   const scrollRight = () => {
-    if (carouselRef.current) {
+    if (carouselRef.current && canScrollRight) {
       carouselRef.current.scrollBy({ left: carouselRef.current.clientWidth / 2, behavior: 'smooth' });
+      setTimeout(checkScrollPosition, 350);
     }
   };
 
@@ -51,16 +80,26 @@ export function KpiCarousel() {
         <div className="hidden md:flex items-center gap-2">
           <button
             onClick={scrollLeft}
+            disabled={!canScrollLeft}
             aria-label="Scroll left"
-            className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-[#d4af37] hover:bg-slate-50 flex items-center justify-center transition-all shadow-xs cursor-pointer"
+            className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-200 shadow-xs ${
+              canScrollLeft
+                ? 'bg-white border-slate-200 text-slate-700 hover:text-slate-950 hover:border-[#d4af37] hover:bg-slate-50 cursor-pointer active:scale-95'
+                : 'bg-slate-100/70 border-slate-200/50 text-slate-300 opacity-40 cursor-not-allowed pointer-events-none'
+            }`}
             type="button"
           >
             <span className="material-symbols-outlined text-lg">chevron_left</span>
           </button>
           <button
             onClick={scrollRight}
+            disabled={!canScrollRight}
             aria-label="Scroll right"
-            className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:border-[#d4af37] hover:bg-slate-50 flex items-center justify-center transition-all shadow-xs cursor-pointer"
+            className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-200 shadow-xs ${
+              canScrollRight
+                ? 'bg-white border-slate-200 text-slate-700 hover:text-slate-950 hover:border-[#d4af37] hover:bg-slate-50 cursor-pointer active:scale-95'
+                : 'bg-slate-100/70 border-slate-200/50 text-slate-300 opacity-40 cursor-not-allowed pointer-events-none'
+            }`}
             type="button"
           >
             <span className="material-symbols-outlined text-lg">chevron_right</span>
