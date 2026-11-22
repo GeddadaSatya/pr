@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { BorrowerLoan } from './loans-interest-view';
 import { RepaymentsLedgerView } from './repayments-ledger-view';
+import { AmountDisplay } from '@/components/ui/amount-display';
 
 interface BorrowerDetailViewProps {
   borrower: BorrowerLoan;
@@ -598,8 +599,8 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
                 </svg>
               </span>
             </div>
-            <div className="text-xl font-semibold text-slate-900 tracking-tight font-mono">
-              {privacyMode ? '••••••' : `₹${totalSanctioned.toLocaleString('en-IN')}`}
+            <div className="mt-1">
+              <AmountDisplay amount={totalSanctioned} privacyMode={privacyMode} size="xl" />
             </div>
             <p className="text-[11px] text-slate-500 mt-1">
               2 Closed • <span className="text-slate-800 font-medium">1 Active</span> (3 Advances)
@@ -630,13 +631,20 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
                 </svg>
               </span>
             </div>
-            <div className="text-xl font-semibold text-slate-900 tracking-tight font-mono">
-              {privacyMode ? '••••••' : `₹${outstandingBalance.toLocaleString('en-IN')}`}
+            <div className="mt-1">
+              <AmountDisplay amount={outstandingBalance} privacyMode={privacyMode} size="xl" />
             </div>
             <p className="text-[11px] text-slate-500 mt-1 truncate">
-              {privacyMode
-                ? '•••••• of ••••••'
-                : `Paid ₹${borrower.receivedAmount.toLocaleString('en-IN')} of ₹${borrower.totalReceivable.toLocaleString('en-IN')}`}
+              {privacyMode ? (
+                '•••••• of ••••••'
+              ) : (
+                <span className="inline-flex items-baseline gap-1">
+                  <span>Paid</span>
+                  <AmountDisplay amount={borrower.receivedAmount} size="xs" />
+                  <span>of</span>
+                  <AmountDisplay amount={borrower.totalReceivable} size="xs" />
+                </span>
+              )}
             </p>
           </div>
 
@@ -661,7 +669,7 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
                 </svg>
               </span>
             </div>
-            <div className="text-xl font-semibold text-slate-900 tracking-tight font-mono">
+            <div className="text-xl font-semibold text-slate-900 tracking-tight font-serif">
               {repaymentPacing}
             </div>
             <p className="text-[11px] text-slate-500 mt-1">
@@ -692,8 +700,8 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
                 </svg>
               </span>
             </div>
-            <div className="text-xl font-semibold text-slate-900 tracking-tight font-mono">
-              {privacyMode ? '••••••' : `₹${lifetimeCollected.toLocaleString('en-IN')}`}
+            <div className="mt-1">
+              <AmountDisplay amount={lifetimeCollected} privacyMode={privacyMode} size="xl" />
             </div>
             <p className="text-[11px] text-slate-500 mt-1">
               Tier 1 Prime Customer • <span className="text-emerald-600 font-medium">100% On-Time</span>
@@ -770,14 +778,14 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
                   <td className="py-3 px-5 font-mono font-medium text-slate-900">{adv.advanceId}</td>
                   <td className="py-3 px-4 text-slate-700">{adv.agent}</td>
                   <td className="py-3 px-4 text-slate-500">{adv.issueDate}</td>
-                  <td className="py-3 px-4 font-mono font-medium text-emerald-600 text-right">
-                    {privacyMode ? '••••••' : `+₹${adv.issueAmount.toLocaleString('en-IN')}`}
+                  <td className="py-3 px-4 text-right">
+                    <AmountDisplay amount={adv.issueAmount} privacyMode={privacyMode} prefix="+₹" size="xs" color="text-emerald-700" />
                   </td>
-                  <td className="py-3 px-4 font-mono text-amber-700 font-medium text-right">
-                    {privacyMode ? '••••••' : `₹${adv.outstandingTotal.toLocaleString('en-IN')}`}
+                  <td className="py-3 px-4 text-right">
+                    <AmountDisplay amount={adv.outstandingTotal} privacyMode={privacyMode} size="xs" color="text-amber-700" />
                   </td>
-                  <td className="py-3 px-5 font-mono font-semibold text-slate-900 text-right">
-                    {privacyMode ? '••••••' : `₹${adv.total.toLocaleString('en-IN')}`}
+                  <td className="py-3 px-5 text-right">
+                    <AmountDisplay amount={adv.total} privacyMode={privacyMode} size="xs" />
                   </td>
                 </tr>
               ))}
@@ -879,9 +887,7 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
                     <div className="font-medium text-slate-900">
                       {rep.date} <span className="text-slate-400 mx-1">•</span> Installment #{rep.installmentNumber}{' '}
                       <span className="text-slate-400 mx-1">•</span>{' '}
-                      <span className="font-mono font-semibold">
-                        {privacyMode ? '••••••' : `₹${rep.amount.toLocaleString('en-IN')}`}
-                      </span>
+                      <AmountDisplay amount={rep.amount} privacyMode={privacyMode} size="xs" />
                     </div>
                   </div>
                 </div>

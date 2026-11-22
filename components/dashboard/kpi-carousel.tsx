@@ -219,8 +219,9 @@ export function KpiCarousel() {
               <span className="font-label-caps text-[11px] uppercase text-slate-500">This Month&apos;s Expenses</span>
               <div className="flex items-baseline gap-1 mt-1">
                 <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
-                  {formatCurrency(totalExpenses, privacyMode)}
+                  {privacyMode ? '••••••' : `₹${Math.floor(totalExpenses).toLocaleString('en-IN')}`}
                 </span>
+                <span className="font-label-numeric text-xs text-slate-500 font-medium">{privacyMode ? '' : '.00'}</span>
               </div>
             </div>
             <div className="w-8 h-8 rounded-lg bg-[#fef9e7] flex items-center justify-center text-[#b48e28]">

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { NotebookEntry, INITIAL_NOTEBOOK_ENTRIES } from '@/lib/notebook-data';
+import { AmountDisplay } from '@/components/ui/amount-display';
 
 interface ExpenseNotebookViewProps {
   onOpenDayLedger: (dateKey: string) => void;
@@ -916,14 +917,14 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
 
                       {/* Amount */}
                       <td className="w-[14%] py-3.5 px-4 text-right whitespace-nowrap">
-                        <span className="font-serif font-bold text-red-600 text-sm md:text-base">
-                          {privacyMode
-                            ? '••••••'
-                            : `-₹${item.amount.toLocaleString('en-IN', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })}`}
-                        </span>
+                        <AmountDisplay
+                          amount={item.amount}
+                          privacyMode={privacyMode}
+                          prefix="-₹"
+                          color="text-red-700"
+                          decimalColor="text-red-500"
+                          size="sm"
+                        />
                       </td>
                     </tr>
                   ))

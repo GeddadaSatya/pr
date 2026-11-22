@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { PayableItem } from '@/lib/types';
+import { AmountDisplay } from '@/components/ui/amount-display';
 
 export function PayablesDuesView() {
   const { payables, recordPayout, privacyMode, openModal } = useFinance();
@@ -268,9 +269,7 @@ export function PayablesDuesView() {
                   </div>
 
                   <div className="text-right shrink-0 flex flex-col items-end">
-                    <span className="font-serif font-bold text-slate-900 text-sm md:text-base">
-                      {privacyMode ? '••••••' : `₹${item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                    </span>
+                    <AmountDisplay amount={item.amount} privacyMode={privacyMode} size="sm" />
                     {isUrgent ? (
                       <span className="text-[11px] font-semibold text-red-600 flex items-center gap-1 mt-0.5">
                         <span className="material-symbols-outlined text-xs">schedule</span>
@@ -481,14 +480,7 @@ export function PayablesDuesView() {
 
                         {/* Amount */}
                         <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                          <span className="font-serif font-bold text-slate-900 text-xs md:text-sm">
-                            {privacyMode
-                              ? '••••••'
-                              : `₹${item.amount.toLocaleString('en-IN', {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                })}`}
-                          </span>
+                          <AmountDisplay amount={item.amount} privacyMode={privacyMode} size="sm" />
                         </td>
 
                         {/* Action */}

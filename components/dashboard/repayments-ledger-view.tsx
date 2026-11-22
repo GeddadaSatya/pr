@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { BorrowerLoan } from './loans-interest-view';
+import { AmountDisplay } from '@/components/ui/amount-display';
 
 interface RepaymentsLedgerViewProps {
   borrower: BorrowerLoan;
@@ -466,11 +467,8 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile }: RepaymentsLe
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
               Total Sanctioned (All Loans)
             </span>
-            <div className="flex items-baseline space-x-2 pt-1">
-              <span className="font-mono text-3xl font-bold tracking-tight text-slate-900">
-                {privacyMode ? '••••••' : '₹65,000'}
-              </span>
-              <span className="text-xs text-slate-400 font-medium">INR</span>
+            <div className="pt-1">
+              <AmountDisplay amount={65000} privacyMode={privacyMode} size="2xl" />
             </div>
           </div>
           <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-slate-500 text-xs">
@@ -489,9 +487,7 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile }: RepaymentsLe
               Total Collected to Date
             </span>
             <div className="flex items-baseline space-x-2 pt-1">
-              <span className="font-mono text-3xl font-bold tracking-tight text-emerald-600">
-                {privacyMode ? '••••••' : '₹47,500'}
-              </span>
+              <AmountDisplay amount={47500} privacyMode={privacyMode} size="2xl" color="text-emerald-700" />
               <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
                 73.1% Recovery
               </span>
@@ -513,9 +509,7 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile }: RepaymentsLe
               Total Outstanding to Collect
             </span>
             <div className="flex items-baseline space-x-2 pt-1">
-              <span className="font-mono text-3xl font-bold tracking-tight text-slate-900">
-                {privacyMode ? '••••••' : '₹17,500'}
-              </span>
+              <AmountDisplay amount={17500} privacyMode={privacyMode} size="2xl" color="text-rose-700" />
               <span className="text-xs px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-semibold">
                 Active Risk
               </span>
@@ -526,7 +520,9 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile }: RepaymentsLe
               <span className="material-symbols-outlined text-[16px]">warning</span>
               <span>Includes 1 overdue installment</span>
             </span>
-            <span className="font-mono text-xs text-slate-500">₹2,500 pending claim</span>
+            <span className="text-xs text-slate-500">
+              <AmountDisplay amount={2500} privacyMode={privacyMode} size="xs" color="text-slate-600" suffix="pending claim" />
+            </span>
           </div>
         </div>
       </div>
@@ -541,24 +537,24 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile }: RepaymentsLe
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 font-mono text-xs font-medium">
+          <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 text-xs font-medium">
             <span className="text-slate-500">ADV-4091:</span>
-            <span className="font-bold text-slate-900">{privacyMode ? '••••••' : '₹2,500'}</span>
+            <AmountDisplay amount={2500} privacyMode={privacyMode} size="xs" />
           </div>
           <span className="text-slate-400 font-mono text-sm font-bold">+</span>
-          <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 font-mono text-xs font-medium">
+          <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 text-xs font-medium">
             <span className="text-slate-500">ADV-1021:</span>
-            <span className="font-bold text-slate-900">{privacyMode ? '••••••' : '₹15,000'}</span>
+            <AmountDisplay amount={15000} privacyMode={privacyMode} size="xs" />
           </div>
           <span className="text-slate-400 font-mono text-sm font-bold">+</span>
-          <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 font-mono text-xs font-medium">
+          <div className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-800 text-xs font-medium">
             <span className="text-slate-500">ADV-2010:</span>
-            <span className="font-bold text-slate-900">{privacyMode ? '••••••' : '₹0'}</span>
+            <AmountDisplay amount={0} privacyMode={privacyMode} size="xs" />
           </div>
           <span className="text-slate-400 font-mono text-sm font-bold">=</span>
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-[#eed885] text-[#0f172a] border border-[#d4af37]/30 font-mono text-xs font-bold shadow-xs">
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-lg bg-[#eed885] text-[#0f172a] border border-[#d4af37]/30 text-xs font-bold shadow-xs">
             <span className="uppercase tracking-wider">Total to Collect:</span>
-            <span className="text-sm">{privacyMode ? '••••••' : '₹17,500'}</span>
+            <AmountDisplay amount={17500} privacyMode={privacyMode} size="xs" />
           </div>
         </div>
       </div>
@@ -638,8 +634,10 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile }: RepaymentsLe
               <div className="p-5 bg-white flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100">
                 <div className="space-y-1">
                   <div className="flex items-center space-x-3 flex-wrap">
-                    <h2 className="font-serif text-lg font-bold text-slate-900 tracking-tight">
-                      Advance {group.advanceId} — {privacyMode ? '••••••' : `₹${group.sanctionedAmount.toLocaleString('en-IN')}`} Sanctioned
+                    <h2 className="font-serif text-lg font-bold text-slate-900 tracking-tight flex items-baseline gap-1.5 flex-wrap">
+                      <span>Advance {group.advanceId} —</span>
+                      <AmountDisplay amount={group.sanctionedAmount} privacyMode={privacyMode} size="base" />
+                      <span>Sanctioned</span>
                     </h2>
                     <span
                       className={`px-2 py-0.5 rounded text-xs font-semibold ${
@@ -663,9 +661,9 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile }: RepaymentsLe
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                       Collected
                     </span>
-                    <span className="font-mono text-sm font-bold text-emerald-600">
-                      {privacyMode ? '••••••' : `₹${group.collectedAmount.toLocaleString('en-IN')} (${group.collectedRatio})`}
-                    </span>
+                    <div className="mt-0.5">
+                      <AmountDisplay amount={group.collectedAmount} privacyMode={privacyMode} size="sm" color="text-emerald-700" suffix={`(${group.collectedRatio})`} />
+                    </div>
                   </div>
                   <div>
                     <span
@@ -675,13 +673,9 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile }: RepaymentsLe
                     >
                       Remaining to Collect
                     </span>
-                    <span
-                      className={`font-mono text-sm font-bold ${
-                        group.remainingAmount > 0 ? 'text-rose-600' : 'text-slate-500'
-                      }`}
-                    >
-                      {privacyMode ? '••••••' : `₹${group.remainingAmount.toLocaleString('en-IN')}`}
-                    </span>
+                    <div className="mt-0.5">
+                      <AmountDisplay amount={group.remainingAmount} privacyMode={privacyMode} size="sm" color={group.remainingAmount > 0 ? 'text-rose-700' : 'text-slate-600'} />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -718,12 +712,13 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile }: RepaymentsLe
                         >
                           {inst.dueDate}
                         </td>
-                        <td
-                          className={`py-3 px-5 font-mono font-bold ${
-                            inst.status === 'Overdue' ? 'text-rose-700' : 'text-slate-900'
-                          }`}
-                        >
-                          {privacyMode ? '••••••' : `₹${inst.amount.toLocaleString('en-IN')}`}
+                        <td className="py-3 px-5">
+                          <AmountDisplay
+                            amount={inst.amount}
+                            privacyMode={privacyMode}
+                            size="xs"
+                            color={inst.status === 'Overdue' ? 'text-rose-700' : 'text-slate-900'}
+                          />
                         </td>
                         <td
                           className={`py-3 px-5 ${

@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { BorrowerDetailView } from './borrower-detail-view';
+import { AmountDisplay } from '@/components/ui/amount-display';
 
 export interface BorrowerLoan {
   id: string;
@@ -713,9 +714,7 @@ export function LoansInterestView() {
             </div>
           </div>
           <div>
-            <div className="font-serif text-xl md:text-2xl text-[#0f172a] font-bold tracking-tight">
-              {privacyMode ? '••••••' : `₹${totalPrincipalLent.toLocaleString('en-IN')}`}
-            </div>
+            <AmountDisplay amount={totalPrincipalLent} privacyMode={privacyMode} size="2xl" />
             <div className="mt-1 flex items-center gap-1.5">
               <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#fdf8ea] text-[#9a761e] border border-[#d4af37]/30">
                 {borrowers.length} Loans
@@ -733,9 +732,7 @@ export function LoansInterestView() {
             </div>
           </div>
           <div>
-            <div className="font-serif text-xl md:text-2xl text-[#0f172a] font-bold tracking-tight">
-              {privacyMode ? '••••••' : `+₹${totalInterestExpected.toLocaleString('en-IN')}`}
-            </div>
+            <AmountDisplay amount={totalInterestExpected} privacyMode={privacyMode} prefix="+₹" size="2xl" />
             <div className="mt-1 flex items-center gap-1.5">
               <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
                 15.0% Net
@@ -754,9 +751,7 @@ export function LoansInterestView() {
             </div>
           </div>
           <div>
-            <div className="font-serif text-xl md:text-2xl text-[#0f172a] font-bold tracking-tight">
-              {privacyMode ? '••••••' : `₹${totalExpectedBack.toLocaleString('en-IN')}`}
-            </div>
+            <AmountDisplay amount={totalExpectedBack} privacyMode={privacyMode} size="2xl" />
             <div className="mt-1 flex items-center gap-1.5">
               <span className="text-xs text-[#76777d]">Principal + Interest</span>
             </div>
@@ -772,10 +767,7 @@ export function LoansInterestView() {
             </div>
           </div>
           <div>
-            <div className="font-serif text-xl md:text-2xl text-[#0f172a] font-bold tracking-tight">
-              {privacyMode ? '••••••' : '₹1,425'}
-              <span className="text-xs text-[#76777d] font-normal ml-1">/ mon</span>
-            </div>
+            <AmountDisplay amount={1425} privacyMode={privacyMode} size="2xl" suffix="/ mon" />
             <div className="mt-1 flex items-center gap-1.5">
               <span className="text-xs text-[#76777d]">Recurring interest</span>
             </div>
@@ -977,30 +969,24 @@ export function LoansInterestView() {
                   <div className="mt-1 flex flex-col gap-1">
                     <div className="flex items-baseline justify-between gap-1">
                       <span className="text-xs text-[#76777d]">1st Month:</span>
-                      <span className="font-serif text-base font-bold text-[#9a761e]">
-                        ₹{monthlySchedule.firstMonthInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
+                      <AmountDisplay amount={monthlySchedule.firstMonthInterest} color="text-[#9a761e]" size="base" />
                     </div>
 
                     <div className="flex items-baseline justify-between gap-1 pt-1 border-t border-slate-200/60">
                       <span className="text-xs text-[#0f172a] font-semibold">Month {parsedTenure}:</span>
-                      <span className="font-serif text-base font-bold text-[#0f172a]">
-                        ₹{monthlySchedule.lastMonthInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
+                      <AmountDisplay amount={monthlySchedule.lastMonthInterest} color="text-[#0f172a]" size="base" />
                     </div>
 
                     <div className="flex items-center justify-between text-[10px] text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200/60 mt-0.5">
                       <span>+ Interest on Interest:</span>
-                      <span className="font-bold">
-                        +₹{monthlySchedule.lastMonthInterestOnInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
+                      <AmountDisplay amount={monthlySchedule.lastMonthInterestOnInterest} prefix="+₹" color="text-emerald-800" size="xs" />
                     </div>
                   </div>
                 ) : (
                   <div>
-                    <span className="font-serif text-base md:text-lg text-[#9a761e] font-bold block mt-0.5">
-                      ₹{monthlySchedule.firstMonthInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </span>
+                    <div className="mt-0.5">
+                      <AmountDisplay amount={monthlySchedule.firstMonthInterest} color="text-[#9a761e]" size="lg" />
+                    </div>
                     <span className="text-[11px] text-[#76777d] mt-0.5 block">
                       {isCompound ? 'Month 1 base rate' : 'Monthly income (Fixed)'}
                     </span>
@@ -1010,9 +996,14 @@ export function LoansInterestView() {
 
               <div className="mt-2 pt-1 border-t border-slate-200/40 text-[11px] text-[#76777d] flex items-center justify-between">
                 <span>
-                  {isCompound && parsedTenure > 1
-                    ? `Avg: ₹${calcResults.monthly.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mo`
-                    : '1st Month Base'}
+                  {isCompound && parsedTenure > 1 ? (
+                    <span className="inline-flex items-baseline gap-1">
+                      <span>Avg:</span>
+                      <AmountDisplay amount={calcResults.monthly} color="text-[#76777d]" size="xs" suffix="/mo" />
+                    </span>
+                  ) : (
+                    '1st Month Base'
+                  )}
                 </span>
                 {isCompound && (
                   <button
@@ -1033,16 +1024,17 @@ export function LoansInterestView() {
             <div className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 flex flex-col justify-between">
               <div>
                 <span className="text-[10px] text-[#76777d] block uppercase tracking-wider font-semibold">Total Interest</span>
-                <span className="font-serif text-base md:text-lg text-[#0f172a] font-bold block mt-0.5">
-                  +₹{calcResults.totalInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
+                <div className="mt-0.5">
+                  <AmountDisplay amount={calcResults.totalInterest} prefix="+₹" color="text-[#0f172a]" size="lg" />
+                </div>
                 {isCompound && monthlySchedule.totalInterestOnInterest > 0 ? (
                   <div className="mt-1 flex flex-col gap-0.5 text-[10px]">
-                    <span className="text-slate-600">
-                      Base Interest: ₹{monthlySchedule.totalBaseInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <span className="text-slate-600 inline-flex items-baseline gap-1">
+                      <span>Base Interest:</span>
+                      <AmountDisplay amount={monthlySchedule.totalBaseInterest} color="text-slate-600" size="xs" />
                     </span>
-                    <span className="text-emerald-700 font-bold">
-                      +₹{monthlySchedule.totalInterestOnInterest.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} on interest
+                    <span className="text-emerald-700 font-bold inline-flex items-baseline gap-1">
+                      <AmountDisplay amount={monthlySchedule.totalInterestOnInterest} prefix="+₹" color="text-emerald-700" size="xs" suffix=" on interest" />
                     </span>
                   </div>
                 ) : (
@@ -1058,9 +1050,9 @@ export function LoansInterestView() {
             <div className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 flex flex-col justify-between">
               <div>
                 <span className="text-[10px] text-[#76777d] block uppercase tracking-wider font-semibold">Total You Get Back</span>
-                <span className="font-serif text-base md:text-lg text-[#0f172a] font-extrabold block mt-0.5">
-                  ₹{calcResults.gross.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
+                <div className="mt-0.5">
+                  <AmountDisplay amount={calcResults.gross} color="text-[#0f172a]" size="lg" weight="extrabold" />
+                </div>
                 <span className="text-[11px] text-[#76777d] mt-0.5 block">
                   Principal (₹{parsedPrincipal.toLocaleString('en-IN')}) + Interest
                 </span>
@@ -1258,7 +1250,7 @@ export function LoansInterestView() {
             </div>
             <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
               <span className="text-[10px] uppercase font-bold text-[#76777d]">DUE</span>
-              <span className="font-bold text-sm text-[#0f172a]">{privacyMode ? '••••••' : '₹2,500'}</span>
+              <AmountDisplay amount={2500} privacyMode={privacyMode} size="sm" />
             </div>
           </div>
 
@@ -1290,7 +1282,7 @@ export function LoansInterestView() {
             </div>
             <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
               <span className="text-[10px] uppercase font-bold text-[#76777d]">DUE</span>
-              <span className="font-bold text-sm text-[#0f172a]">{privacyMode ? '••••••' : '₹3,500'}</span>
+              <AmountDisplay amount={3500} privacyMode={privacyMode} size="sm" />
             </div>
           </div>
 
@@ -1322,7 +1314,7 @@ export function LoansInterestView() {
             </div>
             <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
               <span className="text-[10px] uppercase font-bold text-[#76777d]">DUE</span>
-              <span className="font-bold text-sm text-[#0f172a]">{privacyMode ? '••••••' : '₹4,000'}</span>
+              <AmountDisplay amount={4000} privacyMode={privacyMode} size="sm" />
             </div>
           </div>
 
@@ -1354,7 +1346,7 @@ export function LoansInterestView() {
             </div>
             <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
               <span className="text-[10px] uppercase font-bold text-[#76777d]">DUE</span>
-              <span className="font-bold text-sm text-[#0f172a]">{privacyMode ? '••••••' : '₹5,000'}</span>
+              <AmountDisplay amount={5000} privacyMode={privacyMode} size="sm" />
             </div>
           </div>
         </div>
@@ -1368,9 +1360,11 @@ export function LoansInterestView() {
             <h2 className="font-serif text-lg md:text-xl text-[#0f172a] font-bold tracking-tight">
               People You Lent Money To
             </h2>
-            <span className="text-xs text-[#45464d]">
-              {filteredBorrowers.length} records • {privacyMode ? '••••••' : `₹${totalPrincipalLent.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`} total principal outstanding
-            </span>
+            <div className="text-xs text-[#45464d] flex items-center gap-1 flex-wrap">
+              <span>{filteredBorrowers.length} records •</span>
+              <AmountDisplay amount={totalPrincipalLent} privacyMode={privacyMode} size="xs" />
+              <span>total principal outstanding</span>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
@@ -1519,9 +1513,7 @@ export function LoansInterestView() {
                     {/* Amount & Payment Mode */}
                     <td className="py-3.5 px-4">
                       <div className="flex flex-col">
-                        <span className="font-bold text-slate-900 font-serif text-sm">
-                          {privacyMode ? '••••••' : `₹${b.principalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
-                        </span>
+                        <AmountDisplay amount={b.principalAmount} privacyMode={privacyMode} size="sm" />
                         <div className="flex items-center gap-1 mt-0.5 text-[11px] text-[#45464d]">
                           <span className="material-symbols-outlined text-xs text-[#9a761e]">
                             {b.paymentModeIcon}
@@ -1551,7 +1543,7 @@ export function LoansInterestView() {
                         <div className="inline-flex items-center gap-1 mt-0.5">
                           <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-lg bg-[#fdf8ea] text-[#0f172a] border border-[#d4af37]/30 text-[10px] font-semibold">
                             <span className="material-symbols-outlined text-[11px] text-[#9a761e]">schedule</span>
-                            {privacyMode ? '••••••' : `₹${b.nextDueAmount.toLocaleString('en-IN')} Due`}
+                            <AmountDisplay amount={b.nextDueAmount} privacyMode={privacyMode} size="xs" suffix=" Due" />
                           </span>
                         </div>
                       </div>
@@ -1561,11 +1553,10 @@ export function LoansInterestView() {
                     <td className="py-3.5 px-4">
                       <div className="flex flex-col min-w-[130px]">
                         <div className="flex justify-between items-center mb-1 text-[11px]">
-                          <span className="font-bold text-[#0f172a]">
-                            {privacyMode ? '••••••' : `₹${b.receivedAmount.toLocaleString('en-IN')}`}
-                          </span>
-                          <span className="text-[#76777d]">
-                            of {privacyMode ? '••••••' : `₹${b.totalReceivable.toLocaleString('en-IN')}`}
+                          <AmountDisplay amount={b.receivedAmount} privacyMode={privacyMode} size="xs" />
+                          <span className="text-[#76777d] inline-flex items-baseline gap-1">
+                            <span>of</span>
+                            <AmountDisplay amount={b.totalReceivable} privacyMode={privacyMode} size="xs" />
                           </span>
                         </div>
                         <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
@@ -1671,25 +1662,22 @@ export function LoansInterestView() {
 
                   {/* Middle Left: Balance Due Progress */}
                   <div className="flex flex-col min-w-[190px]">
-                    <div className="flex items-baseline gap-1.5">
+                    <div className="flex items-baseline gap-1.5 flex-wrap">
                       <span className="text-[10px] text-[#76777d] uppercase font-semibold">BALANCE DUE</span>
-                      <span className="text-base font-bold text-[#0f172a]">
-                        {privacyMode ? '••••••' : `₹${b.nextDueAmount.toLocaleString('en-IN')}`}
-                      </span>
-                      <span className="text-xs text-[#76777d]">
-                        / {privacyMode ? '••••••' : `₹${b.totalReceivable.toLocaleString('en-IN')}`}
+                      <AmountDisplay amount={b.nextDueAmount} privacyMode={privacyMode} size="base" />
+                      <span className="text-xs text-[#76777d] inline-flex items-baseline gap-1">
+                        <span>/</span>
+                        <AmountDisplay amount={b.totalReceivable} privacyMode={privacyMode} size="sm" />
                       </span>
                     </div>
                     <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden my-1">
                       <div
-                        className="bg-[#d4af37] h-full rounded-full transition-all duration-300"
+                        className="bg-[#eed885] h-full rounded-full transition-all duration-300"
                         style={{ width: `${b.progressPercent}%` }}
                       />
                     </div>
-                    <div className="flex justify-between items-center text-[11px] text-[#76777d]">
-                      <span>
-                        {privacyMode ? '••••••' : `₹${b.receivedAmount.toLocaleString('en-IN')}`} Paid to date
-                      </span>
+                    <div className="flex justify-between items-center text-[11px] text-[#76777d] flex-wrap gap-1">
+                      <AmountDisplay amount={b.receivedAmount} privacyMode={privacyMode} size="xs" suffix="Paid to date" />
                       <span className="font-semibold text-[#0f172a]">{b.progressPercent}% cleared</span>
                     </div>
                   </div>
