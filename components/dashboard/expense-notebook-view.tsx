@@ -26,7 +26,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
-  const [notification, setNotification] = useState<string | null>(null);
+  const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   // Sync any newly added expenses from FinanceContext into notebook entries
   useEffect(() => {
@@ -130,7 +130,10 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
   const handleQuickAdd = (e: React.FormEvent) => {
     e.preventDefault();
     if (!quickInput.trim()) {
-      setNotification('Please enter expense details first.');
+      setNotification({
+        message: 'Please enter expense details first.',
+        type: 'error',
+      });
       setTimeout(() => setNotification(null), 3000);
       return;
     }
@@ -212,7 +215,10 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
 
     setQuickInput('');
     setSelectedQuickCategory(null);
-    setNotification(`Logged: ${newEntry.title} (₹${amount})`);
+    setNotification({
+      message: `Logged: ${newEntry.title} (₹${amount})`,
+      type: 'success',
+    });
     setTimeout(() => setNotification(null), 3500);
   };
 
@@ -445,11 +451,23 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           )}
         </div>
 
-        {/* Success toast notification */}
+        {/* Toast notification */}
         {notification && (
-          <div className="absolute top-3 right-3 bg-emerald-900 text-white px-3 py-1.5 rounded-xl text-xs font-medium shadow-md flex items-center gap-1.5 animate-fade-in">
-            <span className="material-symbols-outlined text-sm text-emerald-400">check_circle</span>
-            <span>{notification}</span>
+          <div
+            className={`absolute top-3 right-3 px-3 py-1.5 rounded-xl text-xs font-medium shadow-md flex items-center gap-1.5 animate-fade-in ${
+              notification.type === 'error'
+                ? 'bg-red-900 text-white'
+                : 'bg-emerald-900 text-white'
+            }`}
+          >
+            <span
+              className={`material-symbols-outlined text-sm ${
+                notification.type === 'error' ? 'text-red-400' : 'text-emerald-400'
+              }`}
+            >
+              {notification.type === 'error' ? 'close' : 'check_circle'}
+            </span>
+            <span>{notification.message}</span>
           </div>
         )}
       </div>
