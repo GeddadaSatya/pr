@@ -9,7 +9,11 @@
     "mobile:android": "npx cap open android",
     "mobile:ios": "npx cap open ios",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "playwright test",
+    "test:api": "playwright test --project=api",
+    "test:e2e": "playwright test --project=e2e-desktop",
+    "test:report": "playwright show-report"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.2",
@@ -26,12 +30,14 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^8.6.2",
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/turbopack": "4.3.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "playwright": "^1.65.1",
     "tailwindcss": "4.3.3",
     "typescript": "^5"
   }

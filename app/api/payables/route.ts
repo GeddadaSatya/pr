@@ -48,10 +48,15 @@ export async function PUT(request: Request) {
     }
 
     if (action === 'settle') {
-      serverPayables = serverPayables.map((p) =>
-        p.id === id ? { ...p, status: 'paid', statusLabel: 'Settled', settledAt: new Date().toISOString() } : p
-      );
-      return NextResponse.json({ success: true, message: `Payable ${id} settled` });
+      let settledItem: PayableItem | null = null;
+      serverPayables = serverPayables.map((p) => {
+        if (p.id === id) {
+          settledItem = { ...p, status: 'paid', statusLabel: 'Settled', settledAt: new Date().toISOString() };
+          return settledItem;
+        }
+        return p;
+      });
+      return NextResponse.json({ success: true, message: `Payable ${id} settled`, data: settledItem });
     }
 
     return NextResponse.json({ success: false, error: 'Unknown action' }, { status: 400 });

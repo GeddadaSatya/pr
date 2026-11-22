@@ -39,6 +39,39 @@ export async function POST(request: Request) {
   }
 }
 
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, valuation } = body;
+    if (!id || typeof valuation !== 'number' || valuation <= 0) {
+      return NextResponse.json({ success: false, error: 'Valid ID and valuation are required' }, { status: 400 });
+    }
+
+    let updatedAsset: AssetHolding | null = null;
+    serverAssets = serverAssets.map((a) => {
+      if (a.id === id) {
+        const monthlyYield = (valuation * (a.annualYieldRate / 100)) / 12;
+        updatedAsset = {
+          ...a,
+          valuation,
+          monthlyYield,
+          lastValuationDate: new Date().toISOString().slice(0, 10),
+        };
+        return updatedAsset;
+      }
+      return a;
+    });
+
+    if (!updatedAsset) {
+      return NextResponse.json({ success: false, error: 'Asset not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, data: updatedAsset });
+  } catch (err: any) {
+    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+  }
+}
+
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');

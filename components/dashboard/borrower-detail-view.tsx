@@ -186,16 +186,22 @@ export function BorrowerDetailView({
     e.preventDefault();
     if (!uploadDocTitle.trim()) return;
 
-    addLoanDocument(activeBorrower.id, {
-      borrowerId: activeBorrower.id,
+    const newDoc: DocumentItem = {
+      id: `doc-${Date.now()}`,
       title: uploadDocTitle,
       type: 'PDF',
       size: '1.8 MB',
       uploadedBy: 'Current User (Manager)',
       uploadDate: 'Today',
       iconType: 'pdf',
+    };
+
+    addLoanDocument(activeBorrower.id, {
+      ...newDoc,
+      borrowerId: activeBorrower.id,
     });
 
+    setDocuments((prev) => [newDoc, ...prev]);
     setUploadDocTitle('');
     setShowUploadModal(false);
     showToast(`Uploaded document "${uploadDocTitle}"`);

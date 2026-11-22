@@ -38,7 +38,7 @@ export function NotificationsDrawer() {
   };
 
   return (
-    <div className="fixed inset-0 z-60 bg-slate-950/30 backdrop-blur-xs flex justify-end animate-in fade-in duration-150">
+    <div id="notifications-drawer" className="fixed inset-0 z-60 bg-slate-950/30 backdrop-blur-xs flex justify-end animate-in fade-in duration-150">
       <div className="fixed inset-0" onClick={closeNotificationsDrawer} />
       <div className="relative w-full max-w-sm bg-white h-full shadow-2xl border-l border-slate-200 flex flex-col z-10 animate-in slide-in-from-right duration-200">
         {/* Drawer Header */}
@@ -48,6 +48,8 @@ export function NotificationsDrawer() {
             <span className="font-serif font-bold text-sm text-slate-900">Notifications &amp; Activity</span>
           </div>
           <button
+            id="close-notifications-btn"
+            aria-label="Close Notifications"
             onClick={closeNotificationsDrawer}
             className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-900 cursor-pointer"
           >
@@ -67,7 +69,7 @@ export function NotificationsDrawer() {
         </div>
 
         {/* List */}
-        <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5">
+        <div id="notifications-list" className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5">
           {notifications.length === 0 ? (
             <div className="py-16 text-center text-slate-400 flex flex-col items-center gap-1.5">
               <span className="material-symbols-outlined text-3xl text-slate-300">notifications_off</span>
@@ -80,6 +82,7 @@ export function NotificationsDrawer() {
               return (
                 <div
                   key={notif.id}
+                  data-notification-card
                   className={`p-3 rounded-xl border transition-all flex flex-col gap-1.5 ${
                     notif.read ? 'bg-white border-slate-200/80 opacity-80' : 'bg-[#fefdf8] border-[#d4af37]/40 shadow-2xs'
                   }`}

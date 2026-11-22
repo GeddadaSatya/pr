@@ -7,17 +7,14 @@ import { formatCurrency } from '@/lib/utils';
 export function PayablesLoansHub() {
   const { payables, loans, recordPayout, privacyMode, openModal } = useFinance();
 
-  const totalPayables = payables
-    .filter((p) => p.status === 'pending')
-    .reduce((sum, p) => sum + p.amount, 0);
+  const pendingPayables = payables.filter((p) => p.status !== 'paid');
+  const activeLoans = loans.filter((l) => l.status === 'active');
 
-  const totalLoans = loans
-    .filter((l) => l.status === 'active')
-    .reduce((sum, l) => sum + l.principalAmount, 0);
+  const totalPayables = pendingPayables.reduce((sum, p) => sum + p.amount, 0);
 
-  const totalYield = loans
-    .filter((l) => l.status === 'active')
-    .reduce((sum, l) => sum + (l.monthlyInterest || 0), 0);
+  const totalLoans = activeLoans.reduce((sum, l) => sum + l.principalAmount, 0);
+
+  const totalYield = activeLoans.reduce((sum, l) => sum + (l.monthlyInterest || 0), 0);
 
   return (
     <div className="flex flex-col gap-4 w-full" id="operational-hub-section">
@@ -54,7 +51,7 @@ export function PayablesLoansHub() {
             ) : (
               <div className="flex items-center gap-1.5 font-body-sm text-xs text-slate-500 mt-1">
                 <span className="w-2 h-2 rounded-full bg-red-500 inline-block shrink-0" />
-                <span className="truncate">{payables.length} bills within 7 days</span>
+                <span className="truncate">{pendingPayables.length} bills within 7 days</span>
               </div>
             )}
           </div>
@@ -91,7 +88,7 @@ export function PayablesLoansHub() {
             ) : (
               <div className="flex items-center gap-1.5 font-body-sm text-xs text-slate-500 mt-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block shrink-0" />
-                <span className="truncate">{loans.length} parties active</span>
+                <span className="truncate">{activeLoans.length} parties active</span>
               </div>
             )}
           </div>
@@ -127,7 +124,7 @@ export function PayablesLoansHub() {
             </div>
 
             <div className="flex flex-col gap-2.5 mt-2">
-              {payables.length === 0 ? (
+              {pendingPayables.length === 0 ? (
                 <div className="py-8 flex flex-col items-center justify-center text-center bg-slate-50/50 rounded-xl border border-slate-100">
                   <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 mb-2">
                     <span className="material-symbols-outlined text-xl">event_available</span>
@@ -145,7 +142,7 @@ export function PayablesLoansHub() {
                   </button>
                 </div>
               ) : (
-                payables.map((item, idx) => (
+                pendingPayables.map((item, idx) => (
                   <div
                     key={item.id}
                     className="p-3.5 rounded-lg bg-slate-50 border border-slate-200/70 flex items-center justify-between hover:bg-slate-100/70 transition-all group"
@@ -202,13 +199,13 @@ export function PayablesLoansHub() {
 
           <div className="mt-4 pt-3 flex items-center justify-between text-xs text-slate-500 border-t border-slate-100">
             <span>Pay on time to keep debt clear</span>
-            {payables.length > 0 && (
+            {pendingPayables.length > 0 && (
               <button
-                onClick={() => recordPayout(payables[0].id)}
+                onClick={() => recordPayout(pendingPayables[0].id)}
                 className="px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-800 hover:bg-slate-200 transition-colors font-semibold text-xs cursor-pointer"
                 type="button"
               >
-                Record Payout ({payables[0].creditorName.split(' ')[0]})
+                Record Payout ({pendingPayables[0].creditorName.split(' ')[0]})
               </button>
             )}
           </div>
@@ -238,7 +235,7 @@ export function PayablesLoansHub() {
             </div>
 
             <div className="flex flex-col gap-2.5 mt-2">
-              {loans.length === 0 ? (
+              {activeLoans.length === 0 ? (
                 <div className="py-8 flex flex-col items-center justify-center text-center bg-slate-50/50 rounded-xl border border-slate-100">
                   <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 mb-2">
                     <span className="material-symbols-outlined text-xl">handshake</span>
@@ -256,7 +253,7 @@ export function PayablesLoansHub() {
                   </button>
                 </div>
               ) : (
-                loans.map((loan) => (
+                activeLoans.map((loan) => (
                   <div
                     key={loan.id}
                     className="p-3.5 rounded-lg bg-slate-50 border border-slate-200/70 flex items-center justify-between hover:bg-slate-100/70 transition-all"

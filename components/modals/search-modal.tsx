@@ -110,7 +110,7 @@ export function SearchModal() {
         className="fixed inset-0"
         onClick={closeSearchModal}
       />
-      <div className="relative w-full max-w-xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-10 animate-in zoom-in-95 duration-150">
+      <div id="search-dialog-card" className="relative w-full max-w-xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-10 animate-in zoom-in-95 duration-150">
         {/* Search Input Bar */}
         <div className="flex items-center px-4 py-3.5 border-b border-slate-200 gap-3">
           <span className="material-symbols-outlined text-slate-400 text-xl">search</span>
@@ -164,10 +164,12 @@ export function SearchModal() {
                   </span>
                   <div className="flex flex-col gap-1">
                     {matchedExpenses.map((exp) => (
-                      <div
+                      <button
                         key={exp.id}
+                        type="button"
+                        data-search-result
                         onClick={() => handleSelect('expenses')}
-                        className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 transition cursor-pointer"
+                        className="w-full text-left flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 transition cursor-pointer"
                       >
                         <div className="flex items-center gap-2.5">
                           <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
@@ -179,7 +181,7 @@ export function SearchModal() {
                           </div>
                         </div>
                         <AmountDisplay amount={exp.amount} privacyMode={privacyMode} size="sm" weight="semibold" />
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -193,10 +195,12 @@ export function SearchModal() {
                   </span>
                   <div className="flex flex-col gap-1">
                     {matchedPayables.map((pay) => (
-                      <div
+                      <button
                         key={pay.id}
+                        type="button"
+                        data-search-result
                         onClick={() => handleSelect('payables')}
-                        className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 transition cursor-pointer"
+                        className="w-full text-left flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 transition cursor-pointer"
                       >
                         <div className="flex items-center gap-2.5">
                           <div className="w-7 h-7 rounded-lg bg-red-50 text-red-700 flex items-center justify-center">
@@ -208,7 +212,7 @@ export function SearchModal() {
                           </div>
                         </div>
                         <AmountDisplay amount={pay.amount} privacyMode={privacyMode} size="sm" weight="semibold" />
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -222,10 +226,12 @@ export function SearchModal() {
                   </span>
                   <div className="flex flex-col gap-1">
                     {matchedBorrowers.map((b) => (
-                      <div
+                      <button
                         key={b.id}
+                        type="button"
+                        data-search-result
                         onClick={() => handleSelect('lending')}
-                        className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 transition cursor-pointer"
+                        className="w-full text-left flex items-center justify-between p-2 rounded-xl hover:bg-slate-50 transition cursor-pointer"
                       >
                         <div className="flex items-center gap-2.5">
                           <div className="w-7 h-7 rounded-lg bg-[#fdf8ea] text-[#9a761e] border border-[#d4af37]/30 flex items-center justify-center font-bold text-xs">
@@ -237,7 +243,7 @@ export function SearchModal() {
                           </div>
                         </div>
                         <AmountDisplay amount={b.principalAmount} privacyMode={privacyMode} size="sm" weight="semibold" />
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>

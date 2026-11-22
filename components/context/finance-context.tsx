@@ -243,6 +243,18 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     loadLocal('wt_notifications', setNotifications, INITIAL_NOTIFICATIONS);
   }, []);
 
+  // Global Ctrl+K / Cmd+K search listener
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchModalOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
+
   // Save changes to localStorage
   const saveLocal = (key: string, data: any) => {
     try {
