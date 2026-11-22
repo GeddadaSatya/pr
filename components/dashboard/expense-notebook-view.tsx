@@ -872,11 +872,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                     <span className="material-symbols-outlined text-sm text-[#b48e28] group-hover:translate-x-0.5 transition-transform">
                       menu_book
                     </span>
-                    <span>
-                      {dayItems.length > 5
-                        ? `View All (${dayItems.length} Entries) in Day Ledger`
-                        : 'View Day Ledger'}
-                    </span>
+                    <span>View Day Ledger</span>
                     <span className="material-symbols-outlined text-sm text-slate-400 group-hover:text-slate-700 transition-colors">
                       chevron_right
                     </span>
