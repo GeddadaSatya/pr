@@ -239,16 +239,36 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
       </div>
 
       {/* PENDING FRIEND ADVANCES (LOCATED BELOW KPI CARDS) */}
-      <div className="w-full bg-[#f0fdf4]/80 border border-emerald-200/90 rounded-2xl p-3 sm:p-3.5 shadow-xs flex flex-col gap-2.5 transition-all">
+      <div className="w-full bg-[#f0fdf4]/80 hover:bg-[#f0fdf4] border border-emerald-200/90 hover:border-emerald-300 rounded-2xl p-3 sm:p-3.5 shadow-xs flex flex-col gap-2.5 transition-all">
         {/* Header Strip with Total Pending & Action Buttons */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div
+          onClick={() => {
+            if (pendingReceivables.length > 0) {
+              setIsPendingExpanded(!isPendingExpanded);
+            }
+          }}
+          className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
+            pendingReceivables.length > 0 ? 'cursor-pointer select-none group/banner' : ''
+          }`}
+          title={pendingReceivables.length > 0 ? (isPendingExpanded ? 'Click to collapse advances' : 'Click to view all advances') : undefined}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              if (pendingReceivables.length > 0) {
+                setIsPendingExpanded(!isPendingExpanded);
+              }
+            }
+          }}
+        >
           {/* Status Label & Amount */}
           <div className="flex items-center gap-2 min-w-0">
-            <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+            <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 group-hover/banner:bg-emerald-200 transition-colors">
               <span className="material-symbols-outlined text-sm">schedule</span>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-bold text-slate-800">
+              <span className="text-xs font-bold text-slate-800 group-hover/banner:text-emerald-950 transition-colors">
                 {pendingReceivables.length > 0
                   ? `${pendingReceivables.length} ${pendingReceivables.length === 1 ? 'Advance' : 'Advances'} Pending`
                   : 'Friend Advances (Recoverable)'}
@@ -257,7 +277,7 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
                 <>
                   <span className="text-xs text-slate-400">•</span>
                   <span className="text-xs text-slate-600 font-medium">To get back:</span>
-                  <span className="text-xs font-bold font-serif text-emerald-800">
+                  <span className="text-xs font-bold font-serif text-emerald-800 group-hover/banner:text-emerald-900 transition-colors">
                     {privacyMode
                       ? '••••••'
                       : `₹${totalPendingReceivables.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
@@ -268,11 +288,17 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
           </div>
 
           {/* Action Buttons: On desktop they sit on top on the right; on mobile they are full width / side-by-side */}
-          <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0">
+          <div
+            className="flex items-center justify-between sm:justify-end gap-2 shrink-0"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Quick "+ Log Recoverable" Button */}
             <button
               type="button"
-              onClick={() => openModal('receive')}
+              onClick={(e) => {
+                e.stopPropagation();
+                openModal('receive');
+              }}
               className="h-8 px-3 rounded-xl bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
               title="Record money given to a friend awaiting return"
             >
@@ -284,7 +310,10 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
             {pendingReceivables.length > 0 && (
               <button
                 type="button"
-                onClick={() => setIsPendingExpanded(!isPendingExpanded)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsPendingExpanded(!isPendingExpanded);
+                }}
                 className="h-8 text-xs font-semibold text-slate-700 hover:text-slate-900 flex items-center gap-1 px-3 rounded-xl bg-white border border-slate-200 shadow-2xs cursor-pointer transition-colors"
               >
                 <span>{isPendingExpanded ? 'Collapse' : `View All (${pendingReceivables.length})`}</span>
@@ -301,7 +330,10 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
 
         {/* Detailed Advances List (ONLY shown when expanded - COLLAPSED BY DEFAULT ON ALL SCREENS) */}
         {isPendingExpanded && pendingReceivables.length > 0 && (
-          <div className="flex flex-col divide-y divide-emerald-100/80 pt-2 border-t border-emerald-100/80 animate-fade-in">
+          <div
+            className="flex flex-col divide-y divide-emerald-100/80 pt-2 border-t border-emerald-100/80 animate-fade-in"
+            onClick={(e) => e.stopPropagation()}
+          >
             {pendingReceivables.map((item) => (
               <div key={item.id} className="py-2.5 flex items-center justify-between gap-3 first:pt-1 last:pb-0">
                 <div className="flex items-center gap-2.5 min-w-0">
@@ -324,7 +356,10 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
 
                 <button
                   type="button"
-                  onClick={() => markReceivableReceived(item.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    markReceivableReceived(item.id);
+                  }}
                   className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1 shadow-xs transition-all shrink-0 cursor-pointer"
                   title={`Mark ₹${item.amount} from ${item.friendName} as received`}
                 >
