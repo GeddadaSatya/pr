@@ -232,13 +232,13 @@ export function MobileNav({ activeTab, setActiveTab }: MobileNavProps) {
               <button
                 onClick={() => handleTabClick('expenses')}
                 className={`flex flex-col items-center justify-center min-w-[56px] h-13 group relative cursor-pointer ${
-                  activeTab === 'expenses' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                  activeTab === 'expenses' || activeTab === 'day-ledger' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 }`}
                 type="button"
               >
                 <span
                   className="material-symbols-outlined text-[22px] group-hover:scale-105 transition-transform"
-                  style={{ fontVariationSettings: activeTab === 'expenses' ? "'FILL' 1" : "'FILL' 0" }}
+                  style={{ fontVariationSettings: activeTab === 'expenses' || activeTab === 'day-ledger' ? "'FILL' 1" : "'FILL' 0" }}
                 >
                   receipt_long
                 </span>
@@ -247,7 +247,7 @@ export function MobileNav({ activeTab, setActiveTab }: MobileNavProps) {
                 </span>
                 <span
                   className={`w-1.5 h-1.5 rounded-full mt-0.5 transition-colors ${
-                    activeTab === 'expenses' ? 'bg-[#735c00]' : 'bg-transparent'
+                    activeTab === 'expenses' || activeTab === 'day-ledger' ? 'bg-[#735c00]' : 'bg-transparent'
                   }`}
                 />
               </button>

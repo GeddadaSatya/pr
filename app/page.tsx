@@ -13,21 +13,23 @@ import { CategoryAnalytics } from '@/components/dashboard/category-analytics';
 import { ExpenseTable } from '@/components/dashboard/expense-table';
 import { PayablesLoansHub } from '@/components/dashboard/payables-loans-hub';
 import { ExpenseNotebookView } from '@/components/dashboard/expense-notebook-view';
+import { DayLedgerView } from '@/components/dashboard/day-ledger-view';
 import { TransactionModal } from '@/components/modals/transaction-modal';
 import { AuthModal } from '@/components/modals/auth-modal';
-import { DayLedgerModal } from '@/components/modals/day-ledger-modal';
 
 import { useFinance } from '@/components/context/finance-context';
 
 function DashboardContent() {
   const [activeTab, setActiveTab] = useState('overview');
-  const [isDayLedgerOpen, setIsDayLedgerOpen] = useState(false);
+  const [previousTab, setPreviousTab] = useState<'overview' | 'expenses'>('expenses');
   const [selectedDateKey, setSelectedDateKey] = useState('2026-10-28');
   const { isCollapsed } = useFinance();
 
   const handleOpenDayLedger = (dateKey: string = '2026-10-28') => {
+    setPreviousTab(activeTab === 'expenses' ? 'expenses' : 'overview');
     setSelectedDateKey(dateKey);
-    setIsDayLedgerOpen(true);
+    setActiveTab('day-ledger');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -48,6 +50,16 @@ function DashboardContent() {
           <div className="flex flex-col w-full px-4 md:px-0 md:w-[88%] mx-auto gap-5 md:gap-6">
             {activeTab === 'expenses' ? (
               <ExpenseNotebookView onOpenDayLedger={handleOpenDayLedger} />
+            ) : activeTab === 'day-ledger' ? (
+              <DayLedgerView
+                selectedDateKey={selectedDateKey}
+                onBack={() => {
+                  setActiveTab(previousTab);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                previousTabTitle={previousTab === 'overview' ? 'Overview & Net Worth' : 'Expense Notebook'}
+                onDateChange={(dateKey) => setSelectedDateKey(dateKey)}
+              />
             ) : (
               <>
                 {/* Top Command Strip & Greeting */}
@@ -79,11 +91,6 @@ function DashboardContent() {
       {/* Interactive Modals */}
       <TransactionModal />
       <AuthModal />
-      <DayLedgerModal
-        isOpen={isDayLedgerOpen}
-        onClose={() => setIsDayLedgerOpen(false)}
-        selectedDateKey={selectedDateKey}
-      />
     </div>
   );
 }

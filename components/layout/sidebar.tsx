@@ -161,7 +161,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         {/* Navigation Items List */}
         <nav className={`flex flex-col gap-1.5 w-full overflow-hidden ${isCollapsed ? 'px-0 items-center' : 'px-2.5'}`}>
           {navItems.map((item) => {
-            const isActive = activeTab === item.id;
+            const isActive = activeTab === item.id || (activeTab === 'day-ledger' && item.id === 'expenses');
             return (
               <button
                 key={item.id}
