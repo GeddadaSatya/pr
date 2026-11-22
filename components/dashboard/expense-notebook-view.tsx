@@ -631,23 +631,30 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
               <div key={group.dateKey} className="flex flex-col rounded-xl border border-slate-200/80 overflow-hidden shadow-2xs">
                 {/* Day Table */}
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
+                  <table className="w-full text-left border-collapse table-fixed min-w-[760px]">
+                    <colgroup>
+                      <col className="w-[38%]" />
+                      <col className="w-[18%]" />
+                      <col className="w-[18%]" />
+                      <col className="w-[12%]" />
+                      <col className="w-[14%]" />
+                    </colgroup>
                     <thead>
                       <tr className="text-slate-600 text-[11px] uppercase tracking-wider bg-slate-50 border-b border-slate-200/80">
-                        <th className="py-2.5 px-4 font-semibold text-slate-800 text-xs">
+                        <th className="w-[38%] py-2.5 px-4 font-semibold text-slate-800 text-xs truncate">
                           {group.dateGroup} • {group.items.length} {group.items.length === 1 ? 'Entry' : 'Entries'} • Total: {privacyMode ? '••••••' : `₹${group.total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}
                         </th>
-                        <th className="py-2.5 px-4 text-center text-xs">CATEGORY</th>
-                        <th className="py-2.5 px-4 text-xs">PAID WITH</th>
-                        <th className="py-2.5 px-4 text-xs">DATE &amp; TIME</th>
-                        <th className="py-2.5 px-4 text-right text-xs">AMOUNT</th>
+                        <th className="w-[18%] py-2.5 px-4 text-center text-xs">CATEGORY</th>
+                        <th className="w-[18%] py-2.5 px-4 text-xs">PAID WITH</th>
+                        <th className="w-[12%] py-2.5 px-4 text-xs">DATE &amp; TIME</th>
+                        <th className="w-[14%] py-2.5 px-4 text-right text-xs">AMOUNT</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 bg-white">
                       {displayedItems.map((item) => (
                         <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
                           {/* Item details */}
-                          <td className="py-3 px-4">
+                          <td className="w-[38%] py-3 px-4">
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-slate-700 shrink-0">
                                 <span className="material-symbols-outlined text-base">{item.icon}</span>
@@ -664,7 +671,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                           </td>
 
                           {/* Category pill */}
-                          <td className="py-3 px-4 text-center">
+                          <td className="w-[18%] py-3 px-4 text-center">
                             <span
                               className={`inline-block px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
                                 item.category.includes('Travel')
@@ -681,17 +688,17 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                           </td>
 
                           {/* Paid With */}
-                          <td className="py-3 px-4 text-xs text-slate-600 font-medium whitespace-nowrap">
+                          <td className="w-[18%] py-3 px-4 text-xs text-slate-600 font-medium whitespace-nowrap truncate">
                             {item.paidWith}
                           </td>
 
                           {/* Date & Time */}
-                          <td className="py-3 px-4 text-xs text-slate-500 whitespace-nowrap">
+                          <td className="w-[12%] py-3 px-4 text-xs text-slate-500 whitespace-nowrap truncate">
                             {item.time || item.dateTime}
                           </td>
 
                           {/* Amount */}
-                          <td className="py-3 px-4 text-right whitespace-nowrap">
+                          <td className="w-[14%] py-3 px-4 text-right whitespace-nowrap">
                             {privacyMode ? (
                               <span className="text-sm font-bold text-slate-900 tracking-tight font-serif">••••••</span>
                             ) : (
