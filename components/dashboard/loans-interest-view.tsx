@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useFinance } from '@/components/context/finance-context';
+import { BorrowerDetailView } from './borrower-detail-view';
 
 export interface BorrowerLoan {
   id: string;
@@ -36,17 +37,68 @@ export interface BorrowerLoan {
   noteTitle?: string;
   noteText?: string;
   attachmentName?: string;
+  // Profile & Dossier fields
+  phone?: string;
+  address?: string;
+  borrowerId?: string;
+  totalSanctioned?: number;
+  outstandingBalance?: number;
+  repaymentPacing?: string;
+  lifetimeCollected?: number;
 }
 
 const INITIAL_BORROWERS: BorrowerLoan[] = [
+  {
+    id: 'borrower-priya',
+    name: 'Priya Reddy',
+    initials: 'PR',
+    avatarBg: 'bg-slate-100',
+    avatarText: 'text-slate-700',
+    badgeNumber: 1,
+    contactOrNote: '+91 98765 43210 • Cyber Towers',
+    phone: '+91 98765 43210',
+    address: 'Madhapur (C), Sector 2, Cyber Towers, Hyderabad',
+    borrowerId: 'PD-90803',
+    principalAmount: 25000,
+    paymentMode: 'Bank Transfer',
+    paymentModeIcon: 'account_balance',
+    dateGiven: 'May 14, 2024',
+    interestRate: 10.0,
+    interestRatePeriod: 'flat rate',
+    payoutFrequency: 'Daily Cycle Pacing',
+    tenureMonths: 12,
+    termLabel: 'Prime Active',
+    nextDueDate: 'Nov 20, 2026',
+    nextDueAmount: 2500,
+    dueCountdownText: '3 Days Remaining',
+    dueCountdownType: 'critical',
+    receivedAmount: 22500,
+    totalReceivable: 25000,
+    progressPercent: 90,
+    status: 'active',
+    statusLabel: 'Active',
+    contractType: 'Micro-Enterprise Advance',
+    priorityTag: 'Tier 1 Prime',
+    settlementChannel: 'HDFC Direct Wire',
+    noteTitle: 'Field Visit',
+    noteText: 'Visited by Rahul Sharma (Agent) - Promised to pay on Nov 20.',
+    attachmentName: 'Signed_Promissory_Note.pdf',
+    totalSanctioned: 65000,
+    outstandingBalance: 2500,
+    repaymentPacing: '90.0%',
+    lifetimeCollected: 62500,
+  },
   {
     id: 'borrower-1',
     name: 'Marcus Vance',
     initials: 'MV',
     avatarBg: 'bg-[#0f172a]',
     avatarText: 'text-[#d4af37]',
-    badgeNumber: 1,
+    badgeNumber: 2,
     contactOrNote: 'Head Builder & Architect Renovations',
+    phone: '+91 98112 33445',
+    address: 'Banjara Hills, Road No. 12, Hyderabad',
+    borrowerId: 'MV-10294',
     principalAmount: 10000,
     paymentMode: 'UPI / Bank Wire',
     paymentModeIcon: 'account_balance',
@@ -70,6 +122,10 @@ const INITIAL_BORROWERS: BorrowerLoan[] = [
     settlementChannel: 'FedWire Direct (Chase Corp)',
     noteTitle: 'General Contractor',
     noteText: 'Milestone loan for materials and subcontractor advance.',
+    totalSanctioned: 30000,
+    outstandingBalance: 3500,
+    repaymentPacing: '71.0%',
+    lifetimeCollected: 26500,
   },
   {
     id: 'borrower-2',
@@ -241,6 +297,9 @@ export function LoansInterestView() {
 
   // Master loan records
   const [borrowers, setBorrowers] = useState<BorrowerLoan[]>(INITIAL_BORROWERS);
+
+  // Selected Borrower for Dossier / Customer Profile View
+  const [selectedBorrower, setSelectedBorrower] = useState<BorrowerLoan | null>(null);
 
   // View Mode: 'cards' or 'table'
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
@@ -570,6 +629,33 @@ export function LoansInterestView() {
     setFormAmount('');
     showToast(`Recorded new loan of ₹${principal.toLocaleString('en-IN')} to ${formName}`);
   };
+
+  if (selectedBorrower) {
+    return (
+      <BorrowerDetailView
+        borrower={selectedBorrower}
+        onBack={() => {
+          setSelectedBorrower(null);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onRecordPayment={(id, amt) => {
+          handlePayPart(id, selectedBorrower.name);
+          setSelectedBorrower((prev) => {
+            if (!prev) return null;
+            const nextRec = Math.min(prev.totalReceivable, prev.receivedAmount + amt);
+            const pct = Math.min(100, Math.round((nextRec / prev.totalReceivable) * 100));
+            return {
+              ...prev,
+              receivedAmount: nextRec,
+              progressPercent: pct,
+              status: pct >= 100 ? 'paid' : prev.status,
+              outstandingBalance: Math.max(0, (prev.outstandingBalance ?? prev.nextDueAmount) - amt),
+            };
+          });
+        }}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col w-full py-4 md:py-6 gap-6 animate-fade-in">
@@ -1144,8 +1230,47 @@ export function LoansInterestView() {
 
         {/* 4 Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-1">
-          {/* Card 1: Marcus Vance */}
-          <div className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
+          {/* Card 1: Priya Reddy */}
+          <div
+            onClick={() => {
+              const b = borrowers.find((item) => item.name.includes('Priya')) || borrowers[0];
+              if (b) setSelectedBorrower(b);
+            }}
+            className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-[#d4af37] hover:shadow-xs transition-all cursor-pointer group"
+            title="Click to view Priya Reddy's Dossier"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#fdf8ea] border border-[#d4af37]/40 text-[#0f172a] text-[11px] font-bold">
+                <span className="material-symbols-outlined text-[13px] text-[#9a761e]">timer</span>
+                3 Days Remaining
+              </span>
+              <div className="flex flex-col text-right">
+                <span className="text-[10px] text-[#76777d] uppercase">Nov</span>
+                <span className="font-bold text-xs text-[#0f172a] leading-none">20</span>
+              </div>
+            </div>
+            <div className="my-1">
+              <h3 className="font-semibold text-sm text-[#0f172a] leading-tight group-hover:text-[#9a761e] transition-colors flex items-center justify-between">
+                <span>Priya Reddy</span>
+                <span className="material-symbols-outlined text-xs text-slate-400 group-hover:text-[#9a761e]">chevron_right</span>
+              </h3>
+              <p className="text-xs text-[#76777d] truncate mt-0.5">Madhapur • Cyber Towers</p>
+            </div>
+            <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+              <span className="text-[10px] uppercase font-bold text-[#76777d]">DUE</span>
+              <span className="font-bold text-sm text-[#0f172a]">{privacyMode ? '••••••' : '₹2,500'}</span>
+            </div>
+          </div>
+
+          {/* Card 2: Marcus Vance */}
+          <div
+            onClick={() => {
+              const b = borrowers.find((item) => item.name.includes('Marcus'));
+              if (b) setSelectedBorrower(b);
+            }}
+            className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-[#d4af37] hover:shadow-xs transition-all cursor-pointer group"
+            title="Click to view Marcus Vance's Dossier"
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#fdf8ea] border border-[#d4af37]/40 text-[#0f172a] text-[11px] font-bold">
                 <span className="material-symbols-outlined text-[13px] text-[#9a761e]">timer</span>
@@ -1157,7 +1282,10 @@ export function LoansInterestView() {
               </div>
             </div>
             <div className="my-1">
-              <h3 className="font-semibold text-sm text-[#0f172a] leading-tight">Marcus Vance</h3>
+              <h3 className="font-semibold text-sm text-[#0f172a] leading-tight group-hover:text-[#9a761e] transition-colors flex items-center justify-between">
+                <span>Marcus Vance</span>
+                <span className="material-symbols-outlined text-xs text-slate-400 group-hover:text-[#9a761e]">chevron_right</span>
+              </h3>
               <p className="text-xs text-[#76777d] truncate mt-0.5">General Contractor / Milesto...</p>
             </div>
             <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
@@ -1166,8 +1294,15 @@ export function LoansInterestView() {
             </div>
           </div>
 
-          {/* Card 2: Sarah Jenkins */}
-          <div className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
+          {/* Card 3: Sarah Jenkins */}
+          <div
+            onClick={() => {
+              const b = borrowers.find((item) => item.name.includes('Sarah'));
+              if (b) setSelectedBorrower(b);
+            }}
+            className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-[#d4af37] hover:shadow-xs transition-all cursor-pointer group"
+            title="Click to view Sarah Jenkins' Dossier"
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#fdf8ea] border border-[#d4af37]/40 text-[#0f172a] text-[11px] font-bold">
                 <span className="material-symbols-outlined text-[13px] text-[#9a761e]">timer</span>
@@ -1179,7 +1314,10 @@ export function LoansInterestView() {
               </div>
             </div>
             <div className="my-1">
-              <h3 className="font-semibold text-sm text-[#0f172a] leading-tight">Sarah Jenkins</h3>
+              <h3 className="font-semibold text-sm text-[#0f172a] leading-tight group-hover:text-[#9a761e] transition-colors flex items-center justify-between">
+                <span>Sarah Jenkins</span>
+                <span className="material-symbols-outlined text-xs text-slate-400 group-hover:text-[#9a761e]">chevron_right</span>
+              </h3>
               <p className="text-xs text-[#76777d] truncate mt-0.5">Highline Studio Lease Q4</p>
             </div>
             <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
@@ -1188,8 +1326,15 @@ export function LoansInterestView() {
             </div>
           </div>
 
-          {/* Card 3: David Chen */}
-          <div className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
+          {/* Card 4: David Chen */}
+          <div
+            onClick={() => {
+              const b = borrowers.find((item) => item.name.includes('David'));
+              if (b) setSelectedBorrower(b);
+            }}
+            className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-[#d4af37] hover:shadow-xs transition-all cursor-pointer group"
+            title="Click to view David Chen's Dossier"
+          >
             <div className="flex items-center justify-between mb-2">
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[#0f172a] text-[11px] font-bold">
                 <span className="material-symbols-outlined text-[13px] text-[#45464d]">schedule</span>
@@ -1201,34 +1346,15 @@ export function LoansInterestView() {
               </div>
             </div>
             <div className="my-1">
-              <h3 className="font-semibold text-sm text-[#0f172a] leading-tight">David Chen</h3>
+              <h3 className="font-semibold text-sm text-[#0f172a] leading-tight group-hover:text-[#9a761e] transition-colors flex items-center justify-between">
+                <span>David Chen</span>
+                <span className="material-symbols-outlined text-xs text-slate-400 group-hover:text-[#9a761e]">chevron_right</span>
+              </h3>
               <p className="text-xs text-[#76777d] truncate mt-0.5">RED V-Raptor Equipment Loan</p>
             </div>
             <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
               <span className="text-[10px] uppercase font-bold text-[#76777d]">DUE</span>
               <span className="font-bold text-sm text-[#0f172a]">{privacyMode ? '••••••' : '₹5,000'}</span>
-            </div>
-          </div>
-
-          {/* Card 4: Apex Global Logistics */}
-          <div className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
-            <div className="flex items-center justify-between mb-2">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[#0f172a] text-[11px] font-bold">
-                <span className="material-symbols-outlined text-[13px] text-[#45464d]">date_range</span>
-                21 Days
-              </span>
-              <div className="flex flex-col text-right">
-                <span className="text-[10px] text-[#76777d] uppercase">Dec</span>
-                <span className="font-bold text-xs text-[#0f172a] leading-none">06</span>
-              </div>
-            </div>
-            <div className="my-1">
-              <h3 className="font-semibold text-sm text-[#0f172a] leading-tight">Apex Global Logistics</h3>
-              <p className="text-xs text-[#76777d] truncate mt-0.5">Freight Charter &amp; Customs #...</p>
-            </div>
-            <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold text-[#76777d]">DUE</span>
-              <span className="font-bold text-sm text-[#0f172a]">{privacyMode ? '••••••' : '₹18,750'}</span>
             </div>
           </div>
         </div>
@@ -1368,14 +1494,23 @@ export function LoansInterestView() {
                   <tr key={b.id} className="hover:bg-slate-50/80 transition-colors">
                     {/* Borrower */}
                     <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-2.5">
+                      <div
+                        onClick={() => setSelectedBorrower(b)}
+                        className="flex items-center gap-2.5 cursor-pointer group"
+                        title={`Click to view ${b.name}'s Dossier & Profile`}
+                      >
                         <div
-                          className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${b.avatarBg} ${b.avatarText}`}
+                          className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 transition-transform group-hover:scale-105 shadow-2xs ${b.avatarBg} ${b.avatarText}`}
                         >
                           {b.initials}
                         </div>
                         <div className="flex flex-col min-w-0">
-                          <span className="font-semibold text-slate-900 truncate">{b.name}</span>
+                          <span className="font-semibold text-slate-900 truncate group-hover:text-[#9a761e] transition-colors flex items-center gap-1">
+                            <span>{b.name}</span>
+                            <span className="material-symbols-outlined text-[13px] text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                              chevron_right
+                            </span>
+                          </span>
                           <span className="text-[11px] text-[#76777d] truncate">{b.contactOrNote}</span>
                         </div>
                       </div>
@@ -1490,10 +1625,14 @@ export function LoansInterestView() {
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                   {/* Left: Avatar + Details */}
-                  <div className="flex items-start gap-3.5">
+                  <div
+                    onClick={() => setSelectedBorrower(b)}
+                    className="flex items-start gap-3.5 cursor-pointer group"
+                    title={`Click to view ${b.name}'s Dossier & Profile`}
+                  >
                     <div className="relative shrink-0">
                       <div
-                        className={`w-11 h-11 rounded-full font-bold flex items-center justify-center border border-slate-200 shadow-2xs text-sm ${b.avatarBg} ${b.avatarText}`}
+                        className={`w-11 h-11 rounded-full font-bold flex items-center justify-center border border-slate-200 shadow-2xs text-sm transition-transform group-hover:scale-105 ${b.avatarBg} ${b.avatarText}`}
                       >
                         {b.initials}
                       </div>
@@ -1506,8 +1645,11 @@ export function LoansInterestView() {
 
                     <div className="flex flex-col">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-bold text-[#0f172a] text-sm md:text-base leading-snug">
-                          {b.name}
+                        <span className="font-bold text-[#0f172a] text-sm md:text-base leading-snug group-hover:text-[#9a761e] transition-colors flex items-center gap-1">
+                          <span>{b.name}</span>
+                          <span className="material-symbols-outlined text-sm text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                            arrow_forward
+                          </span>
                         </span>
                         <span className="material-symbols-outlined text-sm text-[#9a761e]">check_circle</span>
                       </div>
