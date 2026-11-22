@@ -661,13 +661,14 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
 
                     {/* Search Box with Individual Clear Button */}
                     <div className="relative flex items-center">
-                      <span className="material-symbols-outlined absolute left-2 text-slate-400 text-sm pointer-events-none">
+                      <span className="material-symbols-outlined absolute left-2.5 text-slate-400 text-sm pointer-events-none">
                         search
                       </span>
                       <input
                         value={dayFilter.search}
                         onChange={(e) => handleDaySearchChange(group.dateKey, e.target.value)}
-                        className={`h-7.5 pl-6.5 ${dayFilter.search ? 'pr-6.5' : 'pr-2'} text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-36 sm:w-52 shadow-2xs`}
+                        className={`h-7.5 pl-8.5 ${dayFilter.search ? 'pr-7' : 'pr-2.5'} text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-36 sm:w-52 shadow-2xs`}
+                        style={{ paddingLeft: '2.125rem' }}
                         placeholder="Search transactions..."
                         type="text"
                       />

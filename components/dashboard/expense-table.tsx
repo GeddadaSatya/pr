@@ -387,7 +387,8 @@ export function ExpenseTable() {
                 <input
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`h-9 pl-8 ${searchTerm ? 'pr-8' : 'pr-3'} text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-full sm:w-64 shadow-xs`}
+                  className={`h-9 ${searchTerm ? 'pr-8' : 'pr-3'} text-xs bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all w-full sm:w-64 shadow-xs`}
+                  style={{ paddingLeft: '2.375rem' }}
                   placeholder="Search transactions..."
                   type="text"
                 />
