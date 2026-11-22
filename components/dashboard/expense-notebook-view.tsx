@@ -828,18 +828,18 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse table-fixed min-w-[760px]">
               <colgroup>
-                <col className="w-[38%]" />
+                <col className="w-[34%]" />
+                <col className="w-[20%]" />
                 <col className="w-[18%]" />
-                <col className="w-[18%]" />
-                <col className="w-[12%]" />
+                <col className="w-[14%]" />
                 <col className="w-[14%]" />
               </colgroup>
               <thead>
                 <tr className="text-slate-500 text-[11px] uppercase tracking-wider bg-slate-50 border-b border-slate-200/80 font-bold">
-                  <th className="py-2.5 px-4 w-[38%] text-xs font-semibold text-left">EXPENSE ITEM</th>
-                  <th className="py-2.5 px-4 w-[18%] text-xs font-semibold text-center">CATEGORY</th>
+                  <th className="py-2.5 px-4 w-[34%] text-xs font-semibold text-left">EXPENSE ITEM</th>
+                  <th className="py-2.5 px-4 w-[20%] text-xs font-semibold text-center">CATEGORY</th>
                   <th className="py-2.5 px-4 w-[18%] text-xs font-semibold text-left">PAID WITH</th>
-                  <th className="py-2.5 px-4 w-[12%] text-xs font-semibold text-left">DATE &amp; TIME</th>
+                  <th className="py-2.5 px-4 w-[14%] text-xs font-semibold text-left">DATE &amp; TIME</th>
                   <th className="py-2.5 px-4 w-[14%] text-xs font-semibold text-right">AMOUNT</th>
                 </tr>
               </thead>
@@ -870,7 +870,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                   sortedEntries.map((item, idx) => (
                     <tr key={`${item.id}-${idx}`} className="hover:bg-slate-50/80 transition-colors">
                       {/* Expense Item */}
-                      <td className="w-[38%] py-3.5 px-4">
+                      <td className="w-[34%] py-3.5 px-4">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200/60 flex items-center justify-center text-slate-700 shrink-0">
                             <span className="material-symbols-outlined text-base">{item.icon}</span>
@@ -886,10 +886,10 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                         </div>
                       </td>
 
-                      {/* Category Pill */}
-                      <td className="w-[18%] py-3.5 px-4 text-center">
+                      {/* Category Pill - Standardized equal width and center aligned */}
+                      <td className="w-[20%] py-3.5 px-4 text-center">
                         <span
-                          className={`inline-flex items-center justify-center text-center px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap shadow-2xs ${getCategoryPillClass(
+                          className={`inline-flex items-center justify-center text-center px-2.5 h-7 rounded-full text-xs font-semibold whitespace-nowrap w-[185px] shadow-2xs ${getCategoryPillClass(
                             item.category
                           )}`}
                         >
@@ -903,7 +903,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                       </td>
 
                       {/* Date & Time */}
-                      <td className="w-[12%] py-3.5 px-4 text-xs font-medium text-slate-600 truncate">
+                      <td className="w-[14%] py-3.5 px-4 text-xs font-medium text-slate-600 truncate">
                         <button
                           type="button"
                           onClick={() => onOpenDayLedger(item.dateKey || '2026-10-28')}

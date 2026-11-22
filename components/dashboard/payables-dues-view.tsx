@@ -429,7 +429,7 @@ export function PayablesDuesView() {
                         {/* Category */}
                         <td className="py-3.5 px-4 text-center">
                           <span
-                            className={`inline-flex items-center justify-center text-center px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap shadow-2xs ${getCategoryPill(
+                            className={`inline-flex items-center justify-center text-center px-2.5 h-7 rounded-full text-xs font-semibold whitespace-nowrap w-[170px] shadow-2xs ${getCategoryPill(
                               item.category
                             )}`}
                           >
@@ -494,12 +494,12 @@ export function PayablesDuesView() {
                         {/* Action */}
                         <td className="py-3.5 px-4 text-center">
                           {isPaid ? (
-                            <span className="text-[11px] font-semibold text-emerald-600">Paid</span>
+                            <span className="inline-flex items-center justify-center w-[96px] h-7 text-xs font-semibold text-emerald-600">Paid</span>
                           ) : item.actionLabel === 'Settle Now' || isUrgent ? (
                             <button
                               type="button"
                               onClick={() => handleSettle(item.id)}
-                              className="px-3 py-1 rounded-lg bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs shadow-2xs transition-colors cursor-pointer"
+                              className="w-[96px] h-7 rounded-lg bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs shadow-2xs transition-colors cursor-pointer inline-flex items-center justify-center"
                             >
                               Settle Now
                             </button>
@@ -507,7 +507,7 @@ export function PayablesDuesView() {
                             <button
                               type="button"
                               onClick={() => alert(`Reviewing automated ACH release for ${item.creditorName}`)}
-                              className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+                              className="w-[96px] h-7 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer inline-flex items-center justify-center"
                             >
                               Review ACH
                             </button>
@@ -515,9 +515,9 @@ export function PayablesDuesView() {
                             <button
                               type="button"
                               onClick={() => alert(`Managing payable for ${item.creditorName}`)}
-                              className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
+                              className="w-[96px] h-7 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer inline-flex items-center justify-center"
                             >
-                              Manage
+                              {item.actionLabel || 'Manage'}
                             </button>
                           )}
                         </td>
