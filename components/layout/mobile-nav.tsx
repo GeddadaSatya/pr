@@ -29,13 +29,7 @@ export function MobileNav({ activeTab, setActiveTab }: MobileNavProps) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       setActiveTab(tabId);
-      if (tabId === 'overview') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else if (tabId === 'expenses') {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else if (tabId === 'lending') {
-        document.getElementById('operational-hub-section')?.scrollIntoView({ behavior: 'smooth' });
-      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 

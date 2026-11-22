@@ -13,6 +13,7 @@ import { CategoryAnalytics } from '@/components/dashboard/category-analytics';
 import { ExpenseTable } from '@/components/dashboard/expense-table';
 import { PayablesLoansHub } from '@/components/dashboard/payables-loans-hub';
 import { PayablesDuesView } from '@/components/dashboard/payables-dues-view';
+import { LoansInterestView } from '@/components/dashboard/loans-interest-view';
 import { ExpenseNotebookView } from '@/components/dashboard/expense-notebook-view';
 import { DayLedgerView } from '@/components/dashboard/day-ledger-view';
 import { TransactionModal } from '@/components/modals/transaction-modal';
@@ -64,6 +65,8 @@ function DashboardContent() {
               />
             ) : activeTab === 'payables' ? (
               <PayablesDuesView />
+            ) : activeTab === 'lending' ? (
+              <LoansInterestView />
             ) : (
               <>
                 {/* Top Command Strip & Greeting */}
