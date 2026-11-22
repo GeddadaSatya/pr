@@ -8,6 +8,7 @@ import { AmountDisplay } from '@/components/ui/amount-display';
 interface RepaymentsLedgerViewProps {
   borrower: BorrowerLoan;
   onBackToProfile: () => void;
+  onBackToLoans?: () => void;
 }
 
 interface InstallmentRow {
@@ -33,7 +34,7 @@ interface AdvanceGroupData {
   installments: InstallmentRow[];
 }
 
-export function RepaymentsLedgerView({ borrower, onBackToProfile }: RepaymentsLedgerViewProps) {
+export function RepaymentsLedgerView({ borrower, onBackToProfile, onBackToLoans }: RepaymentsLedgerViewProps) {
   const { privacyMode } = useFinance();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'Completed' | 'Overdue' | 'Upcoming'>('all');
@@ -404,50 +405,74 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile }: RepaymentsLe
         </div>
       )}
 
-      {/* TOP BREADCRUMB & CONTEXT BANNER */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-slate-200/90 p-5 rounded-2xl shadow-2xs">
-        <div className="space-y-1">
-          <div className="flex items-center space-x-2 flex-wrap">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Portfolio Outstanding Audit
-            </span>
-            <span className="text-slate-300">•</span>
-            <div className="inline-flex items-center space-x-1.5 px-2 py-0.5 rounded bg-slate-100 text-slate-800">
-              <span className="text-xs font-semibold text-slate-800">{borrower.name}</span>
-              <span className="font-mono text-[11px] px-1.5 py-0.2 rounded bg-slate-200 text-slate-700 font-medium">
-                {borrower.borrowerId || 'PD-90803'}
-              </span>
-            </div>
-          </div>
+      {/* Breadcrumb Navigation (Unboxed) */}
+      <nav aria-label="Breadcrumb" className="flex items-center text-xs text-slate-500 space-x-2 flex-wrap">
+        <button
+          type="button"
+          onClick={onBackToLoans || onBackToProfile}
+          className="font-medium text-slate-500 hover:text-slate-900 transition-colors cursor-pointer flex items-center gap-1.5"
+          title="Return to Loans & Interest Ledger"
+        >
+          <span>Loans &amp; Interest Ledger</span>
+        </button>
 
-          <div className="flex flex-wrap items-center gap-3 pt-1">
-            <h1 className="font-serif text-2xl md:text-3xl text-slate-900 tracking-tight font-semibold">
-              Repayments Ledger &amp; Summary Breakdown
-            </h1>
-            <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-              <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span>2 Active Advances</span>
-              </span>
-              <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                <span>1 Closed Advance</span>
-              </span>
-            </div>
+        <span className="text-slate-300">/</span>
+
+        <button
+          type="button"
+          onClick={onBackToProfile}
+          className="font-medium text-slate-500 hover:text-slate-900 transition-colors cursor-pointer flex items-center gap-1"
+          title="Return to Borrower Dossier"
+        >
+          <span>Borrower Dossier</span>
+        </button>
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-slate-400"
+        >
+          <path d="m9 18 6-6-6-6" />
+        </svg>
+
+        <span className="font-medium text-slate-800 font-mono bg-slate-100 px-1.5 py-0.5 rounded text-[11px]">
+          {borrower.borrowerId || (borrower.id ? `PD-${borrower.id.slice(0, 5)}` : 'PD-90803')}
+        </span>
+
+        <span className="text-slate-300">/</span>
+
+        <span className="font-semibold text-slate-900">
+          Repayments Ledger
+        </span>
+      </nav>
+
+      {/* Header Title Row with Action Button (Unboxed) */}
+      <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="font-serif text-2xl md:text-3xl text-slate-900 tracking-tight font-semibold">
+            Repayments Ledger &amp; Summary Breakdown
+          </h1>
+          <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+            <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span>2 Active Advances</span>
+            </span>
+            <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+              <span>1 Closed Advance</span>
+            </span>
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center space-x-3 self-start md:self-center flex-wrap gap-y-2">
-          <button
-            type="button"
-            onClick={onBackToProfile}
-            className="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs transition shadow-2xs cursor-pointer"
-            title="Return to Customer Profile"
-          >
-            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
-            <span>Back to Profile</span>
-          </button>
+        {/* Action Button: Export Audit CSV */}
+        <div className="flex items-center space-x-3 shrink-0">
           <button
             type="button"
             onClick={handleExportCSV}
@@ -457,7 +482,7 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile }: RepaymentsLe
             <span>Export Audit CSV</span>
           </button>
         </div>
-      </div>
+      </section>
 
       {/* PORTFOLIO SUMMARY METRIC CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">

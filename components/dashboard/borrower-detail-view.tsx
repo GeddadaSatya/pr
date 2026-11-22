@@ -214,6 +214,7 @@ export function BorrowerDetailView({ borrower, onBack, onRecordPayment }: Borrow
           setShowLedgerView(false);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
+        onBackToLoans={onBack}
       />
     );
   }
