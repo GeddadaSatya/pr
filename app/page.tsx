@@ -12,6 +12,7 @@ import { DailyFlowKpi } from '@/components/dashboard/daily-flow-kpi';
 import { CategoryAnalytics } from '@/components/dashboard/category-analytics';
 import { ExpenseTable } from '@/components/dashboard/expense-table';
 import { PayablesLoansHub } from '@/components/dashboard/payables-loans-hub';
+import { PayablesDuesView } from '@/components/dashboard/payables-dues-view';
 import { ExpenseNotebookView } from '@/components/dashboard/expense-notebook-view';
 import { DayLedgerView } from '@/components/dashboard/day-ledger-view';
 import { TransactionModal } from '@/components/modals/transaction-modal';
@@ -60,6 +61,8 @@ function DashboardContent() {
                 previousTabTitle={previousTab === 'overview' ? 'Overview & Net Worth' : 'Expense Notebook'}
                 onDateChange={(dateKey) => setSelectedDateKey(dateKey)}
               />
+            ) : activeTab === 'payables' ? (
+              <PayablesDuesView />
             ) : (
               <>
                 {/* Top Command Strip & Greeting */}

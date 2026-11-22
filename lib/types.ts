@@ -36,6 +36,13 @@ export interface PayableItem {
   dueDate: string;
   urgencyBadge?: string;
   status: 'pending' | 'paid';
+  category?: string;
+  beneficiarySub?: string;
+  fullDueDate?: string;
+  dueDateUrgency?: string;
+  disbursementRoute?: string;
+  statusLabel?: string;
+  actionLabel?: string;
 }
 
 export interface LoanItem {

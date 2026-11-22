@@ -24,13 +24,18 @@ export function MobileNav({ activeTab, setActiveTab }: MobileNavProps) {
   };
 
   const handleTabClick = (tabId: string) => {
-    setActiveTab(tabId);
-    if (tabId === 'overview') {
+    if (tabId === 'dues' || tabId === 'payables') {
+      setActiveTab('payables');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (tabId === 'expenses') {
-      document.getElementById('notebook-expenses-card')?.scrollIntoView({ behavior: 'smooth' });
-    } else if (tabId === 'dues' || tabId === 'lending') {
-      document.getElementById('operational-hub-section')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      setActiveTab(tabId);
+      if (tabId === 'overview') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tabId === 'expenses') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (tabId === 'lending') {
+        document.getElementById('operational-hub-section')?.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -262,13 +267,13 @@ export function MobileNav({ activeTab, setActiveTab }: MobileNavProps) {
               <button
                 onClick={() => handleTabClick('dues')}
                 className={`flex flex-col items-center justify-center min-w-[56px] h-13 group relative cursor-pointer ${
-                  activeTab === 'dues' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
+                  activeTab === 'dues' || activeTab === 'payables' ? 'text-slate-900' : 'text-slate-500 hover:text-slate-800'
                 }`}
                 type="button"
               >
                 <span
                   className="material-symbols-outlined text-[22px] group-hover:scale-105 transition-transform"
-                  style={{ fontVariationSettings: activeTab === 'dues' ? "'FILL' 1" : "'FILL' 0" }}
+                  style={{ fontVariationSettings: activeTab === 'dues' || activeTab === 'payables' ? "'FILL' 1" : "'FILL' 0" }}
                 >
                   event_upcoming
                 </span>
@@ -277,7 +282,7 @@ export function MobileNav({ activeTab, setActiveTab }: MobileNavProps) {
                 </span>
                 <span
                   className={`w-1.5 h-1.5 rounded-full mt-0.5 transition-colors ${
-                    activeTab === 'dues' ? 'bg-[#735c00]' : 'bg-transparent'
+                    activeTab === 'dues' || activeTab === 'payables' ? 'bg-[#735c00]' : 'bg-transparent'
                   }`}
                 />
               </button>
