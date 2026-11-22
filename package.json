@@ -10,10 +10,10 @@
     "mobile:ios": "npx cap open ios",
     "start": "next start",
     "lint": "eslint",
-    "test": "playwright test",
-    "test:api": "playwright test --project=api",
-    "test:e2e": "playwright test --project=e2e-desktop",
-    "test:report": "playwright show-report"
+    "test": "playwright test --config=automation/playwright.config.ts",
+    "test:api": "playwright test --config=automation/playwright.config.ts --project=api",
+    "test:e2e": "playwright test --config=automation/playwright.config.ts --project=e2e-desktop",
+    "test:report": "playwright show-report automation/reports"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.2",

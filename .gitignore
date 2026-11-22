@@ -51,4 +51,6 @@ next-env.d.ts
 .playwright-mcp/
 /playwright-report/
 /test-results/
+/automation/reports/
+/automation/results/
 supabase/.temp/
