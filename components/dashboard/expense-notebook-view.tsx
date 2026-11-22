@@ -810,7 +810,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                             {/* Category pill */}
                             <td className="w-[18%] py-3 px-4 text-center">
                               <span
-                                className={`inline-block px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                                className={`inline-flex items-center justify-center text-center px-2.5 h-7 rounded-full text-xs font-medium whitespace-nowrap w-[185px] shadow-2xs ${
                                   item.category.includes('Travel')
                                     ? 'bg-amber-100/70 text-amber-900 border border-amber-200/60'
                                     : item.category.includes('Tech') || item.category.includes('Hardware')
