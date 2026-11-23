@@ -496,6 +496,93 @@ export function LoansInterestView() {
     showToast(`Payment status updated for ${name}`);
   };
 
+  // Helper: check if payment date is within T-1, T, T+1 or due window
+  const isPaymentDueWindow = (b: BorrowerLoan): boolean => {
+    if (b.status === 'paid' || b.receivedAmount >= b.totalReceivable) return false;
+    const text = (b.dueCountdownText || '').toLowerCase();
+    if (
+      text.includes('today') ||
+      text.includes('tomorrow') ||
+      text.includes('yesterday') ||
+      text.includes('extra time') ||
+      text.includes('overdue') ||
+      b.status === 'grace'
+    ) {
+      return true;
+    }
+    // Matches 1, 2, or 3 days (e.g. "3 Days Remaining", "Due in 3 Days", "1 Day")
+    if (/\b[123]\s*days?\b/i.test(text)) {
+      return true;
+    }
+    return false;
+  };
+
+  // Unified Action Buttons for both Card View and Table View
+  const renderActionButtons = (b: BorrowerLoan) => {
+    const isPaid = b.status === 'paid' || b.receivedAmount >= b.totalReceivable;
+    const isDueWindow = isPaymentDueWindow(b);
+
+    return (
+      <div className="flex items-center gap-2 self-start lg:self-center justify-start lg:justify-end shrink-0">
+        {/* 1. Eye Symbol Button (View Profile & Dossier) */}
+        <button
+          type="button"
+          onClick={() => {
+            setShowLedgerDirectly(false);
+            setSelectedBorrower(b);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          className="w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 text-emerald-700 flex items-center justify-center transition shadow-2xs cursor-pointer shrink-0"
+          title={`View ${b.name}'s Profile & Dossier`}
+        >
+          <span className="material-symbols-outlined text-base">visibility</span>
+        </button>
+
+        {/* 2. Conditional Action Button */}
+        {isPaid ? (
+          // Payments completed -> Show "View Payments"
+          <button
+            type="button"
+            onClick={() => {
+              setShowLedgerDirectly(true);
+              setSelectedBorrower(b);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0 whitespace-nowrap"
+            title={`View ${b.name}'s payments history`}
+          >
+            <span>View Payments</span>
+          </button>
+        ) : isDueWindow ? (
+          // Date is T, T-1, T+1 (Due Window) -> Show "Mark as Paid"
+          <button
+            type="button"
+            onClick={() => handleMarkAsPaid(b.id, b.name)}
+            className="px-3 py-1.5 rounded-lg bg-[#eed885] hover:bg-[#dec468] text-slate-950 font-bold text-xs flex items-center gap-1 shadow-2xs transition-all cursor-pointer shrink-0 whitespace-nowrap"
+            title={`Mark payment as completed for ${b.name}`}
+          >
+            <span className="material-symbols-outlined text-sm">check</span>
+            <span>Mark as Paid</span>
+          </button>
+        ) : (
+          // Future installment outside T-1..T+1 -> Show "View Payment"
+          <button
+            type="button"
+            onClick={() => {
+              setShowLedgerDirectly(true);
+              setSelectedBorrower(b);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0 whitespace-nowrap"
+            title={`View ${b.name}'s payment details`}
+          >
+            <span>View Payment</span>
+          </button>
+        )}
+      </div>
+    );
+  };
+
   // Handle Quick Partial Payment
   const handlePayPart = (id: string, name: string) => {
     recordLoanRepayment(id, 1000, 'UPI / Cash Handover');
@@ -1535,31 +1622,7 @@ export function LoansInterestView() {
 
                     {/* Actions */}
                     <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => handlePayPart(b.id, b.name)}
-                          className="h-7.5 px-2.5 rounded-lg bg-[#f8fafc] border border-slate-200 text-[#0f172a] hover:bg-[#0f172a] hover:text-white transition-all flex items-center gap-1 text-[11px] font-semibold cursor-pointer shadow-2xs"
-                          title="Record Received Payment"
-                        >
-                          <span className="material-symbols-outlined text-xs text-[#9a761e]">receipt_long</span>
-                          <span>+ Payment</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleMarkAsPaid(b.id, b.name)}
-                          className={`w-7.5 h-7.5 rounded-lg border flex items-center justify-center transition-all cursor-pointer ${
-                            b.status === 'paid'
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                              : 'bg-white text-slate-600 border-slate-200 hover:text-slate-900'
-                          }`}
-                          title="Toggle Fully Paid"
-                        >
-                          <span className="material-symbols-outlined text-sm">
-                            {b.status === 'paid' ? 'check_circle' : 'task_alt'}
-                          </span>
-                        </button>
-                      </div>
+                      {renderActionButtons(b)}
                     </td>
                   </tr>
                 ))}
@@ -1576,7 +1639,7 @@ export function LoansInterestView() {
                 key={b.id}
                 className="bg-white rounded-2xl border border-slate-200 p-4 md:p-5 shadow-2xs hover:border-[#d4af37]/40 transition-all flex flex-col gap-3.5"
               >
-                <div className="grid grid-cols-1 lg:grid-cols-[minmax(220px,1.5fr)_minmax(200px,1.1fr)_minmax(180px,1fr)_155px] items-center gap-4 lg:gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-[minmax(220px,1.5fr)_minmax(200px,1.1fr)_minmax(180px,1fr)_165px] items-center gap-4 lg:gap-6">
                   {/* Left: Avatar + Details */}
                   <div
                     onClick={() => setSelectedBorrower(b)}
@@ -1653,40 +1716,8 @@ export function LoansInterestView() {
                     </div>
                   </div>
 
-                  {/* Right Actions: Eye symbol (View Dossier) & View Payment/s */}
-                  <div className="flex items-center gap-2 self-start lg:self-center justify-start lg:justify-end shrink-0">
-                    {/* Eye Symbol Button (like Image 2) */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowLedgerDirectly(false);
-                        setSelectedBorrower(b);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className="w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 text-emerald-700 flex items-center justify-center transition shadow-2xs cursor-pointer shrink-0"
-                      title={`View ${b.name}'s Profile & Dossier`}
-                    >
-                      <span className="material-symbols-outlined text-base">visibility</span>
-                    </button>
-
-                    {/* View Payment (if due) / View Payments (if paid) (styled like Image 3) */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowLedgerDirectly(true);
-                        setSelectedBorrower(b);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className="px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0 whitespace-nowrap"
-                      title={`View ${b.name}'s ${b.status === 'paid' || b.receivedAmount >= b.totalReceivable ? 'payments history' : 'payment details'}`}
-                    >
-                      <span>
-                        {b.status === 'paid' || b.receivedAmount >= b.totalReceivable
-                          ? 'View Payments'
-                          : 'View Payment'}
-                      </span>
-                    </button>
-                  </div>
+                  {/* Right Actions: Eye symbol (View Dossier) & View Payment/s / Mark as Paid */}
+                  {renderActionButtons(b)}
                 </div>
               </div>
             ))}
