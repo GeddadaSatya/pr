@@ -1576,11 +1576,11 @@ export function LoansInterestView() {
                 key={b.id}
                 className="bg-white rounded-2xl border border-slate-200 p-4 md:p-5 shadow-2xs hover:border-[#d4af37]/40 transition-all flex flex-col gap-3.5"
               >
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-[minmax(220px,1.5fr)_minmax(200px,1.1fr)_minmax(180px,1fr)_155px] items-center gap-4 lg:gap-6">
                   {/* Left: Avatar + Details */}
                   <div
                     onClick={() => setSelectedBorrower(b)}
-                    className="flex items-start gap-3.5 cursor-pointer group"
+                    className="flex items-start gap-3.5 cursor-pointer group min-w-0"
                     title={`Click to view ${b.name}'s Dossier & Profile`}
                   >
                     <div className="relative shrink-0">
@@ -1596,7 +1596,7 @@ export function LoansInterestView() {
                       )}
                     </div>
 
-                    <div className="flex flex-col">
+                    <div className="flex flex-col min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-bold text-[#0f172a] text-sm md:text-base leading-snug group-hover:text-[#9a761e] transition-colors flex items-center gap-1">
                           <span>{b.name}</span>
@@ -1605,7 +1605,7 @@ export function LoansInterestView() {
                           </span>
                         </span>
                       </div>
-                      <span className="text-xs text-[#76777d] mt-0.5">{b.contactOrNote}</span>
+                      <span className="text-xs text-[#76777d] mt-0.5 truncate">{b.contactOrNote}</span>
                       <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                         {b.contractType && (
                           <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 text-[#45464d] border border-slate-200">
@@ -1622,9 +1622,9 @@ export function LoansInterestView() {
                   </div>
 
                   {/* Middle Left: Balance Due Progress */}
-                  <div className="flex flex-col min-w-[190px]">
-                    <div className="flex items-baseline gap-1.5 flex-wrap">
-                      <span className="text-[10px] text-[#76777d] uppercase font-semibold">BALANCE DUE</span>
+                  <div className="flex flex-col w-full">
+                    <div className="flex items-baseline gap-1.5 whitespace-nowrap">
+                      <span className="text-[10px] text-[#76777d] uppercase font-semibold shrink-0">BALANCE DUE</span>
                       <AmountDisplay amount={b.nextDueAmount} privacyMode={privacyMode} size="base" />
                       <span className="text-xs text-[#76777d] inline-flex items-baseline gap-1">
                         <span>/</span>
@@ -1637,16 +1637,16 @@ export function LoansInterestView() {
                         style={{ width: `${b.progressPercent}%` }}
                       />
                     </div>
-                    <div className="flex justify-between items-center text-[11px] text-[#76777d] flex-wrap gap-1">
+                    <div className="flex justify-between items-center text-[11px] text-[#76777d] whitespace-nowrap gap-1">
                       <AmountDisplay amount={b.receivedAmount} privacyMode={privacyMode} size="xs" suffix="Paid to date" />
                       <span className="font-semibold text-[#0f172a]">{b.progressPercent}% cleared</span>
                     </div>
                   </div>
 
                   {/* Middle Right: Strict Due Date */}
-                  <div className="flex flex-col text-xs text-[#45464d] min-w-[180px]">
+                  <div className="flex flex-col text-xs text-[#45464d] w-full">
                     <span className="text-[10px] uppercase font-semibold text-[#76777d]">STRICT DUE DATE</span>
-                    <div className="flex items-center gap-1 font-semibold text-[#0f172a] mt-0.5">
+                    <div className="flex items-center gap-1 font-semibold text-[#0f172a] mt-0.5 whitespace-nowrap">
                       <span className="material-symbols-outlined text-sm text-[#9a761e]">calendar_today</span>
                       <span>{b.nextDueDate}</span>
                       <span className="text-[11px] font-normal text-[#76777d]">({b.dueCountdownText})</span>
@@ -1654,7 +1654,7 @@ export function LoansInterestView() {
                   </div>
 
                   {/* Right Actions: Eye symbol (View Dossier) & View Payment/s */}
-                  <div className="flex items-center gap-2 self-start lg:self-center">
+                  <div className="flex items-center gap-2 self-start lg:self-center justify-start lg:justify-end shrink-0">
                     {/* Eye Symbol Button (like Image 2) */}
                     <button
                       type="button"
@@ -1663,7 +1663,7 @@ export function LoansInterestView() {
                         setSelectedBorrower(b);
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 text-emerald-700 flex items-center justify-center transition shadow-2xs cursor-pointer"
+                      className="w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/60 text-emerald-700 flex items-center justify-center transition shadow-2xs cursor-pointer shrink-0"
                       title={`View ${b.name}'s Profile & Dossier`}
                     >
                       <span className="material-symbols-outlined text-base">visibility</span>
@@ -1677,7 +1677,7 @@ export function LoansInterestView() {
                         setSelectedBorrower(b);
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className="px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
+                      className="px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold shadow-2xs transition-all cursor-pointer shrink-0 whitespace-nowrap"
                       title={`View ${b.name}'s ${b.status === 'paid' || b.receivedAmount >= b.totalReceivable ? 'payments history' : 'payment details'}`}
                     >
                       <span>
