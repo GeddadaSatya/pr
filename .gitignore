@@ -51,8 +51,8 @@ next-env.d.ts
 .playwright-mcp/
 /playwright-report/
 /test-results/
-/automation/reports/
-/automation/results/
+playwright.config.ts
+/automation/
 supabase/.temp/
 
 # Temporary test screenshots & showcase files
