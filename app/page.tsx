@@ -17,6 +17,7 @@ import { LoansInterestView } from '@/components/dashboard/loans-interest-view';
 import { ExpenseNotebookView } from '@/components/dashboard/expense-notebook-view';
 import { DayLedgerView } from '@/components/dashboard/day-ledger-view';
 import { AssetsHoldingsView } from '@/components/dashboard/assets-holdings-view';
+import { VersionTrackingView } from '@/components/dashboard/version-tracking-view';
 import { TransactionModal } from '@/components/modals/transaction-modal';
 import { AuthModal } from '@/components/modals/auth-modal';
 import { PrivacyUnlockModal } from '@/components/modals/privacy-unlock-modal';
@@ -96,6 +97,8 @@ function DashboardContent() {
               <LoansInterestView />
             ) : activeTab === 'assets' ? (
               <AssetsHoldingsView />
+            ) : activeTab === 'release-notes' || activeTab === 'version-tracking' ? (
+              <VersionTrackingView />
             ) : (
               <>
                 {/* Top Command Strip & Greeting */}

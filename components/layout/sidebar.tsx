@@ -9,7 +9,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
-  const { privacyMode, togglePrivacyMode, openModal, isCollapsed, toggleSidebar } = useFinance();
+  const { privacyMode, togglePrivacyMode, openModal, isCollapsed, toggleSidebar, signOut } = useFinance();
 
   const navItems = [
     { id: 'overview', label: 'Overview & Net Worth', icon: 'insights' },
@@ -202,8 +202,9 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
         </nav>
       </div>
 
-      {/* Footer Controls: Privacy Mode & Version */}
+      {/* Footer Controls: Privacy Mode, Log Out & Version */}
       <div className={`pt-4 flex flex-col gap-2.5 overflow-hidden w-full ${isCollapsed ? 'px-0 items-center' : 'px-3'}`}>
+        {/* Privacy Mode Card */}
         <div
           className={`rounded-xl bg-slate-50 border border-slate-200/80 flex items-center transition-all duration-300 overflow-hidden ${
             isCollapsed ? 'w-10 h-10 p-0 justify-center' : 'p-3 justify-between'
@@ -238,10 +239,48 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
           </button>
         </div>
 
-        <div className="text-center overflow-hidden whitespace-nowrap transition-all duration-300">
-          <span className="text-[11px] text-slate-400 font-medium">
-            {isCollapsed ? 'v2.4' : 'v2.4 FinTech Suite'}
+        {/* Log Out Button (Positioned below Privacy Mode and on top of Versions) */}
+        <button
+          onClick={signOut}
+          type="button"
+          title="Sign Out / Log Out"
+          className={`h-9.5 rounded-xl flex items-center border border-slate-200 bg-white hover:bg-rose-50 hover:border-rose-200 text-slate-600 hover:text-rose-700 transition-all duration-200 shadow-2xs cursor-pointer overflow-hidden whitespace-nowrap group ${
+            isCollapsed ? 'w-10 justify-center px-0' : 'w-full justify-start px-3 gap-2'
+          }`}
+        >
+          <span className="material-symbols-outlined text-base group-hover:text-rose-600 transition-colors shrink-0">
+            logout
           </span>
+          <span
+            className={`text-xs font-semibold tracking-wide transition-all duration-300 ${
+              isCollapsed
+                ? 'opacity-0 max-w-0 -translate-x-2 pointer-events-none'
+                : 'opacity-100 max-w-[120px] translate-x-0'
+            }`}
+          >
+            Log Out
+          </span>
+        </button>
+
+        {/* Version Badge & "What's new" Release Tracking Link */}
+        <div className="flex flex-col items-center justify-center overflow-hidden whitespace-nowrap transition-all duration-300 pb-1 pt-0.5">
+          <button
+            type="button"
+            onClick={() => setActiveTab('release-notes')}
+            className="group flex flex-col items-center hover:opacity-90 transition-all cursor-pointer text-center"
+            title="View Release Notes & Version Tracking"
+          >
+            <span className="text-[11px] text-slate-500 font-semibold group-hover:text-[#9a761e] transition-colors flex items-center gap-1.5">
+              <span>{isCollapsed ? 'v2.4.1' : 'v2.4.1 FinTech Suite'}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            </span>
+            {!isCollapsed && (
+              <span className="text-[10px] text-[#9a761e] hover:underline font-semibold mt-0.5 flex items-center gap-0.5">
+                <span>What&apos;s new in this version</span>
+                <span className="material-symbols-outlined text-[12px]">chevron_right</span>
+              </span>
+            )}
+          </button>
         </div>
       </div>
     </aside>

@@ -62,6 +62,7 @@ interface FinanceContextType {
   notifications: NotificationItem[];
   userProfile: UserProfile;
   unreadNotificationsCount: number;
+  signOut: () => Promise<void>;
 
   // Active navigation
   activeTab: string;
@@ -1198,6 +1199,22 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     saveLocal('wt_notifications', INITIAL_NOTIFICATIONS);
   };
 
+  const signOut = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch {}
+    document.cookie = 'sovereign_demo_session=; path=/; max-age=0; SameSite=Lax';
+    try {
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('wt_') || key.startsWith('sovereign_')) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch {}
+    window.location.href = '/login';
+  };
+
   return (
     <FinanceContext.Provider
       value={{
@@ -1210,6 +1227,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         notifications,
         userProfile,
         unreadNotificationsCount,
+        signOut,
 
         activeTab,
         setActiveTab,
