@@ -78,6 +78,7 @@ interface FinanceContextType {
   privacyPin: string;
   setPrivacyPin: (pin: string) => void;
   verifyPrivacyPin: (pin: string) => Promise<boolean>;
+  verifyAccountPassword: (password: string) => Promise<boolean>;
 
   // Transaction Modal
   isModalOpen: boolean;
@@ -434,6 +435,34 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     }
 
     // 3. Default: Verify against the user's real account password via Supabase Auth
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      const userEmail = user?.email || userProfile.email;
+      if (userEmail) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: userEmail,
+          password: trimmed,
+        });
+        if (!error) {
+          return true;
+        }
+      }
+    } catch {}
+
+    return false;
+  };
+
+  const verifyAccountPassword = async (accountPassword: string): Promise<boolean> => {
+    const trimmed = accountPassword.trim();
+    if (!trimmed) return false;
+
+    // Demo mode session: accept demo password 'demo'
+    const isDemo = typeof document !== 'undefined' && document.cookie.includes('sovereign_demo_session=true');
+    if (isDemo && trimmed.toLowerCase() === 'demo') {
+      return true;
+    }
+
     try {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
@@ -1114,6 +1143,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         privacyPin,
         setPrivacyPin,
         verifyPrivacyPin,
+        verifyAccountPassword,
 
         isModalOpen,
         modalType,
