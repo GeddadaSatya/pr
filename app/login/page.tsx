@@ -26,6 +26,7 @@ export function UnifiedAuthContainer({ defaultMode = 'login' }: { defaultMode?: 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Status & Feedback
   const [loading, setLoading] = useState(false);
@@ -127,6 +128,8 @@ export function UnifiedAuthContainer({ defaultMode = 'login' }: { defaultMode?: 
     setSuccessMessage(null);
     setForgotSubmitted(false);
     setRegisterSubmitted(false);
+    setShowPassword(false);
+    setShowConfirmPassword(false);
     if (typeof window !== 'undefined') {
       const newHash = newMode === 'login' ? '' : `#${newMode}`;
       window.history.replaceState(null, '', window.location.pathname + newHash);
@@ -823,29 +826,67 @@ export function UnifiedAuthContainer({ defaultMode = 'login' }: { defaultMode?: 
                           <label className="block text-[11px] font-bold tracking-wider text-slate-700 uppercase mb-1" htmlFor="reg-pass-input">
                             Password <span className="text-amber-600">*</span>
                           </label>
-                          <input
-                            className="block w-full rounded-lg border border-slate-200 bg-white py-1.5 px-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition"
-                            id="reg-pass-input"
-                            placeholder="Min 6 chars"
-                            required
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                          />
+                          <div className="relative rounded-lg">
+                            <input
+                              className="block w-full rounded-lg border border-slate-200 bg-white py-1.5 pl-3 pr-8 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition"
+                              id="reg-pass-input"
+                              placeholder="Min 6 chars"
+                              required
+                              type={showPassword ? 'text' : 'password'}
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                            />
+                            <button
+                              aria-label="Toggle password visibility"
+                              className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? (
+                                <svg className="h-4 w-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                                </svg>
+                              ) : (
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+                                  <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+                                </svg>
+                              )}
+                            </button>
+                          </div>
                         </div>
                         <div>
                           <label className="block text-[11px] font-bold tracking-wider text-slate-700 uppercase mb-1" htmlFor="reg-confirm-input">
                             Confirm <span className="text-amber-600">*</span>
                           </label>
-                          <input
-                            className="block w-full rounded-lg border border-slate-200 bg-white py-1.5 px-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition"
-                            id="reg-confirm-input"
-                            placeholder="Repeat"
-                            required
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                          />
+                          <div className="relative rounded-lg">
+                            <input
+                              className="block w-full rounded-lg border border-slate-200 bg-white py-1.5 pl-3 pr-8 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition"
+                              id="reg-confirm-input"
+                              placeholder="Repeat"
+                              required
+                              type={showConfirmPassword ? 'text' : 'password'}
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                            />
+                            <button
+                              aria-label="Toggle confirm password visibility"
+                              className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                              type="button"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            >
+                              {showConfirmPassword ? (
+                                <svg className="h-4 w-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                                </svg>
+                              ) : (
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+                                  <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+                                </svg>
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </div>
 
@@ -881,30 +922,68 @@ export function UnifiedAuthContainer({ defaultMode = 'login' }: { defaultMode?: 
                       <label className="block text-[11px] font-bold tracking-wider text-slate-700 uppercase mb-1.5" htmlFor="invite-password">
                         New Security Password <span className="text-amber-600">*</span>
                       </label>
-                      <input
-                        className="block w-full rounded-lg border border-slate-200 bg-white py-2 px-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition"
-                        id="invite-password"
-                        placeholder="Minimum 6 characters"
-                        required
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
+                      <div className="relative rounded-lg">
+                        <input
+                          className="block w-full rounded-lg border border-slate-200 bg-white py-2 pl-3 pr-9 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition"
+                          id="invite-password"
+                          placeholder="Minimum 6 characters"
+                          required
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <button
+                          aria-label="Toggle password visibility"
+                          className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <svg className="h-4 w-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                            </svg>
+                          ) : (
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+                              <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     <div>
                       <label className="block text-[11px] font-bold tracking-wider text-slate-700 uppercase mb-1.5" htmlFor="invite-confirm">
                         Confirm New Password <span className="text-amber-600">*</span>
                       </label>
-                      <input
-                        className="block w-full rounded-lg border border-slate-200 bg-white py-2 px-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition"
-                        id="invite-confirm"
-                        placeholder="Repeat password"
-                        required
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                      />
+                      <div className="relative rounded-lg">
+                        <input
+                          className="block w-full rounded-lg border border-slate-200 bg-white py-2 pl-3 pr-9 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition"
+                          id="invite-confirm"
+                          placeholder="Repeat password"
+                          required
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
+                        <button
+                          aria-label="Toggle confirm password visibility"
+                          className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                          {showConfirmPassword ? (
+                            <svg className="h-4 w-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                            </svg>
+                          ) : (
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+                              <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="pt-1">
@@ -938,30 +1017,68 @@ export function UnifiedAuthContainer({ defaultMode = 'login' }: { defaultMode?: 
                       <label className="block text-[11px] font-bold tracking-wider text-slate-700 uppercase mb-1.5" htmlFor="reset-password">
                         New Security Password <span className="text-amber-600">*</span>
                       </label>
-                      <input
-                        className="block w-full rounded-lg border border-slate-200 bg-white py-2 px-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition"
-                        id="reset-password"
-                        placeholder="Minimum 6 characters"
-                        required
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                      />
+                      <div className="relative rounded-lg">
+                        <input
+                          className="block w-full rounded-lg border border-slate-200 bg-white py-2 pl-3 pr-9 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition"
+                          id="reset-password"
+                          placeholder="Minimum 6 characters"
+                          required
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <button
+                          aria-label="Toggle password visibility"
+                          className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <svg className="h-4 w-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                            </svg>
+                          ) : (
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+                              <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     <div>
                       <label className="block text-[11px] font-bold tracking-wider text-slate-700 uppercase mb-1.5" htmlFor="reset-confirm">
                         Confirm New Password <span className="text-amber-600">*</span>
                       </label>
-                      <input
-                        className="block w-full rounded-lg border border-slate-200 bg-white py-2 px-3 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition"
-                        id="reset-confirm"
-                        placeholder="Repeat new password"
-                        required
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                      />
+                      <div className="relative rounded-lg">
+                        <input
+                          className="block w-full rounded-lg border border-slate-200 bg-white py-2 pl-3 pr-9 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] transition"
+                          id="reset-confirm"
+                          placeholder="Repeat new password"
+                          required
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
+                        <button
+                          aria-label="Toggle confirm password visibility"
+                          className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer"
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                          {showConfirmPassword ? (
+                            <svg className="h-4 w-4 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                            </svg>
+                          ) : (
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+                              <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="pt-1">
