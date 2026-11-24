@@ -5,7 +5,7 @@ export async function GET() {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     service: 'PR ExpenseTracker & Sovereign Wealth Engine',
-    version: '1.0.0',
+    version: '2.4.1',
     database: 'supabase-ready',
   });
 }

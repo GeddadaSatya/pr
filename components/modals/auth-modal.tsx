@@ -151,7 +151,7 @@ export function AuthModal() {
             <span className="material-symbols-outlined text-base">logout</span>
             <span>Sign Out</span>
           </button>
-          <span className="text-[11px] text-slate-400">Personal Tracker v1.0</span>
+          <span className="text-[11px] text-slate-400">Personal Tracker v2.4.1</span>
         </div>
       </div>
     </div>
