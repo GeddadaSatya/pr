@@ -1,37 +1,31 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { CATEGORIES_DATA } from '@/lib/mock-data';
 import { formatCurrency } from '@/lib/utils';
+import {
+  DateFilterDropdown,
+  DateFilterValue,
+  matchesDateFilter,
+} from '@/components/ui/date-filter-dropdown';
 
 export function CategoryAnalytics() {
   const { expenses, privacyMode, openModal } = useFinance();
-  const [selectedFilter, setSelectedFilter] = useState('Month (October)');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isCustomCalendarOpen, setIsCustomCalendarOpen] = useState(false);
-  const filterRef = useRef<HTMLDivElement>(null);
+  const [dateFilter, setDateFilter] = useState<DateFilterValue>({ type: 'all' });
 
-  const filterOptions = ['Last Day', 'Last Week', 'Month (October)'];
+  // Filter expenses based on active date selection
+  const filteredExpenses = useMemo(() => {
+    return expenses.filter((exp) => matchesDateFilter(exp.dateKey || exp.dateTime, dateFilter));
+  }, [expenses, dateFilter]);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-        setIsCustomCalendarOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const totalSpent = filteredExpenses.reduce((acc, exp) => acc + exp.amount, 0);
 
-  const totalSpent = expenses.reduce((acc, exp) => acc + exp.amount, 0);
-
-  // Dynamically calculate category stats from live expenses
+  // Dynamically calculate category stats from live filtered expenses
   const dynamicCategories = React.useMemo(() => {
-    if (!expenses || expenses.length === 0) return CATEGORIES_DATA;
+    if (!filteredExpenses || filteredExpenses.length === 0) return [];
     const catMap: Record<string, number> = {};
-    for (const exp of expenses) {
+    for (const exp of filteredExpenses) {
       const cat = exp.category || 'General';
       catMap[cat] = (catMap[cat] || 0) + exp.amount;
     }
@@ -134,35 +128,8 @@ export function CategoryAnalytics() {
                 <span className="font-label-caps text-[11px] uppercase text-slate-400 font-bold">Monthly Allocation</span>
                 <span className="font-title-md text-base text-slate-900 font-semibold">Spending Breakdown</span>
               </div>
-              <button
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="text-slate-500 hover:text-slate-900 p-1 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
-                type="button"
-                title="Filter by Period"
-              >
-                <span className="material-symbols-outlined text-xl">filter_alt</span>
-              </button>
+              <DateFilterDropdown value={dateFilter} onChange={setDateFilter} align="right" size="sm" />
             </div>
-
-            {/* Dropdown Options for Mobile */}
-            {isDropdownOpen && (
-              <div className="w-full bg-slate-50 border border-slate-200 rounded-lg p-1.5 flex flex-col gap-1">
-                {filterOptions.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => {
-                      setSelectedFilter(opt);
-                      setIsDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-1.5 rounded text-xs font-semibold ${
-                      selectedFilter === opt ? 'bg-[#fef9e7] text-amber-950 font-bold' : 'text-slate-700 hover:bg-white'
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            )}
 
             {/* Donut Visualization & Center Metric */}
             <div className="flex items-center justify-center py-2">
@@ -389,130 +356,13 @@ export function CategoryAnalytics() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 relative" ref={filterRef}>
+              <div className="flex flex-wrap items-center gap-2 relative">
                 <span className="px-2.5 py-1 rounded-full bg-[#fef9e7] text-[#b48e28] border border-[#d4af37]/30 text-xs font-semibold">
                   {dynamicCategories.length} Active {dynamicCategories.length === 1 ? 'Category' : 'Categories'}
                 </span>
 
-                <div className="relative inline-block text-left">
-                  <button
-                    onClick={() => {
-                      setIsCustomCalendarOpen(false);
-                      setIsDropdownOpen(!isDropdownOpen);
-                    }}
-                    className="h-9 px-3 rounded-lg border border-slate-200 bg-white hover:border-[#d4af37] text-slate-700 text-xs font-semibold flex items-center gap-2 shadow-xs transition-colors cursor-pointer"
-                    type="button"
-                  >
-                    <span className="material-symbols-outlined text-base text-slate-500">calendar_today</span>
-                    <span>{selectedFilter}</span>
-                    <span className="material-symbols-outlined text-sm text-slate-400">expand_more</span>
-                  </button>
-
-                  {/* Dropdown Options */}
-                  {isDropdownOpen && (
-                    <div className="absolute right-0 top-full mt-1.5 w-44 bg-white border border-slate-200 rounded-xl shadow-xl py-1 z-50">
-                      {filterOptions.map((opt) => (
-                        <button
-                          key={opt}
-                          onClick={() => {
-                            setSelectedFilter(opt);
-                            setIsDropdownOpen(false);
-                          }}
-                          className={`w-full text-left px-3 py-2 text-xs font-medium cursor-pointer ${
-                            selectedFilter === opt
-                              ? 'bg-[#fef9e7] text-[#b48e28] font-bold'
-                              : 'text-slate-700 hover:bg-slate-50'
-                          }`}
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                      <div className="border-t border-slate-100 my-1"></div>
-                      <button
-                        onClick={() => {
-                          setIsDropdownOpen(false);
-                          setIsCustomCalendarOpen(true);
-                        }}
-                        className="w-full text-left px-3 py-2 text-xs text-blue-700 font-semibold flex items-center justify-between hover:bg-slate-50 cursor-pointer"
-                      >
-                        <span>Custom Range</span>
-                        <span className="material-symbols-outlined text-sm">date_range</span>
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Custom 2-Month Calendar Popover */}
-                  {isCustomCalendarOpen && (
-                    <div className="absolute right-0 top-full mt-2 bg-white border border-slate-200 rounded-xl shadow-2xl p-4 z-50 w-[340px] sm:w-[580px]">
-                      <div className="flex flex-col sm:flex-row gap-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-                        {/* Month 1: October */}
-                        <div className="flex-1 sm:pr-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-semibold text-xs text-slate-900">October 2026</span>
-                          </div>
-                          <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold text-slate-400 mb-1">
-                            <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
-                          </div>
-                          <div className="grid grid-cols-7 gap-1 text-center text-xs text-slate-700">
-                            {[...Array(4)].map((_, i) => (
-                              <div key={`empty-${i}`} className="py-1 text-slate-300">{27 + i}</div>
-                            ))}
-                            {[...Array(31)].map((_, i) => (
-                              <button
-                                key={`oct-${i + 1}`}
-                                className={`py-1 rounded-full hover:bg-slate-100 transition-colors ${
-                                  i + 1 >= 15 && i + 1 <= 28 ? 'bg-blue-50 text-blue-700 font-semibold' : ''
-                                }`}
-                              >
-                                {i + 1}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Month 2: November */}
-                        <div className="flex-1 pt-3 sm:pt-0 sm:pl-4">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-semibold text-xs text-slate-900">November 2026</span>
-                          </div>
-                          <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-semibold text-slate-400 mb-1">
-                            <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
-                          </div>
-                          <div className="grid grid-cols-7 gap-1 text-center text-xs text-slate-700">
-                            {[...Array(30)].map((_, i) => (
-                              <button
-                                key={`nov-${i + 1}`}
-                                className={`py-1 rounded-full hover:bg-slate-100 transition-colors ${
-                                  i + 1 === 16 ? 'bg-blue-600 text-white font-bold' : ''
-                                }`}
-                              >
-                                {i + 1}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 mt-4">
-                        <button
-                          onClick={() => setIsCustomCalendarOpen(false)}
-                          className="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold cursor-pointer"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSelectedFilter('Oct 15 - Nov 16');
-                            setIsCustomCalendarOpen(false);
-                          }}
-                          className="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs cursor-pointer"
-                        >
-                          Apply Range
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                {/* Universal Date Filter Dropdown with 7 Presets, Single Date, & Date Range */}
+                <DateFilterDropdown value={dateFilter} onChange={setDateFilter} align="right" />
               </div>
             </div>
 

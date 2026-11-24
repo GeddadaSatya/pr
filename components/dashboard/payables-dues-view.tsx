@@ -5,11 +5,16 @@ import { useFinance } from '@/components/context/finance-context';
 import { PayableItem } from '@/lib/types';
 import { AmountDisplay } from '@/components/ui/amount-display';
 import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
+import {
+  DateFilterDropdown,
+  DateFilterValue,
+  matchesDateFilter,
+} from '@/components/ui/date-filter-dropdown';
 
 export function PayablesDuesView() {
   const { payables, settlePayable, deletePayable, privacyMode, openModal } = useFinance();
   const [activeLedgerTab, setActiveLedgerTab] = useState<'all' | 'paid'>('all');
-  const [selectedMonth, setSelectedMonth] = useState('October');
+  const [dateFilter, setDateFilter] = useState<DateFilterValue>({ type: 'all' });
   const [pageSize, setPageSize] = useState('10');
   const [settleModalItem, setSettleModalItem] = useState<PayableItem | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -26,8 +31,8 @@ export function PayablesDuesView() {
     showToast(`Successfully settled ₹${item.amount.toLocaleString('en-IN')} to ${item.creditorName}`);
   };
 
-  const pendingPayables = payables.filter((p) => p.status === 'pending');
-  const settledPayables = payables.filter((p) => p.status === 'paid');
+  const pendingPayables = payables.filter((p) => p.status === 'pending' && matchesDateFilter(p.dueDate || p.fullDueDate, dateFilter));
+  const settledPayables = payables.filter((p) => p.status === 'paid' && matchesDateFilter(p.settledAt || p.dueDate, dateFilter));
   const displayedPayables = activeLedgerTab === 'all' ? pendingPayables : settledPayables;
 
   const totalOutstanding = pendingPayables.reduce((sum, p) => sum + p.amount, 0);
@@ -240,21 +245,8 @@ export function PayablesDuesView() {
           </div>
 
           <div className="flex items-center gap-2 self-start sm:self-auto">
-            {/* Month Dropdown */}
-            <div className="relative">
-              <select
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="h-9 pl-3 pr-7 text-xs font-semibold rounded-xl border border-slate-200 bg-white text-slate-700 hover:border-[#d4af37] focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all cursor-pointer shadow-2xs appearance-none"
-              >
-                <option value="October">Month (October)</option>
-                <option value="November">Month (November)</option>
-                <option value="All">All Months</option>
-              </select>
-              <span className="material-symbols-outlined absolute right-2 top-2 text-slate-400 text-sm pointer-events-none">
-                expand_more
-              </span>
-            </div>
+            {/* Universal Date Filter Dropdown with 7 Presets, Single Date, & Date Range */}
+            <DateFilterDropdown value={dateFilter} onChange={setDateFilter} />
 
             {/* Add Bill Standardized Gold Button */}
             <button
@@ -375,21 +367,8 @@ export function PayablesDuesView() {
               </button>
             </div>
 
-            {/* Month Filter */}
-            <div className="relative">
-              <select
-                value={selectedMonth}
-                onChange={(e) => setSelectedMonth(e.target.value)}
-                className="h-8.5 pl-2.5 pr-7 text-xs font-semibold rounded-lg border border-slate-200 bg-white text-slate-700 hover:border-[#d4af37] focus:outline-none focus:ring-1 focus:ring-[#d4af37] transition-all cursor-pointer shadow-2xs appearance-none"
-              >
-                <option value="October">Month (October)</option>
-                <option value="November">Month (November)</option>
-                <option value="All">All Months</option>
-              </select>
-              <span className="material-symbols-outlined absolute right-1.5 top-1.5 text-slate-400 text-sm pointer-events-none">
-                expand_more
-              </span>
-            </div>
+            {/* Date Filter */}
+            <DateFilterDropdown value={dateFilter} onChange={setDateFilter} size="sm" />
           </div>
         </div>
 

@@ -5,6 +5,11 @@ import { useFinance } from '@/components/context/finance-context';
 import { BorrowerDetailView } from './borrower-detail-view';
 import { AmountDisplay } from '@/components/ui/amount-display';
 import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
+import {
+  DateFilterDropdown,
+  DateFilterValue,
+  matchesDateFilter,
+} from '@/components/ui/date-filter-dropdown';
 
 export interface BorrowerLoan {
   id: string;
@@ -62,6 +67,7 @@ export function LoansInterestView() {
   // Filter & Search states
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'grace'>('all');
+  const [dateFilter, setDateFilter] = useState<DateFilterValue>({ type: 'all' });
 
   // New Loan Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -278,9 +284,11 @@ export function LoansInterestView() {
       const matchesStatus =
         statusFilter === 'all' ? true : statusFilter === 'active' ? b.status === 'active' : b.status === 'grace';
 
-      return matchesSearch && matchesStatus;
+      const matchesDate = matchesDateFilter(b.dateGiven, dateFilter);
+
+      return matchesSearch && matchesStatus && matchesDate;
     });
-  }, [borrowers, searchQuery, statusFilter]);
+  }, [borrowers, searchQuery, statusFilter, dateFilter]);
 
   // Handle Mark as Paid
   const handleMarkAsPaid = (id: string, name: string) => {
@@ -1263,6 +1271,9 @@ export function LoansInterestView() {
                 Grace ({graceCount})
               </button>
             </div>
+
+            {/* Universal Date Filter Dropdown with 7 Presets, Single Date, & Date Range */}
+            <DateFilterDropdown value={dateFilter} onChange={setDateFilter} />
 
             {/* Export Button */}
             <button

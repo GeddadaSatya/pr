@@ -5,6 +5,11 @@ import { useFinance } from '@/components/context/finance-context';
 import { NotebookEntry, INITIAL_NOTEBOOK_ENTRIES } from '@/lib/notebook-data';
 import { AmountDisplay } from '@/components/ui/amount-display';
 import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
+import {
+  DateFilterDropdown,
+  DateFilterValue,
+  matchesDateFilter,
+} from '@/components/ui/date-filter-dropdown';
 
 interface ExpenseNotebookViewProps {
   onOpenDayLedger: (dateKey: string) => void;
@@ -24,30 +29,9 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
   const [showCategoryConfirmModal, setShowCategoryConfirmModal] = useState(false);
   const [categoryHighlight, setCategoryHighlight] = useState(false);
   const [parsedQuickEntry, setParsedQuickEntry] = useState<{ title: string; amount: string } | null>(null);
-  const [selectedDateFilter, setSelectedDateFilter] = useState('all');
-  const [isDateFilterOpen, setIsDateFilterOpen] = useState(false);
-  const [customDateTab, setCustomDateTab] = useState<'single' | 'range'>('single');
-  const [customSingleDate, setCustomSingleDate] = useState('2026-10-28');
-  const [customRangeFrom, setCustomRangeFrom] = useState('2026-10-25');
-  const [customRangeTo, setCustomRangeTo] = useState('2026-10-28');
-  const dateDropdownRef = useRef<HTMLDivElement>(null);
+  const [dateFilter, setDateFilter] = useState<DateFilterValue>({ type: 'all' });
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-
-  // Close date dropdown on click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dateDropdownRef.current && !dateDropdownRef.current.contains(event.target as Node)) {
-        setIsDateFilterOpen(false);
-      }
-    };
-    if (isDateFilterOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isDateFilterOpen]);
 
   // Search and Category filters
   const [topSearch, setTopSearch] = useState('');
@@ -57,13 +41,13 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
   const handleClearAllFilters = () => {
     setTopSearch('');
     setTopCategory('all');
-    setSelectedDateFilter('all');
+    setDateFilter({ type: 'all' });
   };
 
   const isAnyFilterActive = Boolean(
     topSearch.trim() !== '' ||
     topCategory !== 'all' ||
-    selectedDateFilter !== 'all'
+    dateFilter.type !== 'all'
   );
 
   // Derive notebook entries directly from FinanceContext expenses
@@ -111,22 +95,6 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
     }
   };
 
-  const selectedDateFilterLabel = (() => {
-    if (selectedDateFilter === 'all') return 'All Dates';
-    if (selectedDateFilter === '2026-10-28') return 'Today (Oct 28)';
-    if (selectedDateFilter === '2026-10-27') return 'Sunday (Oct 27)';
-    if (selectedDateFilter === '2026-10-25') return 'Friday (Oct 25)';
-    if (selectedDateFilter === 'custom-single') {
-      return `Date: ${formatDateDisplay(customSingleDate)}`;
-    }
-    if (selectedDateFilter === 'custom-range') {
-      const from = customRangeFrom <= customRangeTo ? customRangeFrom : customRangeTo;
-      const to = customRangeFrom <= customRangeTo ? customRangeTo : customRangeFrom;
-      return `${formatDateDisplay(from)} – ${formatDateDisplay(to)}`;
-    }
-    return 'All Dates';
-  })();
-
   const getCategoryPillClass = (category: string) => {
     const c = category.toLowerCase();
     if (c.includes('travel')) {
@@ -172,19 +140,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
       item.category.toLowerCase().includes(topCategory.toLowerCase()) ||
       item.tag.toLowerCase().includes(topCategory.toLowerCase());
 
-    let matchesDate = true;
-    if (selectedDateFilter === 'all') {
-      matchesDate = true;
-    } else if (selectedDateFilter === 'custom-single') {
-      matchesDate = (item.dateKey || '2026-10-28') === customSingleDate;
-    } else if (selectedDateFilter === 'custom-range') {
-      const from = customRangeFrom <= customRangeTo ? customRangeFrom : customRangeTo;
-      const to = customRangeFrom <= customRangeTo ? customRangeTo : customRangeFrom;
-      const k = item.dateKey || '2026-10-28';
-      matchesDate = k >= from && k <= to;
-    } else {
-      matchesDate = (item.dateKey || '2026-10-28') === selectedDateFilter;
-    }
+    const matchesDate = matchesDateFilter(item.dateKey || item.dateTime, dateFilter);
 
     return matchesSearch && matchesCategory && matchesDate;
   });
@@ -577,159 +533,8 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
 
           {/* Right Controls: Date Filter, Sort, PDF Folio, CSV / Excel */}
           <div className="flex flex-wrap items-center gap-2">
-            {/* Date Filter Dropdown with Presets, Custom Single Date, & Custom Date Range */}
-            <div className="relative flex items-center gap-1" ref={dateDropdownRef}>
-              <button
-                type="button"
-                onClick={() => setIsDateFilterOpen(!isDateFilterOpen)}
-                className={`h-9 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
-                  selectedDateFilter !== 'all'
-                    ? 'bg-amber-50 border-amber-300 text-amber-900 shadow-2xs'
-                    : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
-                }`}
-              >
-                <span className="material-symbols-outlined text-sm text-[#b48e28]">calendar_today</span>
-                <span>{selectedDateFilterLabel}</span>
-                <span className="material-symbols-outlined text-sm text-slate-500">expand_more</span>
-              </button>
-
-              {isDateFilterOpen && (
-                <div className="absolute left-0 mt-1 w-72 sm:w-80 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-xl border border-slate-200 p-3 z-30 animate-fade-in top-full">
-                  {/* Presets Header */}
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1 mb-1">
-                    Preset Dates
-                  </div>
-                  <div className="space-y-0.5">
-                    {[
-                      { key: 'all', label: 'All Dates' },
-                      { key: '2026-10-28', label: 'Today (Oct 28)' },
-                      { key: '2026-10-27', label: 'Sunday (Oct 27)' },
-                      { key: '2026-10-25', label: 'Friday (Oct 25)' },
-                    ].map((d) => (
-                      <button
-                        key={d.key}
-                        type="button"
-                        onClick={() => {
-                          setSelectedDateFilter(d.key);
-                          setIsDateFilterOpen(false);
-                        }}
-                        className={`w-full px-2.5 py-1.5 rounded-lg text-left text-xs font-medium flex items-center justify-between cursor-pointer transition-colors ${
-                          selectedDateFilter === d.key
-                            ? 'bg-[#fef9e7] text-amber-950 font-bold'
-                            : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
-                        }`}
-                      >
-                        <span>{d.label}</span>
-                        {selectedDateFilter === d.key && (
-                          <span className="material-symbols-outlined text-sm text-[#b48e28]">check</span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Divider */}
-                  <div className="my-2.5 border-t border-slate-100" />
-
-                  {/* Custom Filter Section */}
-                  <div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1 mb-1.5">
-                      Custom Date Selection
-                    </div>
-
-                    {/* Tab Switcher */}
-                    <div className="grid grid-cols-2 gap-1 bg-slate-100 p-0.5 rounded-lg text-xs font-semibold mb-2.5">
-                      <button
-                        type="button"
-                        onClick={() => setCustomDateTab('single')}
-                        className={`py-1 rounded-md text-center transition-all cursor-pointer ${
-                          customDateTab === 'single'
-                            ? 'bg-white text-slate-900 shadow-2xs font-bold'
-                            : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        Single Date
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setCustomDateTab('range')}
-                        className={`py-1 rounded-md text-center transition-all cursor-pointer ${
-                          customDateTab === 'range'
-                            ? 'bg-white text-slate-900 shadow-2xs font-bold'
-                            : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        Date Range
-                      </button>
-                    </div>
-
-                    {customDateTab === 'single' ? (
-                      <div className="space-y-2">
-                        <div>
-                          <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                            Select Specific Date
-                          </label>
-                          <input
-                            type="date"
-                            value={customSingleDate}
-                            onChange={(e) => setCustomSingleDate(e.target.value)}
-                            className="w-full h-8.5 px-2.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white"
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedDateFilter('custom-single');
-                            setIsDateFilterOpen(false);
-                          }}
-                          className="w-full h-8.5 bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
-                        >
-                          <span className="material-symbols-outlined text-sm">calendar_month</span>
-                          <span>Apply Single Date</span>
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                              From
-                            </label>
-                            <input
-                              type="date"
-                              value={customRangeFrom}
-                              onChange={(e) => setCustomRangeFrom(e.target.value)}
-                              className="w-full h-8.5 px-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[11px] font-semibold text-slate-600 mb-1">
-                              To
-                            </label>
-                            <input
-                              type="date"
-                              value={customRangeTo}
-                              onChange={(e) => setCustomRangeTo(e.target.value)}
-                              className="w-full h-8.5 px-2 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white"
-                            />
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedDateFilter('custom-range');
-                            setIsDateFilterOpen(false);
-                          }}
-                          className="w-full h-8.5 bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
-                        >
-                          <span className="material-symbols-outlined text-sm">date_range</span>
-                          <span>Apply Date Range</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* Universal Date Filter Dropdown with 7 Presets, Single Date, & Date Range */}
+            <DateFilterDropdown value={dateFilter} onChange={setDateFilter} />
 
             {/* Sort Toggle */}
             <button
