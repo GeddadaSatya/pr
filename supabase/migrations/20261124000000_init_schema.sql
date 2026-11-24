@@ -205,7 +205,7 @@ CREATE TABLE IF NOT EXISTS public.peer_receivables (
 -- 10. NOTIFICATIONS
 CREATE TABLE IF NOT EXISTS public.notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
   description TEXT NOT NULL,
   type TEXT NOT NULL CHECK (type IN ('due_alert', 'loan_payment', 'repayment_due', 'security', 'system')),
