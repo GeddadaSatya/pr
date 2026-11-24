@@ -35,9 +35,6 @@ export function SearchModal() {
         e.preventDefault();
         if (isSearchModalOpen) {
           closeSearchModal();
-        } else {
-          // Open
-          useFinance;
         }
       }
       if (e.key === 'Escape' && isSearchModalOpen) {

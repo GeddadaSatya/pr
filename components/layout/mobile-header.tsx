@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 
 export function MobileHeader() {
@@ -12,6 +12,11 @@ export function MobileHeader() {
     openNotificationsDrawer,
     unreadNotificationsCount,
   } = useFinance();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="fixed top-0 w-full z-40 bg-[#f7f9fb]/90 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.03)] border-b border-slate-200/40 md:hidden">
@@ -53,7 +58,7 @@ export function MobileHeader() {
             type="button"
           >
             <span className="material-symbols-outlined text-2xl">notifications</span>
-            {unreadNotificationsCount > 0 && (
+            {mounted && unreadNotificationsCount > 0 && (
               <span className="absolute top-1.5 right-1.5 min-w-[14px] h-[14px] px-0.5 rounded-full bg-[#d4af37] text-slate-950 font-bold text-[9px] flex items-center justify-center ring-2 ring-white">
                 {unreadNotificationsCount}
               </span>

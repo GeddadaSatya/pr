@@ -34,7 +34,7 @@ export function PayablesLoansHub() {
             {privacyMode ? (
               <span className="font-serif text-base font-bold text-slate-900">••••••</span>
             ) : (
-              <div className="flex items-baseline gap-0.5">
+              <div className="flex items-baseline">
                 <span className="font-serif text-base font-bold text-slate-900">
                   ₹{Math.floor(totalPayables).toLocaleString('en-IN')}
                 </span>
@@ -71,7 +71,7 @@ export function PayablesLoansHub() {
             {privacyMode ? (
               <span className="font-serif text-base font-bold text-slate-900">••••••</span>
             ) : (
-              <div className="flex items-baseline gap-0.5">
+              <div className="flex items-baseline">
                 <span className="font-serif text-base font-bold text-slate-900">
                   ₹{Math.floor(totalLoans).toLocaleString('en-IN')}
                 </span>
@@ -169,7 +169,7 @@ export function PayablesLoansHub() {
                       {privacyMode ? (
                         <span className="font-serif font-bold text-sm text-slate-900">••••••</span>
                       ) : (
-                        <div className="flex items-baseline gap-0.5">
+                        <div className="flex items-baseline">
                           <span className="font-serif font-bold text-sm text-slate-900 tracking-tight">
                             ₹{Math.floor(item.amount).toLocaleString('en-IN')}
                           </span>
@@ -274,7 +274,7 @@ export function PayablesLoansHub() {
                       {privacyMode ? (
                         <span className="font-serif font-bold text-sm text-slate-900">••••••</span>
                       ) : (
-                        <div className="flex items-baseline gap-0.5">
+                        <div className="flex items-baseline">
                           <span className="font-serif font-bold text-sm text-slate-900 tracking-tight">
                             ₹{Math.floor(loan.principalAmount).toLocaleString('en-IN')}
                           </span>
@@ -299,7 +299,7 @@ export function PayablesLoansHub() {
               {privacyMode ? (
                 '••••'
               ) : (
-                <span className="inline-flex items-baseline gap-0.5 font-semibold text-slate-900">
+                <span className="inline-flex items-baseline font-semibold text-slate-900">
                   <span className="font-serif font-bold">₹11,400</span>
                   <span className="font-label-numeric text-[11px] text-slate-400 font-medium">.00</span>
                 </span>

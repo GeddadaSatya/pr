@@ -123,7 +123,7 @@ export function KpiCarousel() {
           <div className="flex justify-between items-start">
             <div className="flex flex-col">
               <span className="font-label-caps text-[11px] uppercase text-slate-500">Total Property &amp; Assets</span>
-              <div className="flex items-baseline gap-1 mt-1">
+              <div className="flex items-baseline mt-1">
                 <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                   {privacyMode ? '••••••' : `₹${Math.floor(totalPropertyAssets).toLocaleString('en-IN')}`}
                 </span>
@@ -159,7 +159,7 @@ export function KpiCarousel() {
                   {payables.length} Due Soon
                 </span>
               </div>
-              <div className="flex items-baseline gap-1 mt-1">
+              <div className="flex items-baseline mt-1">
                 <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-red-700 font-semibold tracking-tight">
                   {privacyMode ? '••••••' : `₹${totalPayables.toLocaleString('en-IN')}`}
                 </span>
@@ -170,20 +170,27 @@ export function KpiCarousel() {
               <span className="material-symbols-outlined text-lg">credit_card_off</span>
             </div>
           </div>
-          <div className="flex flex-col gap-1.5 bg-slate-50 p-2.5 rounded-lg">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-slate-800 font-medium truncate">
-                Upcoming: {payables[0]?.creditorName || 'Marcus Vance'}
-              </span>
-              <span className="font-label-numeric text-red-700 font-semibold">
-                {privacyMode ? '••••' : `₹${payables[0]?.amount?.toLocaleString('en-IN') || '2,500'}`}
-              </span>
+          {payables.length > 0 ? (
+            <div className="flex flex-col gap-1.5 bg-slate-50 p-2.5 rounded-lg">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-slate-800 font-medium truncate">
+                  Upcoming: {payables[0].creditorName}
+                </span>
+                <span className="font-label-numeric text-red-700 font-semibold">
+                  {privacyMode ? '••••' : `₹${payables[0].amount.toLocaleString('en-IN')}`}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                <span className="material-symbols-outlined text-xs text-red-600">schedule</span>
+                <span>Due: {payables[0].dueDate || 'Upcoming'}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
-              <span className="material-symbols-outlined text-xs text-red-600">schedule</span>
-              <span>Final reconciliation due in 3 days</span>
+          ) : (
+            <div className="flex items-center gap-2 bg-emerald-50/60 p-2.5 rounded-lg text-emerald-800 text-xs">
+              <span className="material-symbols-outlined text-sm text-emerald-600">verified</span>
+              <span className="font-medium">No pending payables • Dues clear</span>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Card 3: Money Lent to Others */}
@@ -198,7 +205,7 @@ export function KpiCarousel() {
                   +{privacyMode ? '••••' : `₹${Math.round(totalYield).toLocaleString('en-IN')}`}/mo
                 </span>
               </div>
-              <div className="flex items-baseline gap-1 mt-1">
+              <div className="flex items-baseline mt-1">
                 <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                   {privacyMode ? '••••••' : `₹${totalLoans.toLocaleString('en-IN')}`}
                 </span>
@@ -211,7 +218,11 @@ export function KpiCarousel() {
           </div>
           <div className="flex items-center justify-between text-xs text-slate-600">
             <span>Average Interest Rate</span>
-            <span className="font-semibold text-slate-900 font-label-numeric">18.0% p.a.</span>
+            <span className="font-semibold text-slate-900 font-label-numeric">
+              {loans.length > 0
+                ? `${(loans.reduce((acc, l) => acc + (l.interestRateAnnual || 0), 0) / loans.length).toFixed(1)}% p.a.`
+                : '0.0% p.a.'}
+            </span>
           </div>
         </div>
 
@@ -221,7 +232,7 @@ export function KpiCarousel() {
           <div className="flex justify-between items-start">
             <div className="flex flex-col">
               <span className="font-label-caps text-[11px] uppercase text-slate-500">This Month&apos;s Expenses</span>
-              <div className="flex items-baseline gap-1 mt-1">
+              <div className="flex items-baseline mt-1">
                 <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                   {privacyMode ? '••••••' : `₹${Math.floor(totalExpenses).toLocaleString('en-IN')}`}
                 </span>

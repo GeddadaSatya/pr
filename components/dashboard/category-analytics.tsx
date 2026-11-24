@@ -247,7 +247,7 @@ export function CategoryAnalytics() {
                   {privacyMode ? (
                     <span className="font-serif font-bold text-xs text-slate-900">••••</span>
                   ) : (
-                    <div className="flex items-baseline gap-0.5">
+                    <div className="flex items-baseline">
                       <span className="font-serif font-bold text-xs text-slate-900">₹5,835</span>
                       <span className="font-label-numeric text-[10px] text-slate-400 font-medium">.00</span>
                     </div>
@@ -265,7 +265,7 @@ export function CategoryAnalytics() {
                   {privacyMode ? (
                     <span className="font-serif font-bold text-xs text-slate-900">••••</span>
                   ) : (
-                    <div className="flex items-baseline gap-0.5">
+                    <div className="flex items-baseline">
                       <span className="font-serif font-bold text-xs text-slate-900">₹3,890</span>
                       <span className="font-label-numeric text-[10px] text-slate-400 font-medium">.00</span>
                     </div>
@@ -283,7 +283,7 @@ export function CategoryAnalytics() {
                   {privacyMode ? (
                     <span className="font-serif font-bold text-xs text-slate-900">••••</span>
                   ) : (
-                    <div className="flex items-baseline gap-0.5">
+                    <div className="flex items-baseline">
                       <span className="font-serif font-bold text-xs text-slate-900">₹1,750</span>
                       <span className="font-label-numeric text-[10px] text-slate-400 font-medium">.50</span>
                     </div>
@@ -301,7 +301,7 @@ export function CategoryAnalytics() {
                   {privacyMode ? (
                     <span className="font-serif font-bold text-xs text-slate-900">••••</span>
                   ) : (
-                    <div className="flex items-baseline gap-0.5">
+                    <div className="flex items-baseline">
                       <span className="font-serif font-bold text-xs text-slate-900">₹1,167</span>
                       <span className="font-label-numeric text-[10px] text-slate-400 font-medium">.00</span>
                     </div>
@@ -391,7 +391,7 @@ export function CategoryAnalytics() {
 
               <div className="flex flex-wrap items-center gap-2 relative" ref={filterRef}>
                 <span className="px-2.5 py-1 rounded-full bg-[#fef9e7] text-[#b48e28] border border-[#d4af37]/30 text-xs font-semibold">
-                  8 Active Categories
+                  {dynamicCategories.length} Active {dynamicCategories.length === 1 ? 'Category' : 'Categories'}
                 </span>
 
                 <div className="relative inline-block text-left">
@@ -600,7 +600,7 @@ export function CategoryAnalytics() {
                         {privacyMode ? (
                           <span className="text-slate-900 font-bold font-serif text-xs">••••</span>
                         ) : (
-                          <div className="flex items-baseline gap-0.5">
+                          <div className="flex items-baseline">
                             <span className="text-slate-900 font-bold font-serif text-xs">
                               ₹{Math.floor(cat.amount).toLocaleString('en-IN')}
                             </span>

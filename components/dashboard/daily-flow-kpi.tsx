@@ -120,7 +120,7 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
               <span className="font-label-caps text-[10px] sm:text-[11px] uppercase text-slate-500 font-bold tracking-wider truncate">
                 Today&apos;s Inflow
               </span>
-              <div className="flex items-baseline gap-1 mt-1">
+              <div className="flex items-baseline mt-1">
                 <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight text-lg sm:text-2xl md:text-3xl">
                   {privacyMode
                     ? '••••••'
@@ -182,7 +182,7 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
               <span className="font-label-caps text-[10px] sm:text-[11px] uppercase text-slate-500 font-bold tracking-wider truncate">
                 Today&apos;s Outflow
               </span>
-              <div className="flex items-baseline gap-1 mt-1">
+              <div className="flex items-baseline mt-1">
                 <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-red-600 font-semibold tracking-tight text-lg sm:text-2xl md:text-3xl">
                   {privacyMode
                     ? '••••••'

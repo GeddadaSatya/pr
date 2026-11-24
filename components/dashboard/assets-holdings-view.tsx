@@ -297,7 +297,28 @@ export function AssetsHoldingsView() {
 
       {/* Holdings Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredAssets.map((asset) => {
+        {filteredAssets.length === 0 ? (
+          <div className="col-span-full py-12 px-4 flex flex-col items-center justify-center text-center bg-white rounded-2xl border border-slate-200">
+            <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-200/60 flex items-center justify-center text-blue-700 mb-3">
+              <span className="material-symbols-outlined text-3xl">account_balance_wallet</span>
+            </div>
+            <h3 className="font-headline-sm text-base font-semibold text-slate-900 mb-1">
+              No asset holdings recorded
+            </h3>
+            <p className="font-body-sm text-xs text-slate-500 max-w-sm mb-4">
+              Add your liquid cash, bank balances, bullion, or investment assets to track your net worth.
+            </p>
+            <button
+              type="button"
+              onClick={() => setIsAddModalOpen(true)}
+              className="px-4 py-2 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-sm">add</span>
+              <span>Add First Asset</span>
+            </button>
+          </div>
+        ) : (
+          filteredAssets.map((asset) => {
           const catStyle = CATEGORY_COLORS[asset.category] || {
             bg: 'bg-slate-100',
             text: 'text-slate-800',
@@ -369,8 +390,9 @@ export function AssetsHoldingsView() {
               </div>
             </div>
           );
-        })}
-      </div>
+        })
+      )}
+    </div>
 
       {/* Add Asset Modal */}
       {isAddModalOpen && (

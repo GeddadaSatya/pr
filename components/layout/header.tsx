@@ -1,9 +1,12 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useFinance } from '@/components/context/finance-context';
+import { createClient } from '@/utils/supabase/client';
 
 export function Header() {
+  const router = useRouter();
   const {
     userProfile,
     openAuthModal,
@@ -15,7 +18,29 @@ export function Header() {
     unreadNotificationsCount,
   } = useFinance();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch {}
+    document.cookie = 'sovereign_demo_session=; path=/; max-age=0; SameSite=Lax';
+    localStorage.removeItem('wt_expenses');
+    localStorage.removeItem('wt_payables');
+    localStorage.removeItem('wt_borrowers');
+    localStorage.removeItem('wt_assets');
+    localStorage.removeItem('wt_peer_receivables');
+    localStorage.removeItem('wt_notifications');
+    setDropdownOpen(false);
+    router.push('/login');
+    router.refresh();
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -59,7 +84,7 @@ export function Header() {
               type="button"
             >
               <span className="material-symbols-outlined text-xl">notifications</span>
-              {unreadNotificationsCount > 0 && (
+              {mounted && unreadNotificationsCount > 0 && (
                 <span className="absolute top-1.5 right-1.5 min-w-[14px] h-[14px] px-0.5 rounded-full bg-[#d4af37] text-slate-950 font-bold text-[9px] flex items-center justify-center ring-2 ring-white">
                   {unreadNotificationsCount}
                 </span>
@@ -164,23 +189,20 @@ export function Header() {
                     <span className="material-symbols-outlined text-lg text-[#b48e28]">
                       key
                     </span>
-                    <span>Email OTP / Cloud Sync</span>
+                    <span>Password &amp; Security</span>
                   </button>
                 </div>
 
                 <div className="pt-1 border-t border-slate-100">
                   <button
-                    onClick={() => {
-                      setDropdownOpen(false);
-                      openAuthModal();
-                    }}
+                    onClick={handleSignOut}
                     className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50/70 transition-colors text-xs font-semibold cursor-pointer text-left"
                     type="button"
                   >
                     <span className="material-symbols-outlined text-lg text-red-600">
-                      lock
+                      logout
                     </span>
-                    <span>Switch User / Auth</span>
+                    <span>Sign Out</span>
                   </button>
                 </div>
               </div>

@@ -1,11 +1,38 @@
 import { NextResponse } from 'next/server';
-import { INITIAL_PAYABLES } from '@/lib/mock-data';
+import { getAdminSupabase } from '@/lib/supabase/server-client';
 import { PayableItem } from '@/lib/types';
 
-let serverPayables: PayableItem[] = [...INITIAL_PAYABLES];
+let localPayables: PayableItem[] = [];
 
 export async function GET() {
-  return NextResponse.json({ success: true, count: serverPayables.length, data: serverPayables });
+  const supabase = getAdminSupabase();
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.from('payables').select('*').order('created_at', { ascending: false });
+      if (!error && data && data.length > 0) {
+        const mapped: PayableItem[] = data.map((d: any) => ({
+          id: d.id,
+          creditorName: d.creditor_name,
+          invoiceNote: d.invoice_note,
+          amount: parseFloat(d.amount) || 0,
+          dueDate: d.due_date,
+          urgencyBadge: d.urgency_badge,
+          category: d.category,
+          beneficiarySub: d.beneficiary_sub,
+          fullDueDate: d.full_due_date,
+          dueDateUrgency: d.due_date_urgency,
+          disbursementRoute: d.disbursement_route,
+          statusLabel: d.status_label,
+          actionLabel: d.action_label,
+          status: d.status,
+          settledAt: d.settled_at,
+        }));
+        return NextResponse.json({ success: true, count: mapped.length, data: mapped });
+      }
+    } catch {}
+  }
+
+  return NextResponse.json({ success: true, count: localPayables.length, data: localPayables });
 }
 
 export async function POST(request: Request) {
@@ -31,48 +58,29 @@ export async function POST(request: Request) {
       status: 'pending',
     };
 
-    serverPayables = [newPayable, ...serverPayables];
+    const supabase = getAdminSupabase();
+    if (supabase) {
+      try {
+        await supabase.from('payables').insert({
+          creditor_name: newPayable.creditorName,
+          invoice_note: newPayable.invoiceNote,
+          amount: newPayable.amount,
+          due_date: newPayable.dueDate,
+          full_due_date: newPayable.fullDueDate,
+          urgency_badge: newPayable.urgencyBadge,
+          category: newPayable.category,
+          beneficiary_sub: newPayable.beneficiarySub,
+          disbursement_route: newPayable.disbursementRoute,
+          status_label: newPayable.statusLabel,
+          action_label: newPayable.actionLabel,
+          status: newPayable.status,
+        });
+      } catch {}
+    }
+
+    localPayables = [newPayable, ...localPayables];
     return NextResponse.json({ success: true, data: newPayable }, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
-}
-
-export async function PUT(request: Request) {
-  try {
-    const body = await request.json();
-    const { id, action } = body;
-
-    if (!id) {
-      return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
-    }
-
-    if (action === 'settle') {
-      let settledItem: PayableItem | null = null;
-      serverPayables = serverPayables.map((p) => {
-        if (p.id === id) {
-          settledItem = { ...p, status: 'paid', statusLabel: 'Settled', settledAt: new Date().toISOString() };
-          return settledItem;
-        }
-        return p;
-      });
-      return NextResponse.json({ success: true, message: `Payable ${id} settled`, data: settledItem });
-    }
-
-    return NextResponse.json({ success: false, error: 'Unknown action' }, { status: 400 });
-  } catch (err: any) {
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
-  }
-}
-
-export async function DELETE(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
-
-  if (!id) {
-    return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
-  }
-
-  serverPayables = serverPayables.filter((p) => p.id !== id);
-  return NextResponse.json({ success: true, message: `Payable ${id} deleted` });
 }

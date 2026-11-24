@@ -2,6 +2,12 @@
 
 @theme {
   --breakpoint-md: 975px;
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --color-gold: #d4af37;
+  --color-gold-dark: #b48e28;
+  --color-gold-light: #fef9e7;
 }
 
 @layer base {
@@ -96,6 +102,10 @@ body {
   letter-spacing: -0.015em;
   font-variant-numeric: lining-nums tabular-nums;
   font-feature-settings: "lnum" 1, "tnum" 1;
+}
+
+.ambient-glow {
+  background: radial-gradient(circle at 18% 18%, rgba(245, 222, 179, 0.45) 0%, rgba(252, 251, 247, 0.1) 50%, rgba(255, 255, 255, 0) 100%);
 }
 
 @media (min-width: 768px) {

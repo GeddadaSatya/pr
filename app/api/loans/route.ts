@@ -1,11 +1,51 @@
 import { NextResponse } from 'next/server';
-import { INITIAL_BORROWERS } from '@/lib/mock-data';
+import { getAdminSupabase } from '@/lib/supabase/server-client';
 import { BorrowerLoan } from '@/lib/types';
 
-let serverBorrowers: BorrowerLoan[] = [...INITIAL_BORROWERS];
+let localBorrowers: BorrowerLoan[] = [];
 
 export async function GET() {
-  return NextResponse.json({ success: true, count: serverBorrowers.length, data: serverBorrowers });
+  const supabase = getAdminSupabase();
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.from('borrowers').select('*').order('created_at', { ascending: false });
+      if (!error && data && data.length > 0) {
+        const mapped: BorrowerLoan[] = data.map((d: any) => ({
+          id: d.id,
+          name: d.name,
+          initials: d.initials,
+          avatarBg: d.avatar_bg,
+          avatarText: d.avatar_text,
+          contactOrNote: d.contact_or_note,
+          phone: d.phone,
+          address: d.address,
+          borrowerId: d.borrower_id,
+          principalAmount: parseFloat(d.principal_amount) || 0,
+          paymentMode: d.payment_mode,
+          paymentModeIcon: d.payment_mode_icon,
+          dateGiven: d.date_given,
+          interestRate: parseFloat(d.interest_rate) || 0,
+          interestRatePeriod: d.interest_rate_period,
+          payoutFrequency: d.payout_frequency,
+          tenureMonths: d.tenure_months,
+          termLabel: d.term_label,
+          nextDueDate: d.next_due_date,
+          nextDueAmount: parseFloat(d.next_due_amount) || 0,
+          dueCountdownText: d.due_countdown_text,
+          dueCountdownType: d.due_countdown_type,
+          receivedAmount: parseFloat(d.received_amount) || 0,
+          totalReceivable: parseFloat(d.total_receivable) || 0,
+          progressPercent: d.progress_percent,
+          status: d.status,
+          statusLabel: d.status_label,
+          contractType: d.contract_type,
+        }));
+        return NextResponse.json({ success: true, count: mapped.length, data: mapped });
+      }
+    } catch {}
+  }
+
+  return NextResponse.json({ success: true, count: localBorrowers.length, data: localBorrowers });
 }
 
 export async function POST(request: Request) {
@@ -53,54 +93,39 @@ export async function POST(request: Request) {
       totalReceivable,
       progressPercent: 0,
       status: 'active',
-      statusLabel: 'Active & Disbursed',
+      statusLabel: 'Active & Paying',
       contractType: body.contractType || 'Promissory Note',
-      priorityTag: 'Active Advance',
-      settlementChannel: body.paymentMode || 'Direct Wire',
-      totalSanctioned: body.principalAmount,
-      outstandingBalance: totalReceivable,
-      repaymentPacing: '0.0%',
-      lifetimeCollected: 0,
     };
 
-    serverBorrowers = [newBorrower, ...serverBorrowers];
+    const supabase = getAdminSupabase();
+    if (supabase) {
+      try {
+        await supabase.from('borrowers').insert({
+          name: newBorrower.name,
+          initials: newBorrower.initials,
+          contact_or_note: newBorrower.contactOrNote,
+          phone: newBorrower.phone,
+          address: newBorrower.address,
+          borrower_id: newBorrower.borrowerId,
+          principal_amount: newBorrower.principalAmount,
+          payment_mode: newBorrower.paymentMode,
+          date_given: newBorrower.dateGiven,
+          interest_rate: newBorrower.interestRate,
+          interest_rate_period: newBorrower.interestRatePeriod,
+          tenure_months: newBorrower.tenureMonths,
+          term_label: newBorrower.termLabel,
+          next_due_date: newBorrower.nextDueDate,
+          next_due_amount: newBorrower.nextDueAmount,
+          total_receivable: newBorrower.totalReceivable,
+          status: newBorrower.status,
+          status_label: newBorrower.statusLabel,
+          contract_type: newBorrower.contractType,
+        });
+      } catch {}
+    }
+
+    localBorrowers = [newBorrower, ...localBorrowers];
     return NextResponse.json({ success: true, data: newBorrower }, { status: 201 });
-  } catch (err: any) {
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
-  }
-}
-
-export async function PUT(request: Request) {
-  try {
-    const body = await request.json();
-    const { id, action, amount } = body;
-
-    if (!id) {
-      return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
-    }
-
-    if (action === 'repayment') {
-      const repaymentAmount = Number(amount) || 0;
-      serverBorrowers = serverBorrowers.map((b) => {
-        if (b.id === id) {
-          const nextReceived = Math.min(b.totalReceivable, b.receivedAmount + repaymentAmount);
-          const percent = Math.min(100, Math.round((nextReceived / b.totalReceivable) * 100));
-          return {
-            ...b,
-            receivedAmount: nextReceived,
-            progressPercent: percent,
-            status: percent >= 100 ? 'paid' : b.status,
-            statusLabel: percent >= 100 ? 'Fully Settled' : b.statusLabel,
-            outstandingBalance: Math.max(0, b.totalReceivable - nextReceived),
-            lifetimeCollected: (b.lifetimeCollected || 0) + repaymentAmount,
-          };
-        }
-        return b;
-      });
-      return NextResponse.json({ success: true, message: `Repayment recorded for ${id}` });
-    }
-
-    return NextResponse.json({ success: false, error: 'Unknown action' }, { status: 400 });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }

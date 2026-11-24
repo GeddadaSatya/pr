@@ -49,251 +49,6 @@ export interface BorrowerLoan {
   lifetimeCollected?: number;
 }
 
-const INITIAL_BORROWERS: BorrowerLoan[] = [
-  {
-    id: 'borrower-priya',
-    name: 'Priya Reddy',
-    initials: 'PR',
-    avatarBg: 'bg-slate-100',
-    avatarText: 'text-slate-700',
-    badgeNumber: 1,
-    contactOrNote: '+91 98765 43210 • Cyber Towers',
-    phone: '+91 98765 43210',
-    address: 'Madhapur (C), Sector 2, Cyber Towers, Hyderabad',
-    borrowerId: 'PD-90803',
-    principalAmount: 25000,
-    paymentMode: 'Bank Transfer',
-    paymentModeIcon: 'account_balance',
-    dateGiven: 'May 14, 2024',
-    interestRate: 10.0,
-    interestRatePeriod: 'flat rate',
-    payoutFrequency: 'Daily Cycle Pacing',
-    tenureMonths: 12,
-    termLabel: 'Prime Active',
-    nextDueDate: 'Nov 20, 2026',
-    nextDueAmount: 2500,
-    dueCountdownText: '3 Days Remaining',
-    dueCountdownType: 'critical',
-    receivedAmount: 22500,
-    totalReceivable: 25000,
-    progressPercent: 90,
-    status: 'active',
-    statusLabel: 'Active',
-    contractType: 'Micro-Enterprise Advance',
-    priorityTag: 'Tier 1 Prime',
-    settlementChannel: 'HDFC Direct Wire',
-    noteTitle: 'Field Visit',
-    noteText: 'Visited by Rahul Sharma (Agent) - Promised to pay on Nov 20.',
-    attachmentName: 'Signed_Promissory_Note.pdf',
-    totalSanctioned: 65000,
-    outstandingBalance: 2500,
-    repaymentPacing: '90.0%',
-    lifetimeCollected: 62500,
-  },
-  {
-    id: 'borrower-1',
-    name: 'Marcus Vance',
-    initials: 'MV',
-    avatarBg: 'bg-[#0f172a]',
-    avatarText: 'text-[#d4af37]',
-    badgeNumber: 2,
-    contactOrNote: 'Head Builder & Architect Renovations',
-    phone: '+91 98112 33445',
-    address: 'Banjara Hills, Road No. 12, Hyderabad',
-    borrowerId: 'MV-10294',
-    principalAmount: 10000,
-    paymentMode: 'UPI / Bank Wire',
-    paymentModeIcon: 'account_balance',
-    dateGiven: 'Mar 20, 2024',
-    interestRate: 10.0,
-    interestRatePeriod: 'flat rate',
-    payoutFrequency: 'Lump Sum at Maturity',
-    tenureMonths: 6,
-    termLabel: '6-Month Term',
-    nextDueDate: 'Nov 18, 2024',
-    nextDueAmount: 3500,
-    dueCountdownText: '3 Days Remaining',
-    dueCountdownType: 'critical',
-    receivedAmount: 8500,
-    totalReceivable: 12000,
-    progressPercent: 71,
-    status: 'active',
-    statusLabel: 'Active & Paying',
-    contractType: 'Milestone Contract',
-    priorityTag: 'Priority High',
-    settlementChannel: 'FedWire Direct (Chase Corp)',
-    noteTitle: 'General Contractor',
-    noteText: 'Milestone loan for materials and subcontractor advance.',
-    totalSanctioned: 30000,
-    outstandingBalance: 3500,
-    repaymentPacing: '71.0%',
-    lifetimeCollected: 26500,
-  },
-  {
-    id: 'borrower-2',
-    name: 'Sarah Jenkins',
-    initials: 'SJ',
-    avatarBg: 'bg-[#0f172a]',
-    avatarText: 'text-white',
-    badgeNumber: 2,
-    contactOrNote: 'Tribeca Creative Loft Leasing',
-    principalAmount: 30000,
-    paymentMode: 'Cheque #4021',
-    paymentModeIcon: 'history_edu',
-    dateGiven: 'Feb 01, 2024',
-    interestRate: 12.0,
-    interestRatePeriod: '/ year',
-    payoutFrequency: 'Quarterly Payout',
-    tenureMonths: 24,
-    termLabel: '24-Month Term',
-    nextDueDate: 'Nov 20, 2024',
-    nextDueAmount: 4000,
-    dueCountdownText: '5 Days Remaining',
-    dueCountdownType: 'warning',
-    receivedAmount: 6000,
-    totalReceivable: 10000,
-    progressPercent: 60,
-    status: 'active',
-    statusLabel: 'Active & Paying',
-    contractType: 'Commercial Rent',
-    priorityTag: 'Due This Week',
-    settlementChannel: 'Auto-ACH Pull / Signature Bank',
-    noteTitle: 'Lease Note',
-    noteText: 'Includes designated freight elevator clearance window. Utilities invoiced separately on 28th.',
-    attachmentName: 'Master_Lease_2024.pdf',
-  },
-  {
-    id: 'borrower-3',
-    name: 'David Chen',
-    initials: 'DC',
-    avatarBg: 'bg-[#0f172a]',
-    avatarText: 'text-[#d4af37]',
-    badgeNumber: 3,
-    contactOrNote: 'Cinema Tech Equip Loan (Tranche 2/4)',
-    principalAmount: 20000,
-    paymentMode: 'Bank Transfer',
-    paymentModeIcon: 'account_balance',
-    dateGiven: 'Apr 12, 2024',
-    interestRate: 0.0,
-    interestRatePeriod: 'flat rate',
-    payoutFrequency: '0% Peer Loan',
-    tenureMonths: 12,
-    termLabel: 'Installment 2 of 4',
-    nextDueDate: 'Nov 27, 2024',
-    nextDueAmount: 5000,
-    dueCountdownText: '12 Days',
-    dueCountdownType: 'normal',
-    receivedAmount: 10000,
-    totalReceivable: 20000,
-    progressPercent: 50,
-    status: 'active',
-    statusLabel: 'Active & Paying',
-    contractType: '0% Peer Loan',
-    priorityTag: 'Installment 2 of 4',
-    settlementChannel: 'Zelle / Instant Wire',
-    noteTitle: 'Promissory Note',
-    noteText: '0% personal loan agreement for camera production package. Next installment due Dec 27.',
-    attachmentName: 'Promissory_Chen_08.pdf',
-  },
-  {
-    id: 'borrower-4',
-    name: 'Apex Global Logistics',
-    initials: 'AG',
-    avatarBg: 'bg-[#f1f5f9]',
-    avatarText: 'text-[#0f172a]',
-    badgeNumber: 4,
-    contactOrNote: 'International Air Freight & Duty Customs',
-    principalAmount: 18750,
-    paymentMode: 'SWIFT International Transfer',
-    paymentModeIcon: 'language',
-    dateGiven: 'May 05, 2024',
-    interestRate: 0.0,
-    interestRatePeriod: 'flat rate',
-    payoutFrequency: 'Net-30 Invoice',
-    tenureMonths: 1,
-    termLabel: 'Extended Term',
-    nextDueDate: 'Dec 06, 2024',
-    nextDueAmount: 18750,
-    dueCountdownText: '21 Days',
-    dueCountdownType: 'normal',
-    receivedAmount: 0,
-    totalReceivable: 18750,
-    progressPercent: 0,
-    status: 'active',
-    statusLabel: 'Active & Paying',
-    contractType: 'Net-30 Invoice',
-    priorityTag: 'Extended Term',
-    settlementChannel: 'SWIFT International Transfer',
-    noteTitle: 'Customs Clearing',
-    noteText: 'AWB #948-291684. Includes import tariffs & bonded warehouse insurance.',
-    attachmentName: 'AWB_Manifest_Apex.pdf',
-  },
-  {
-    id: 'borrower-5',
-    name: 'Robert Sterling',
-    initials: 'RS',
-    avatarBg: 'bg-[#0f172a]',
-    avatarText: 'text-[#d4af37]',
-    badgeNumber: 5,
-    contactOrNote: 'robert.s@havencrest.io • +91 98200 45112',
-    principalAmount: 40000,
-    paymentMode: 'Bank Transfer',
-    paymentModeIcon: 'account_balance',
-    dateGiven: 'Jan 15, 2024',
-    interestRate: 1.5,
-    interestRatePeriod: '/ month',
-    payoutFrequency: 'Monthly Interest Payout',
-    tenureMonths: 12,
-    termLabel: '12-Month Term',
-    nextDueDate: 'Nov 15, 2024',
-    nextDueAmount: 600,
-    dueCountdownText: 'Due in 3 Days',
-    dueCountdownType: 'critical',
-    receivedAmount: 3000,
-    totalReceivable: 47200,
-    progressPercent: 32,
-    status: 'active',
-    statusLabel: 'Active & Paying',
-    contractType: 'Promissory Note',
-    priorityTag: 'Yield Asset',
-    settlementChannel: 'HDFC Direct RTGS',
-    noteTitle: 'Havencrest Bridge',
-    noteText: 'Secured promissory note with quarterly capital check-in.',
-  },
-  {
-    id: 'borrower-6',
-    name: 'Clara Hughes',
-    initials: 'CH',
-    avatarBg: 'bg-[#fdf8ea]',
-    avatarText: 'text-[#0f172a]',
-    badgeNumber: 6,
-    contactOrNote: 'Shop Expansion • Witnessed',
-    principalAmount: 15000,
-    paymentMode: 'Cash Handover',
-    paymentModeIcon: 'handshake',
-    dateGiven: 'Nov 10, 2023',
-    interestRate: 2.0,
-    interestRatePeriod: '/ month',
-    payoutFrequency: 'Monthly Interest Payout',
-    tenureMonths: 10,
-    termLabel: '10-Month Term',
-    nextDueDate: 'Nov 10, 2024',
-    nextDueAmount: 2100,
-    dueCountdownText: 'Extra Time (4d)',
-    dueCountdownType: 'warning',
-    receivedAmount: 2100,
-    totalReceivable: 18000,
-    progressPercent: 48,
-    status: 'grace',
-    statusLabel: 'Grace Period',
-    contractType: 'Personal Advance',
-    priorityTag: 'Grace Period',
-    settlementChannel: 'Cash Handover (Witnessed)',
-    noteTitle: 'Boutique Expansion',
-    noteText: 'Boutique fit-out advance, structured monthly cash return.',
-  },
-];
-
 export function LoansInterestView() {
   const { privacyMode, borrowers, addBorrower, toggleBorrowerPaid, recordLoanRepayment } = useFinance();
 
@@ -318,12 +73,12 @@ export function LoansInterestView() {
   const [formInterestType, setFormInterestType] = useState('Simple Monthly');
   const [formDuration, setFormDuration] = useState('12');
 
-  // Interactive Calculator State (stored as strings so inputs can be cleared completely without '01' glitches)
-  const [simPrincipal, setSimPrincipal] = useState<string>('25000');
-  const [simRate, setSimRate] = useState<string>('10');
-  const [simTenure, setSimTenure] = useState<string>('2');
-  const [isCompound, setIsCompound] = useState<boolean>(true);
-  const [showSchedule, setShowSchedule] = useState<boolean>(true);
+  // Interactive Calculator State (starts clean and resets to default on reload)
+  const [simPrincipal, setSimPrincipal] = useState<string>('');
+  const [simRate, setSimRate] = useState<string>('');
+  const [simTenure, setSimTenure] = useState<string>('');
+  const [isCompound, setIsCompound] = useState<boolean>(false);
+  const [showSchedule, setShowSchedule] = useState<boolean>(false);
 
   // Parsed numeric values for calculation
   const parsedPrincipal = useMemo(() => {
@@ -344,12 +99,14 @@ export function LoansInterestView() {
     return clean ? parseInt(clean, 10) : 0;
   }, [simTenure]);
 
-  // Handle Reset Calculator (clears all calculator inputs)
+  // Handle Reset Calculator (clears all calculator inputs & resets to Simple interest)
   const handleResetCalculator = () => {
     setSimPrincipal('');
     setSimRate('');
     setSimTenure('');
-    showToast('Calculator reset');
+    setIsCompound(false);
+    setShowSchedule(false);
+    showToast('Calculator reset to Simple Interest');
   };
 
   // Notification Toast
@@ -471,6 +228,41 @@ export function LoansInterestView() {
   const totalExpectedBack = totalPrincipalLent + totalInterestExpected;
   const activeCount = borrowers.filter((b) => b.status === 'active').length;
   const graceCount = borrowers.filter((b) => b.status === 'grace').length;
+
+  // Dynamically calculate monthly recurring interest from actual active loans
+  const calculatedMonthlyInflow = useMemo(() => {
+    return borrowers
+      .filter((b) => b.status === 'active')
+      .reduce((sum, b) => {
+        const monthly =
+          b.nextDueAmount ||
+          Math.round((b.principalAmount * (b.interestRate / 100)) / (b.tenureMonths || 12));
+        return sum + monthly;
+      }, 0);
+  }, [borrowers]);
+
+  // Dynamically calculate repayment rate from active and settled loans
+  const repaymentStats = useMemo(() => {
+    if (borrowers.length === 0) {
+      return { rate: '100%', label: 'No loans active', status: 'Optimal' };
+    }
+    const paidCount = borrowers.filter((b) => b.status === 'paid').length;
+    const total = paidCount + activeCount;
+    if (total === 0) return { rate: '100%', label: 'No dues pending', status: 'Optimal' };
+    const pct = Math.round((paidCount / total) * 100);
+    return {
+      rate: `${pct}%`,
+      label: pct >= 80 ? 'On-time track' : 'Review needed',
+      status: pct >= 80 ? 'Good' : 'Action',
+    };
+  }, [borrowers, activeCount]);
+
+  // Dynamically calculate average yield across all active borrowers
+  const averageYield = useMemo(() => {
+    if (borrowers.length === 0) return '0.0%';
+    const sum = borrowers.reduce((acc, b) => acc + (b.interestRate || 0), 0);
+    return `${(sum / borrowers.length).toFixed(1)}%`;
+  }, [borrowers]);
 
   // Filtered Borrowers List
   const filteredBorrowers = useMemo(() => {
@@ -755,15 +547,24 @@ export function LoansInterestView() {
       {/* Key Metrics Row (Executive Sovereign Light Luxury Cards - 5 Cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
         {/* Total Lent */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
+        <div className="bg-white p-4 md:p-5 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] text-[#76777d] uppercase tracking-wider font-semibold">Total Lent</span>
+            <span className="font-label-caps text-[10px] md:text-[11px] uppercase text-slate-500 font-bold tracking-wider">
+              Total Lent
+            </span>
             <div className="w-8 h-8 rounded-lg bg-[#f8fafc] border border-slate-200/70 flex items-center justify-center text-[#0f172a]">
               <span className="material-symbols-outlined text-base">payments</span>
             </div>
           </div>
           <div>
-            <AmountDisplay amount={totalPrincipalLent} privacyMode={privacyMode} size="2xl" />
+            <div className="flex items-baseline mt-1">
+              <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
+                {privacyMode ? '••••••' : `₹${Math.floor(totalPrincipalLent).toLocaleString('en-IN')}`}
+              </span>
+              <span className="font-label-numeric text-xs text-slate-400 font-medium">
+                {privacyMode ? '' : `.${(totalPrincipalLent % 1).toFixed(2).split('.')[1] || '00'}`}
+              </span>
+            </div>
             <div className="mt-1 flex items-center gap-1.5">
               <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#fdf8ea] text-[#9a761e] border border-[#d4af37]/30">
                 {borrowers.length} Loans
@@ -773,18 +574,27 @@ export function LoansInterestView() {
         </div>
 
         {/* Interest to Earn */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
+        <div className="bg-white p-4 md:p-5 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] text-[#76777d] uppercase tracking-wider font-semibold">Interest to Earn</span>
+            <span className="font-label-caps text-[10px] md:text-[11px] uppercase text-slate-500 font-bold tracking-wider">
+              Interest to Earn
+            </span>
             <div className="w-8 h-8 rounded-lg bg-[#fdf8ea] border border-[#d4af37]/30 flex items-center justify-center text-[#9a761e]">
               <span className="material-symbols-outlined text-base">trending_up</span>
             </div>
           </div>
           <div>
-            <AmountDisplay amount={totalInterestExpected} privacyMode={privacyMode} prefix="+₹" size="2xl" />
+            <div className="flex items-baseline mt-1">
+              <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-[#0f172a] font-semibold tracking-tight">
+                {privacyMode ? '••••••' : `+₹${Math.floor(totalInterestExpected).toLocaleString('en-IN')}`}
+              </span>
+              <span className="font-label-numeric text-xs text-slate-400 font-medium">
+                {privacyMode ? '' : `.${(totalInterestExpected % 1).toFixed(2).split('.')[1] || '00'}`}
+              </span>
+            </div>
             <div className="mt-1 flex items-center gap-1.5">
               <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                15.0% Net
+                {averageYield} Net
               </span>
               <span className="text-xs text-[#76777d]">Avg Yield</span>
             </div>
@@ -792,15 +602,24 @@ export function LoansInterestView() {
         </div>
 
         {/* Expected Back */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
+        <div className="bg-white p-4 md:p-5 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] text-[#76777d] uppercase tracking-wider font-semibold">Expected Back</span>
+            <span className="font-label-caps text-[10px] md:text-[11px] uppercase text-slate-500 font-bold tracking-wider">
+              Expected Back
+            </span>
             <div className="w-8 h-8 rounded-lg bg-[#f8fafc] border border-slate-200/70 flex items-center justify-center text-[#0f172a]">
               <span className="material-symbols-outlined text-base">account_balance</span>
             </div>
           </div>
           <div>
-            <AmountDisplay amount={totalExpectedBack} privacyMode={privacyMode} size="2xl" />
+            <div className="flex items-baseline mt-1">
+              <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
+                {privacyMode ? '••••••' : `₹${Math.floor(totalExpectedBack).toLocaleString('en-IN')}`}
+              </span>
+              <span className="font-label-numeric text-xs text-slate-400 font-medium">
+                {privacyMode ? '' : `.${(totalExpectedBack % 1).toFixed(2).split('.')[1] || '00'}`}
+              </span>
+            </div>
             <div className="mt-1 flex items-center gap-1.5">
               <span className="text-xs text-[#76777d]">Principal + Interest</span>
             </div>
@@ -808,15 +627,25 @@ export function LoansInterestView() {
         </div>
 
         {/* Monthly Inflow */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
+        <div className="bg-white p-4 md:p-5 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] text-[#76777d] uppercase tracking-wider font-semibold">Monthly Inflow</span>
+            <span className="font-label-caps text-[10px] md:text-[11px] uppercase text-slate-500 font-bold tracking-wider">
+              Monthly Inflow
+            </span>
             <div className="w-8 h-8 rounded-lg bg-[#fdf8ea] border border-[#d4af37]/30 flex items-center justify-center text-[#9a761e]">
               <span className="material-symbols-outlined text-base">savings</span>
             </div>
           </div>
           <div>
-            <AmountDisplay amount={1425} privacyMode={privacyMode} size="2xl" suffix="/ mon" />
+            <div className="flex items-baseline mt-1">
+              <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
+                {privacyMode ? '••••••' : `₹${Math.floor(calculatedMonthlyInflow).toLocaleString('en-IN')}`}
+              </span>
+              <span className="font-label-numeric text-xs text-slate-400 font-medium">
+                {privacyMode ? '' : '.00'}
+              </span>
+              <span className="text-xs text-slate-400 font-medium ml-1">/ mon</span>
+            </div>
             <div className="mt-1 flex items-center gap-1.5">
               <span className="text-xs text-[#76777d]">Recurring interest</span>
             </div>
@@ -824,22 +653,26 @@ export function LoansInterestView() {
         </div>
 
         {/* Repayment Rate */}
-        <div className="bg-white p-4 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
+        <div className="bg-white p-4 md:p-5 rounded-xl border border-slate-200/90 shadow-2xs flex flex-col justify-between hover:border-[#d4af37]/40 transition-all">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] text-[#76777d] uppercase tracking-wider font-semibold">Repayment Rate</span>
+            <span className="font-label-caps text-[10px] md:text-[11px] uppercase text-slate-500 font-bold tracking-wider">
+              Repayment Rate
+            </span>
             <div className="w-8 h-8 rounded-lg bg-[#f8fafc] border border-slate-200/70 flex items-center justify-center text-emerald-800">
               <span className="material-symbols-outlined text-base">verified</span>
             </div>
           </div>
           <div>
-            <div className="font-serif text-xl md:text-2xl text-[#0f172a] font-bold tracking-tight">
-              98.2%
+            <div className="flex items-baseline mt-1">
+              <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
+                {repaymentStats.rate}
+              </span>
             </div>
             <div className="mt-1 flex items-center gap-1.5">
               <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                Good
+                {repaymentStats.status}
               </span>
-              <span className="text-xs text-[#76777d]">On-time track</span>
+              <span className="text-xs text-[#76777d]">{repaymentStats.label}</span>
             </div>
           </div>
         </div>
@@ -1189,33 +1022,49 @@ export function LoansInterestView() {
               <span className="material-symbols-outlined text-[#0f172a] text-lg">trending_up</span>
               <span className="text-sm text-[#0f172a] font-bold">Monthly Interest Growth</span>
             </div>
-            <span className="text-xs text-emerald-800 font-bold px-2 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200">
-              +18.4% YoY
-            </span>
+            {borrowers.length > 0 ? (
+              <span className="text-xs text-emerald-800 font-bold px-2 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200">
+                {averageYield} Active Yield
+              </span>
+            ) : (
+              <span className="text-xs text-slate-500 font-medium px-2 py-0.5 rounded-lg bg-slate-100 border border-slate-200">
+                0 Active Loans
+              </span>
+            )}
           </div>
 
-          {/* SVG Glow Curve */}
+          {/* SVG Glow Curve or Clean Baseline */}
           <div className="my-2 bg-[#f8fafc] p-3 rounded-xl border border-slate-200/80">
-            <svg className="w-full h-20 overflow-visible" fill="none" viewBox="0 0 360 85">
-              <defs>
-                <linearGradient id="curveGlowLight" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor="#d4af37" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#d4af37" stopOpacity="0.02" />
-                </linearGradient>
-              </defs>
-              <path d="M 0 70 Q 50 65, 90 48 T 180 40 T 270 24 T 360 12 L 360 85 L 0 85 Z" fill="url(#curveGlowLight)" />
-              <path d="M 0 70 Q 50 65, 90 48 T 180 40 T 270 24 T 360 12" stroke="#d4af37" strokeLinecap="round" strokeWidth="2.5" />
-              <circle cx="90" cy="48" fill="#ffffff" r="4" stroke="#0f172a" strokeWidth="2" />
-              <circle cx="180" cy="40" fill="#ffffff" r="4" stroke="#0f172a" strokeWidth="2" />
-              <circle cx="270" cy="24" fill="#ffffff" r="4" stroke="#0f172a" strokeWidth="2" />
-              <circle cx="360" cy="12" fill="#d4af37" r="5" stroke="#0f172a" strokeWidth="2" />
-            </svg>
-            <div className="flex justify-between text-[11px] text-[#76777d] px-1 mt-1 font-semibold">
-              <span>May</span>
-              <span>Jun</span>
-              <span>Jul</span>
-              <span className="font-bold text-[#0f172a]">Aug (Proj)</span>
-            </div>
+            {borrowers.length === 0 ? (
+              <div className="h-20 flex flex-col items-center justify-center text-center text-slate-400">
+                <span className="material-symbols-outlined text-2xl text-slate-300 mb-0.5">show_chart</span>
+                <span className="text-xs font-medium text-slate-500">No active interest yield to plot</span>
+                <span className="text-[10px] text-slate-400">Returns will chart automatically upon lending</span>
+              </div>
+            ) : (
+              <>
+                <svg className="w-full h-20 overflow-visible" fill="none" viewBox="0 0 360 85">
+                  <defs>
+                    <linearGradient id="curveGlowLight" x1="0" x2="0" y1="0" y2="1">
+                      <stop offset="0%" stopColor="#d4af37" stopOpacity="0.3" />
+                      <stop offset="100%" stopColor="#d4af37" stopOpacity="0.02" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M 0 70 Q 50 65, 90 48 T 180 40 T 270 24 T 360 12 L 360 85 L 0 85 Z" fill="url(#curveGlowLight)" />
+                  <path d="M 0 70 Q 50 65, 90 48 T 180 40 T 270 24 T 360 12" stroke="#d4af37" strokeLinecap="round" strokeWidth="2.5" />
+                  <circle cx="90" cy="48" fill="#ffffff" r="4" stroke="#0f172a" strokeWidth="2" />
+                  <circle cx="180" cy="40" fill="#ffffff" r="4" stroke="#0f172a" strokeWidth="2" />
+                  <circle cx="270" cy="24" fill="#ffffff" r="4" stroke="#0f172a" strokeWidth="2" />
+                  <circle cx="360" cy="12" fill="#d4af37" r="5" stroke="#0f172a" strokeWidth="2" />
+                </svg>
+                <div className="flex justify-between text-[11px] text-[#76777d] px-1 mt-1 font-semibold">
+                  <span>May</span>
+                  <span>Jun</span>
+                  <span>Jul</span>
+                  <span className="font-bold text-[#0f172a]">Aug (Proj)</span>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Next Payment Due Banner */}
@@ -1227,12 +1076,18 @@ export function LoansInterestView() {
               <div className="flex flex-col">
                 <span className="text-[10px] text-[#76777d] font-semibold uppercase tracking-wider">Next Payment Due</span>
                 <span className="text-xs md:text-sm text-[#0f172a] font-bold">
-                  {privacyMode ? 'Robert Sterling • ••••••' : 'Robert Sterling • ₹600.00'}
+                  {borrowers.length > 0 ? (
+                    privacyMode
+                      ? `${borrowers[0].name} • ••••••`
+                      : `${borrowers[0].name} • ₹${(borrowers[0].nextDueAmount || Math.round((borrowers[0].principalAmount * (borrowers[0].interestRate / 100)) / (borrowers[0].tenureMonths || 12))).toLocaleString('en-IN')}`
+                  ) : (
+                    'No payments due'
+                  )}
                 </span>
               </div>
             </div>
             <span className="text-[11px] text-[#0f172a] font-bold px-2.5 py-1 rounded-lg bg-[#fdf8ea] border border-[#d4af37]/40">
-              Due in 3 Days
+              {borrowers.length > 0 ? (borrowers[0].nextDueDate || 'Active') : 'All Clear'}
             </span>
           </div>
         </div>
@@ -1269,136 +1124,47 @@ export function LoansInterestView() {
           </div>
         </div>
 
-        {/* 4 Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-1">
-          {/* Card 1: Priya Reddy */}
-          <div
-            onClick={() => {
-              const b = borrowers.find((item) => item.name.includes('Priya')) || borrowers[0];
-              if (b) setSelectedBorrower(b);
-            }}
-            className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-[#d4af37] hover:shadow-xs transition-all cursor-pointer group"
-            title="Click to view Priya Reddy's Dossier"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#fdf8ea] border border-[#d4af37]/40 text-[#0f172a] text-[11px] font-bold">
-                <span className="material-symbols-outlined text-[13px] text-[#9a761e]">timer</span>
-                3 Days Remaining
-              </span>
-              <div className="flex flex-col text-right">
-                <span className="text-[10px] text-[#76777d] uppercase">Nov</span>
-                <span className="font-bold text-xs text-[#0f172a] leading-none">20</span>
-              </div>
-            </div>
-            <div className="my-1">
-              <h3 className="font-semibold text-sm text-[#0f172a] leading-tight group-hover:text-[#9a761e] transition-colors flex items-center justify-between">
-                <span>Priya Reddy</span>
-                <span className="material-symbols-outlined text-xs text-slate-400 group-hover:text-[#9a761e]">chevron_right</span>
-              </h3>
-              <p className="text-xs text-[#76777d] truncate mt-0.5">Madhapur • Cyber Towers</p>
-            </div>
-            <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold text-[#76777d]">DUE</span>
-              <AmountDisplay amount={2500} privacyMode={privacyMode} size="sm" />
-            </div>
+        {/* 4 Cards Grid OR Clean Zero State */}
+        {borrowers.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center text-slate-500 bg-[#f8fafc] rounded-xl border border-slate-200/80 my-1">
+            <span className="material-symbols-outlined text-3xl text-slate-400 mb-1.5">event_available</span>
+            <p className="text-sm font-semibold text-slate-800">No upcoming loan repayments due</p>
+            <p className="text-xs text-slate-500 mt-0.5">When you lend money or create a promissory contract, scheduled returns will appear here.</p>
           </div>
-
-          {/* Card 2: Marcus Vance */}
-          <div
-            onClick={() => {
-              const b = borrowers.find((item) => item.name.includes('Marcus'));
-              if (b) setSelectedBorrower(b);
-            }}
-            className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-[#d4af37] hover:shadow-xs transition-all cursor-pointer group"
-            title="Click to view Marcus Vance's Dossier"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#fdf8ea] border border-[#d4af37]/40 text-[#0f172a] text-[11px] font-bold">
-                <span className="material-symbols-outlined text-[13px] text-[#9a761e]">timer</span>
-                3 Days Remaining
-              </span>
-              <div className="flex flex-col text-right">
-                <span className="text-[10px] text-[#76777d] uppercase">Nov</span>
-                <span className="font-bold text-xs text-[#0f172a] leading-none">18</span>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-1">
+            {borrowers.slice(0, 4).map((b, idx) => (
+              <div
+                key={b.id || idx}
+                onClick={() => setSelectedBorrower(b)}
+                className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-[#d4af37] hover:shadow-xs transition-all cursor-pointer group"
+                title={`Click to view ${b.name}'s Dossier`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#fdf8ea] border border-[#d4af37]/40 text-[#0f172a] text-[11px] font-bold">
+                    <span className="material-symbols-outlined text-[13px] text-[#9a761e]">timer</span>
+                    {b.nextDueDate ? `${b.nextDueDate}` : 'Active Term'}
+                  </span>
+                  <div className="flex flex-col text-right">
+                    <span className="text-[10px] text-[#76777d] uppercase">{b.contractType || 'Note'}</span>
+                    <span className="font-bold text-xs text-[#0f172a] leading-none">{b.interestRate}%</span>
+                  </div>
+                </div>
+                <div className="my-1">
+                  <h3 className="font-semibold text-sm text-[#0f172a] leading-tight group-hover:text-[#9a761e] transition-colors flex items-center justify-between">
+                    <span>{b.name}</span>
+                    <span className="material-symbols-outlined text-xs text-slate-400 group-hover:text-[#9a761e]">chevron_right</span>
+                  </h3>
+                  <p className="text-xs text-[#76777d] truncate mt-0.5">{b.contactOrNote || 'Promissory Note'}</p>
+                </div>
+                <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold text-[#76777d]">PRINCIPAL</span>
+                  <AmountDisplay amount={b.principalAmount} privacyMode={privacyMode} size="sm" />
+                </div>
               </div>
-            </div>
-            <div className="my-1">
-              <h3 className="font-semibold text-sm text-[#0f172a] leading-tight group-hover:text-[#9a761e] transition-colors flex items-center justify-between">
-                <span>Marcus Vance</span>
-                <span className="material-symbols-outlined text-xs text-slate-400 group-hover:text-[#9a761e]">chevron_right</span>
-              </h3>
-              <p className="text-xs text-[#76777d] truncate mt-0.5">General Contractor / Milesto...</p>
-            </div>
-            <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold text-[#76777d]">DUE</span>
-              <AmountDisplay amount={3500} privacyMode={privacyMode} size="sm" />
-            </div>
+            ))}
           </div>
-
-          {/* Card 3: Sarah Jenkins */}
-          <div
-            onClick={() => {
-              const b = borrowers.find((item) => item.name.includes('Sarah'));
-              if (b) setSelectedBorrower(b);
-            }}
-            className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-[#d4af37] hover:shadow-xs transition-all cursor-pointer group"
-            title="Click to view Sarah Jenkins' Dossier"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#fdf8ea] border border-[#d4af37]/40 text-[#0f172a] text-[11px] font-bold">
-                <span className="material-symbols-outlined text-[13px] text-[#9a761e]">timer</span>
-                5 Days Remaining
-              </span>
-              <div className="flex flex-col text-right">
-                <span className="text-[10px] text-[#76777d] uppercase">Nov</span>
-                <span className="font-bold text-xs text-[#0f172a] leading-none">20</span>
-              </div>
-            </div>
-            <div className="my-1">
-              <h3 className="font-semibold text-sm text-[#0f172a] leading-tight group-hover:text-[#9a761e] transition-colors flex items-center justify-between">
-                <span>Sarah Jenkins</span>
-                <span className="material-symbols-outlined text-xs text-slate-400 group-hover:text-[#9a761e]">chevron_right</span>
-              </h3>
-              <p className="text-xs text-[#76777d] truncate mt-0.5">Highline Studio Lease Q4</p>
-            </div>
-            <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold text-[#76777d]">DUE</span>
-              <AmountDisplay amount={4000} privacyMode={privacyMode} size="sm" />
-            </div>
-          </div>
-
-          {/* Card 4: David Chen */}
-          <div
-            onClick={() => {
-              const b = borrowers.find((item) => item.name.includes('David'));
-              if (b) setSelectedBorrower(b);
-            }}
-            className="bg-[#f8fafc] p-3.5 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between hover:border-[#d4af37] hover:shadow-xs transition-all cursor-pointer group"
-            title="Click to view David Chen's Dossier"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-[#0f172a] text-[11px] font-bold">
-                <span className="material-symbols-outlined text-[13px] text-[#45464d]">schedule</span>
-                12 Days
-              </span>
-              <div className="flex flex-col text-right">
-                <span className="text-[10px] text-[#76777d] uppercase">Nov</span>
-                <span className="font-bold text-xs text-[#0f172a] leading-none">27</span>
-              </div>
-            </div>
-            <div className="my-1">
-              <h3 className="font-semibold text-sm text-[#0f172a] leading-tight group-hover:text-[#9a761e] transition-colors flex items-center justify-between">
-                <span>David Chen</span>
-                <span className="material-symbols-outlined text-xs text-slate-400 group-hover:text-[#9a761e]">chevron_right</span>
-              </h3>
-              <p className="text-xs text-[#76777d] truncate mt-0.5">RED V-Raptor Equipment Loan</p>
-            </div>
-            <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold text-[#76777d]">DUE</span>
-              <AmountDisplay amount={5000} privacyMode={privacyMode} size="sm" />
-            </div>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* People You Lent Money To (Master Ledger Container) */}
@@ -1533,7 +1299,14 @@ export function LoansInterestView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs text-[#0f172a] bg-white">
-                {filteredBorrowers.map((b) => (
+                {filteredBorrowers.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-xs text-slate-500">
+                      No active promissory contracts found. Click &quot;Lend Money&quot; to log your first loan.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredBorrowers.map((b) => (
                   <tr key={b.id} className="hover:bg-slate-50/80 transition-colors">
                     {/* Borrower */}
                     <td className="py-3.5 px-4">
@@ -1625,7 +1398,8 @@ export function LoansInterestView() {
                       {renderActionButtons(b)}
                     </td>
                   </tr>
-                ))}
+                ))
+              )}
               </tbody>
             </table>
           </div>
@@ -1634,12 +1408,33 @@ export function LoansInterestView() {
         {/* View 2: Cards (List) View */}
         {viewMode === 'cards' && (
           <div className="flex flex-col gap-4 p-4 md:p-5 bg-slate-50/60">
-            {filteredBorrowers.map((b) => (
+            {filteredBorrowers.length === 0 ? (
+              <div className="py-14 px-4 flex flex-col items-center justify-center text-center bg-white rounded-2xl border border-slate-200">
+                <div className="w-16 h-16 rounded-2xl bg-[#fdf8ea] border border-[#d4af37]/30 flex items-center justify-center text-[#9a761e] mb-3">
+                  <span className="material-symbols-outlined text-3xl">handshake</span>
+                </div>
+                <h3 className="font-headline-sm text-base font-semibold text-slate-900 mb-1">
+                  No active promissory contracts
+                </h3>
+                <p className="font-body-sm text-xs text-slate-500 max-w-sm mb-4">
+                  Log your first borrower contract or lending disbursal to begin automated interest tracking.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(true)}
+                  className="px-4 py-2.5 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-sm">add</span>
+                  <span>Lend Money / New Borrower</span>
+                </button>
+              </div>
+            ) : (
+              filteredBorrowers.map((b) => (
               <div
                 key={b.id}
                 className="bg-white rounded-2xl border border-slate-200 p-4 md:p-5 shadow-2xs hover:border-[#d4af37]/40 transition-all flex flex-col gap-3.5"
               >
-                <div className="grid grid-cols-1 lg:grid-cols-[minmax(220px,1.5fr)_minmax(200px,1.1fr)_minmax(180px,1fr)_165px] items-center gap-4 lg:gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3.2fr)_minmax(0,2.6fr)_minmax(0,2.1fr)_165px] items-center gap-4 lg:gap-6">
                   {/* Left: Avatar + Details */}
                   <div
                     onClick={() => setSelectedBorrower(b)}
@@ -1685,7 +1480,7 @@ export function LoansInterestView() {
                   </div>
 
                   {/* Middle Left: Balance Due Progress */}
-                  <div className="flex flex-col w-full">
+                  <div className="flex flex-col w-full min-w-0">
                     <div className="flex items-baseline gap-1.5 whitespace-nowrap">
                       <span className="text-[10px] text-[#76777d] uppercase font-semibold shrink-0">BALANCE DUE</span>
                       <AmountDisplay amount={b.nextDueAmount} privacyMode={privacyMode} size="base" />
@@ -1707,7 +1502,7 @@ export function LoansInterestView() {
                   </div>
 
                   {/* Middle Right: Strict Due Date */}
-                  <div className="flex flex-col text-xs text-[#45464d] w-full">
+                  <div className="flex flex-col text-xs text-[#45464d] w-full min-w-0">
                     <span className="text-[10px] uppercase font-semibold text-[#76777d]">STRICT DUE DATE</span>
                     <div className="flex items-center gap-1 font-semibold text-[#0f172a] mt-0.5 whitespace-nowrap">
                       <span className="material-symbols-outlined text-sm text-[#9a761e]">calendar_today</span>
@@ -1720,9 +1515,10 @@ export function LoansInterestView() {
                   {renderActionButtons(b)}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
+      )}
 
         {/* Table Footer Meta & Summary */}
         <div className="p-4 bg-[#f8fafc] border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-2 text-[#45464d] text-xs font-medium">

@@ -243,7 +243,7 @@ export function ExpenseTable() {
                     {privacyMode ? (
                       <span className="font-serif font-bold text-sm text-slate-900">••••••</span>
                     ) : (
-                      <div className="inline-flex items-baseline justify-end gap-0.5">
+                      <div className="inline-flex items-baseline justify-end">
                         <span className="font-serif font-bold text-sm text-red-700 tracking-tight">
                           -₹{Math.floor(exp.amount).toLocaleString('en-IN')}
                         </span>

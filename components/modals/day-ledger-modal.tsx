@@ -88,7 +88,8 @@ export function DayLedgerModal({
         }))
     : [];
 
-  const baseDayEntries = INITIAL_NOTEBOOK_ENTRIES.filter((e) => e.dateKey === currentDateKey);
+  const isZeroState = expenses.length === 0;
+  const baseDayEntries = isZeroState ? [] : INITIAL_NOTEBOOK_ENTRIES.filter((e) => e.dateKey === currentDateKey);
   const dayEntries = [...dynamicTodayEntries, ...baseDayEntries];
 
   // Filter entries
@@ -312,7 +313,7 @@ export function DayLedgerModal({
                   <span className="text-[10px] md:text-[11px] uppercase text-slate-400 font-bold tracking-wider">
                     TODAY&apos;S INFLOW
                   </span>
-                  <div className="flex items-baseline gap-1 mt-1">
+                  <div className="flex items-baseline mt-1">
                     <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                       {privacyMode ? '••••••' : `₹${Math.floor(dayConfig.inflow).toLocaleString('en-IN')}`}
                     </span>
@@ -353,7 +354,7 @@ export function DayLedgerModal({
                   <span className="text-[10px] md:text-[11px] uppercase text-slate-400 font-bold tracking-wider">
                     TODAY&apos;S OUTFLOW
                   </span>
-                  <div className="flex items-baseline gap-1 mt-1">
+                  <div className="flex items-baseline mt-1">
                     <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-red-700 font-semibold tracking-tight">
                       {privacyMode ? '••••••' : `₹${Math.floor(dayConfig.outflow).toLocaleString('en-IN')}`}
                     </span>
@@ -477,7 +478,7 @@ export function DayLedgerModal({
                     {privacyMode ? (
                       <span className="text-base font-bold text-slate-900 tracking-tight font-serif">••••••</span>
                     ) : (
-                      <div className="flex items-baseline gap-0.5">
+                      <div className="flex items-baseline">
                         <span className="text-base font-bold text-slate-900 tracking-tight font-serif">
                           -₹{Math.floor(item.amount).toLocaleString('en-IN')}
                         </span>

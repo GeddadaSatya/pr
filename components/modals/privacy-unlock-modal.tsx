@@ -16,6 +16,7 @@ export function PrivacyUnlockModal() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [isChangingPin, setIsChangingPin] = useState(false);
   const [newPin, setNewPin] = useState('');
   const [changeSuccess, setChangeSuccess] = useState(false);
@@ -25,6 +26,7 @@ export function PrivacyUnlockModal() {
     if (isPrivacyModalOpen) {
       setPassword('');
       setError(null);
+      setIsVerifying(false);
       setIsChangingPin(false);
       setNewPin('');
       setChangeSuccess(false);
@@ -36,19 +38,29 @@ export function PrivacyUnlockModal() {
 
   if (!isPrivacyModalOpen) return null;
 
-  const handleUnlock = (e: React.FormEvent) => {
+  const handleUnlock = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!password.trim()) {
-      setError('Please enter your password or PIN.');
+      setError('Please enter your account password or PIN.');
       return;
     }
 
-    if (verifyPrivacyPin(password.trim())) {
-      setPrivacyMode(false);
-      closePrivacyModal();
-    } else {
-      setError('Incorrect password. Default PIN is 1234.');
-      inputRef.current?.select();
+    setIsVerifying(true);
+    setError(null);
+
+    try {
+      const valid = await verifyPrivacyPin(password.trim());
+      if (valid) {
+        setPrivacyMode(false);
+        closePrivacyModal();
+      } else {
+        setError('Incorrect credentials. Please enter your account password or custom PIN.');
+        inputRef.current?.select();
+      }
+    } catch {
+      setError('Failed to verify credentials. Please try again.');
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -65,6 +77,8 @@ export function PrivacyUnlockModal() {
     setPassword(newPin.trim());
   };
 
+  if (!isPrivacyModalOpen) return null;
+
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
       <div className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 relative animate-in zoom-in-95 duration-200">
@@ -79,7 +93,7 @@ export function PrivacyUnlockModal() {
                 Unlock Privacy Mode
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Enter password to reveal balances
+                Enter account password or custom PIN
               </p>
             </div>
           </div>
@@ -114,7 +128,7 @@ export function PrivacyUnlockModal() {
           <form onSubmit={handleUnlock} className="flex flex-col gap-3.5">
             <div>
               <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5">
-                Vault Password / PIN
+                Account Password or PIN
               </label>
               <div className="relative flex items-center">
                 <span className="material-symbols-outlined absolute left-3 text-slate-400 text-base pointer-events-none">
@@ -128,7 +142,7 @@ export function PrivacyUnlockModal() {
                     setPassword(e.target.value);
                     if (error) setError(null);
                   }}
-                  placeholder="Enter PIN (Default: 1234)"
+                  placeholder="Enter account password or PIN"
                   className="w-full h-11 pl-9 pr-10 text-xs md:text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#d4af37]/40 focus:border-[#d4af37] focus:bg-white transition-all shadow-2xs"
                 />
                 <button
@@ -144,27 +158,37 @@ export function PrivacyUnlockModal() {
               </div>
             </div>
 
-            <div className="text-[11px] text-slate-400 flex items-center justify-between">
-              <span>Default PIN: <strong className="text-slate-600 font-mono">1234</strong></span>
+            <div className="text-[11px] text-slate-500 flex items-center justify-between">
+              <span>Default: <strong className="text-slate-700 font-medium">Account Password</strong></span>
               <button
                 type="button"
                 onClick={() => {
                   setIsChangingPin(true);
                   setError(null);
                 }}
-                className="text-[#b48e28] hover:underline font-semibold cursor-pointer"
+                className="text-[#b48e28] hover:underline font-bold cursor-pointer"
               >
-                Change PIN
+                {privacyPin ? 'Change PIN' : 'Set Quick PIN'}
               </button>
             </div>
 
             {/* Standardized Gold Unlock Button */}
             <button
               type="submit"
-              className="w-full h-11 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs md:text-sm shadow-xs hover:shadow transition-all flex items-center justify-center gap-1.5 cursor-pointer mt-1"
+              disabled={isVerifying}
+              className="w-full h-11 rounded-xl bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs md:text-sm shadow-xs hover:shadow transition-all flex items-center justify-center gap-1.5 cursor-pointer mt-1 disabled:opacity-60"
             >
-              <span className="material-symbols-outlined text-base">lock_open</span>
-              <span>Unlock &amp; Reveal Values</span>
+              {isVerifying ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                  <span>Verifying Credentials...</span>
+                </>
+              ) : (
+                <>
+                  <span className="material-symbols-outlined text-base">lock_open</span>
+                  <span>Unlock &amp; Reveal Values</span>
+                </>
+              )}
             </button>
           </form>
         ) : (

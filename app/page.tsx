@@ -24,13 +24,38 @@ import { SearchModal } from '@/components/modals/search-modal';
 import { NotificationsDrawer } from '@/components/modals/notifications-drawer';
 
 import { useFinance } from '@/components/context/finance-context';
+import { createClient } from '@/utils/supabase/client';
 
 function DashboardContent() {
   const { activeTab, setActiveTab, isCollapsed } = useFinance();
   const [previousTab, setPreviousTab] = useState<'overview' | 'expenses'>('expenses');
-  const [selectedDateKey, setSelectedDateKey] = useState('2026-10-28');
+  const todayDateKey = new Date().toISOString().slice(0, 10);
+  const [selectedDateKey, setSelectedDateKey] = useState(todayDateKey);
 
-  const handleOpenDayLedger = (dateKey: string = '2026-10-28') => {
+  // Recovery Interceptor: If user arrives at root with password recovery tokens, immediately forward to /reset-password
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const hash = window.location.hash;
+    const search = window.location.search;
+
+    if (hash.includes('type=recovery') || search.includes('type=recovery')) {
+      window.location.href = `/reset-password${hash || search}`;
+      return;
+    }
+
+    try {
+      const supabase = createClient();
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          window.location.href = '/reset-password';
+        }
+      });
+      return () => subscription.unsubscribe();
+    } catch {}
+  }, []);
+
+  const handleOpenDayLedger = (dateKey: string = todayDateKey) => {
     setPreviousTab(activeTab === 'expenses' ? 'expenses' : 'overview');
     setSelectedDateKey(dateKey);
     setActiveTab('day-ledger');
@@ -80,7 +105,7 @@ function DashboardContent() {
                 <KpiCarousel />
 
                 {/* Daily Inflow & Outflow Pulse */}
-                <DailyFlowKpi onOpenDayLedger={() => handleOpenDayLedger('2026-10-28')} />
+                <DailyFlowKpi onOpenDayLedger={() => handleOpenDayLedger(todayDateKey)} />
 
                 {/* Recent Daily Expenses Table (Filterable & Exportable) */}
                 <ExpenseTable />

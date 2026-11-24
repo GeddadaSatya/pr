@@ -1,21 +1,51 @@
 import { NextResponse } from 'next/server';
-import { INITIAL_EXPENSES } from '@/lib/mock-data';
+import { getAdminSupabase } from '@/lib/supabase/server-client';
 import { ExpenseItem } from '@/lib/types';
 
-// In-memory server store for local API operations
-let serverExpenses: ExpenseItem[] = [...INITIAL_EXPENSES];
+// In-memory fallback cache
+let localExpenses: ExpenseItem[] = [];
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const category = searchParams.get('category');
   const search = searchParams.get('search');
 
-  let results = [...serverExpenses];
+  const supabase = getAdminSupabase();
+  if (supabase) {
+    try {
+      let query = supabase.from('expenses').select('*').order('created_at', { ascending: false });
+      if (category && category !== 'all') {
+        query = query.ilike('category', `%${category}%`);
+      }
+      if (search) {
+        query = query.ilike('title', `%${search}%`);
+      }
+      const { data, error } = await query;
+      if (!error && data && data.length > 0) {
+        const mapped: ExpenseItem[] = data.map((d: any) => ({
+          id: d.id,
+          title: d.title,
+          subtitle: d.subtitle,
+          category: d.category,
+          categoryColor: d.category_color,
+          paidWith: d.paid_with,
+          amount: parseFloat(d.amount) || 0,
+          receiptUrl: d.receipt_url,
+          tag: d.tag,
+          statusBadge: d.status_badge,
+          icon: d.icon,
+          dateTime: d.date_time,
+          dateKey: d.date_key,
+        }));
+        return NextResponse.json({ success: true, count: mapped.length, data: mapped });
+      }
+    } catch {}
+  }
 
+  let results = [...localExpenses];
   if (category && category !== 'all') {
     results = results.filter((e) => e.category.toLowerCase() === category.toLowerCase());
   }
-
   if (search) {
     const s = search.toLowerCase();
     results = results.filter(
@@ -36,6 +66,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Invalid expense payload' }, { status: 400 });
     }
 
+    const today = new Date();
     const newExpense: ExpenseItem = {
       id: body.id || `exp-${Date.now()}`,
       title: body.title,
@@ -44,16 +75,35 @@ export async function POST(request: Request) {
       categoryColor: body.categoryColor || '#d4af37',
       paidWith: body.paidWith || 'Bank Transfer',
       dateTime: body.dateTime || 'Today, Just now',
-      dateKey: body.dateKey || new Date().toISOString().slice(0, 10),
+      dateKey: body.dateKey || today.toISOString().slice(0, 10),
       amount: body.amount,
       receiptUrl: body.receiptUrl,
       tag: body.tag || `#${(body.category || 'General').split(' ')[0]}`,
-      statusBadge: 'Verified Receipt',
+      statusBadge: body.statusBadge || 'Verified Receipt',
       icon: body.icon || 'receipt_long',
-      dateGroup: 'Today',
     };
 
-    serverExpenses = [newExpense, ...serverExpenses];
+    const supabase = getAdminSupabase();
+    if (supabase) {
+      try {
+        await supabase.from('expenses').insert({
+          title: newExpense.title,
+          subtitle: newExpense.subtitle,
+          category: newExpense.category,
+          category_color: newExpense.categoryColor,
+          paid_with: newExpense.paidWith,
+          amount: newExpense.amount,
+          receipt_url: newExpense.receiptUrl,
+          tag: newExpense.tag,
+          status_badge: newExpense.statusBadge,
+          icon: newExpense.icon,
+          date_time: newExpense.dateTime,
+          date_key: newExpense.dateKey,
+        });
+      } catch {}
+    }
+
+    localExpenses = [newExpense, ...localExpenses];
     return NextResponse.json({ success: true, data: newExpense }, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
@@ -63,11 +113,17 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
-
   if (!id) {
-    return NextResponse.json({ success: false, error: 'ID parameter is required' }, { status: 400 });
+    return NextResponse.json({ success: false, error: 'ID is required' }, { status: 400 });
   }
 
-  serverExpenses = serverExpenses.filter((e) => e.id !== id);
-  return NextResponse.json({ success: true, message: `Expense ${id} deleted` });
+  const supabase = getAdminSupabase();
+  if (supabase) {
+    try {
+      await supabase.from('expenses').delete().eq('id', id);
+    } catch {}
+  }
+
+  localExpenses = localExpenses.filter((e) => e.id !== id);
+  return NextResponse.json({ success: true, message: 'Expense deleted successfully' });
 }

@@ -13,13 +13,15 @@ interface DayLedgerViewProps {
 }
 
 export function DayLedgerView({
-  selectedDateKey = '2026-10-28',
+  selectedDateKey,
   onBack,
   previousTabTitle = 'Expense Notebook',
   onDateChange,
 }: DayLedgerViewProps) {
+  const defaultDateKey = new Date().toISOString().slice(0, 10);
+  const activeDate = selectedDateKey || defaultDateKey;
   const { privacyMode, openModal, expenses, setActiveTab, computeDayLedger } = useFinance();
-  const [currentDateKey, setCurrentDateKey] = useState(selectedDateKey);
+  const [currentDateKey, setCurrentDateKey] = useState(activeDate);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
@@ -321,7 +323,7 @@ export function DayLedgerView({
                   <span className="text-[10px] md:text-[11px] uppercase text-slate-400 font-bold tracking-wider">
                     TODAY&apos;S INFLOW
                   </span>
-                  <div className="flex items-baseline gap-1 mt-1">
+                  <div className="flex items-baseline mt-1">
                     <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                       {privacyMode ? '••••••' : `₹${Math.floor(dayConfig.inflow).toLocaleString('en-IN')}`}
                     </span>
@@ -362,7 +364,7 @@ export function DayLedgerView({
                   <span className="text-[10px] md:text-[11px] uppercase text-slate-400 font-bold tracking-wider">
                     TODAY&apos;S OUTFLOW
                   </span>
-                  <div className="flex items-baseline gap-1 mt-1">
+                  <div className="flex items-baseline mt-1">
                     <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-red-700 font-semibold tracking-tight">
                       {privacyMode ? '••••••' : `₹${Math.floor(dayConfig.outflow).toLocaleString('en-IN')}`}
                     </span>
@@ -490,7 +492,7 @@ export function DayLedgerView({
                     {privacyMode ? (
                       <span className="text-base font-bold text-slate-900 tracking-tight font-serif">••••••</span>
                     ) : (
-                      <div className="flex items-baseline gap-0.5">
+                      <div className="flex items-baseline">
                         <span className="text-base font-bold text-slate-900 tracking-tight font-serif">
                           -₹{Math.floor(item.amount).toLocaleString('en-IN')}
                         </span>

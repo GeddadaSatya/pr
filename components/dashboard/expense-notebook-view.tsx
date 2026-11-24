@@ -353,7 +353,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
             <span className="material-symbols-outlined text-slate-400 text-lg">speed</span>
           </div>
           <div>
-            <div className="flex items-baseline gap-1 mt-1">
+            <div className="flex items-baseline mt-1">
               <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                 {privacyMode ? '••••••' : `₹${Math.floor(dailyAverageSpend).toLocaleString('en-IN')}`}
               </span>
@@ -363,9 +363,15 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
               <span className="text-xs text-slate-400 font-medium ml-0.5">/day</span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs text-emerald-800 font-medium">
-            <span className="material-symbols-outlined text-sm">check_circle</span>
-            <span>Well within ₹250 budget target</span>
+          <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs font-medium">
+            {dailyAverageSpend > 0 ? (
+              <>
+                <span className="material-symbols-outlined text-sm text-emerald-700">check_circle</span>
+                <span className="text-emerald-800">Calculated across active days</span>
+              </>
+            ) : (
+              <span className="text-slate-400">No expenses logged today</span>
+            )}
           </div>
         </div>
 
@@ -379,21 +385,26 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
             <span className="material-symbols-outlined text-slate-400 text-lg">receipt_long</span>
           </div>
           <div>
-            <div className="flex items-baseline gap-1 mt-1">
+            <div className="flex items-baseline mt-1">
               <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-red-700 font-semibold tracking-tight">
                 {privacyMode ? '••••••' : `₹${Math.floor(totalSpentThisMonth).toLocaleString('en-IN')}`}
               </span>
               <span className="font-label-numeric text-xs text-red-500 font-medium">
-                {privacyMode ? '' : `.${(totalSpentThisMonth % 1).toFixed(2).split('.')[1] || '40'}`}
+                {privacyMode ? '' : `.${(totalSpentThisMonth % 1).toFixed(2).split('.')[1] || '00'}`}
               </span>
             </div>
           </div>
           <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs font-medium">
-            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[11px] font-bold bg-red-50 text-red-700 border border-red-200/60">
-              <span className="material-symbols-outlined text-xs">trending_down</span>
-              <span>-4.2%</span>
-            </span>
-            <span className="text-slate-500">vs previous month</span>
+            {totalSpentThisMonth > 0 ? (
+              <>
+                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                  <span>Active Cycle</span>
+                </span>
+                <span className="text-slate-500">current expenditures</span>
+              </>
+            ) : (
+              <span className="text-slate-400">Zero spend this cycle</span>
+            )}
           </div>
         </div>
 
@@ -416,7 +427,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           </div>
           <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs text-slate-500 font-medium">
             <span className="material-symbols-outlined text-sm text-slate-400">verified</span>
-            <span>38 verified with tax receipts</span>
+            <span>{totalNotebookEntriesCount > 0 ? `${totalNotebookEntriesCount} verified in ledger` : 'No entries recorded'}</span>
           </div>
         </div>
       </div>
@@ -507,9 +518,6 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                       : 'bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200/60'
                   }`}
                 >
-                  {isSelected && (
-                    <span className="material-symbols-outlined text-xs text-slate-950 font-bold">check</span>
-                  )}
                   <span className="material-symbols-outlined text-xs">{cat.icon}</span>
                   <span>{cat.tag}</span>
                 </button>

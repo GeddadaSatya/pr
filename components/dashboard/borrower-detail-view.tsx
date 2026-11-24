@@ -73,61 +73,40 @@ export function BorrowerDetailView({
   const repaymentPacing = activeBorrower.repaymentPacing || `${activeBorrower.progressPercent > 0 ? activeBorrower.progressPercent.toFixed(1) : '90.0'}%`;
   const lifetimeCollected = activeBorrower.lifetimeCollected || (activeBorrower.principalAmount * 2.5);
 
-  // Distribution advances
-  const [advances, setAdvances] = useState<AdvanceRow[]>([
+  // Distribution advances tailored dynamically to borrower
+  const [advances, setAdvances] = useState<AdvanceRow[]>(() => [
     {
-      id: 'adv-1',
-      advanceId: 'ADV-2010',
-      agent: 'Rahul Sharma (Field Agent)',
-      issueDate: '14 May 2024',
-      issueAmount: 25000,
-      outstandingTotal: 0,
-      total: 25000,
-    },
-    {
-      id: 'adv-2',
-      advanceId: 'ADV-3010',
-      agent: 'Suresh Varma',
-      issueDate: '18 Aug 2024',
-      issueAmount: 20000,
-      outstandingTotal: 5000,
-      total: 15000,
-    },
-    {
-      id: 'adv-3',
-      advanceId: 'ADV-1021',
-      agent: 'Arjun Sharma (Owner)',
-      issueDate: '05 Jan 2025',
-      issueAmount: 20000,
-      outstandingTotal: 10000,
-      total: 10000,
+      id: `adv-${activeBorrower.id}-1`,
+      advanceId: `ADV-${activeBorrower.badgeNumber || 1}01`,
+      agent: 'Field Officer (Witnessed)',
+      issueDate: activeBorrower.dateGiven || '14 May 2024',
+      issueAmount: activeBorrower.principalAmount,
+      outstandingTotal: Math.max(0, activeBorrower.totalReceivable - activeBorrower.receivedAmount),
+      total: activeBorrower.totalReceivable,
     },
   ]);
 
-  // Repayments history
-  const [repayments, setRepayments] = useState<RepaymentItem[]>([
-    {
-      id: 'rep-4',
-      date: 'Nov 20, 2026',
-      installmentNumber: 4,
-      amount: 5333,
-      status: 'Upcoming',
-    },
-    {
-      id: 'rep-3',
-      date: 'Oct 20, 2026',
-      installmentNumber: 3,
-      amount: 5333,
-      status: 'Completed',
-    },
-    {
-      id: 'rep-2',
-      date: 'Sep 20, 2026',
-      installmentNumber: 2,
-      amount: 5333,
-      status: 'Completed',
-    },
-  ]);
+  // Repayments history tailored dynamically to borrower
+  const [repayments, setRepayments] = useState<RepaymentItem[]>(() => {
+    const list: RepaymentItem[] = [];
+    const tenure = activeBorrower.tenureMonths || 12;
+    const installmentAmt = Math.round(activeBorrower.totalReceivable / tenure);
+    const paidInstallments = Math.min(
+      Math.floor(activeBorrower.receivedAmount / (installmentAmt || 1)),
+      tenure
+    );
+
+    for (let i = 1; i <= Math.min(tenure, 6); i++) {
+      list.push({
+        id: `rep-${activeBorrower.id}-${i}`,
+        date: i === 1 ? (activeBorrower.nextDueDate || 'Upcoming') : `Cycle #${i}`,
+        installmentNumber: i,
+        amount: installmentAmt,
+        status: i <= paidInstallments ? 'Completed' : 'Upcoming',
+      });
+    }
+    return list;
+  });
 
   // Documents
   const [documents, setDocuments] = useState<DocumentItem[]>([

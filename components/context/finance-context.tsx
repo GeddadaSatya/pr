@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { createClient } from '@/utils/supabase/client';
 import {
   ExpenseItem,
   PayableItem,
@@ -76,7 +77,7 @@ interface FinanceContextType {
   closePrivacyModal: () => void;
   privacyPin: string;
   setPrivacyPin: (pin: string) => void;
-  verifyPrivacyPin: (pin: string) => boolean;
+  verifyPrivacyPin: (pin: string) => Promise<boolean>;
 
   // Transaction Modal
   isModalOpen: boolean;
@@ -147,13 +148,19 @@ const FinanceContext = createContext<FinanceContextType | undefined>(undefined);
 
 export function FinanceProvider({ children }: { children: React.ReactNode }) {
   // Primary Entity Collections with Initial Seeding
-  const [expenses, setExpenses] = useState<ExpenseItem[]>(INITIAL_EXPENSES);
-  const [payables, setPayables] = useState<PayableItem[]>(INITIAL_PAYABLES);
-  const [borrowers, setBorrowers] = useState<BorrowerLoan[]>(INITIAL_BORROWERS);
-  const [assets, setAssets] = useState<AssetHolding[]>(INITIAL_ASSETS);
-  const [peerReceivables, setPeerReceivables] = useState<PeerReceivableItem[]>(INITIAL_PEER_RECEIVABLES);
-  const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
-  const [userProfile, setUserProfile] = useState<UserProfile>(INITIAL_USER);
+  const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
+  const [payables, setPayables] = useState<PayableItem[]>([]);
+  const [borrowers, setBorrowers] = useState<BorrowerLoan[]>([]);
+  const [assets, setAssets] = useState<AssetHolding[]>([]);
+  const [peerReceivables, setPeerReceivables] = useState<PeerReceivableItem[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [userProfile, setUserProfile] = useState<UserProfile>({
+    name: 'Executive Client',
+    email: '',
+    tier: 'Private Tier',
+    code: '#0001',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&h=256&q=80',
+  });
 
   // Backward-compatible `loans` state derived from borrowers
   const loans: LoanItem[] = useMemo(() => {
@@ -172,7 +179,10 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   // Security & Privacy State
   const [privacyMode, setPrivacyMode] = useState<boolean>(true);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState<boolean>(false);
-  const [privacyPin, setPrivacyPinState] = useState<string>('1234');
+  const [privacyPin, setPrivacyPinState] = useState<string>('');
+
+  // User-scoped persistent storage prefix ref (ensures data is never overwritten or lost on refresh)
+  const storagePrefixRef = useRef<string>('wt_');
 
   // Modals & Drawers
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -218,29 +228,160 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  // Rehydrate all collections from localStorage on client mount
+  // Rehydrate collections & check authenticated user on client mount
   useEffect(() => {
     setPrivacyMode(true);
-    const savedPin = localStorage.getItem('wt_privacy_pin');
-    if (savedPin) setPrivacyPinState(savedPin);
 
-    const loadLocal = <T,>(key: string, setter: (val: T) => void, fallback: T) => {
+    const isDemoSession = typeof document !== 'undefined' && document.cookie.includes('sovereign_demo_session=true');
+
+    // If password recovery token is detected in URL hash, bypass dashboard initialization
+    if (typeof window !== 'undefined' && window.location.hash.includes('type=recovery')) {
+      return;
+    }
+
+    const initUserData = async () => {
       try {
-        const raw = localStorage.getItem(key);
-        if (raw !== null) {
-          setter(JSON.parse(raw));
+        const supabase = createClient();
+        const { data } = await supabase.auth.getUser();
+        const user = data?.user;
+
+        if (user) {
+          // Real Authenticated User -> Set their real identity
+          const userKeyPrefix = `wt_${user.id}_`;
+          storagePrefixRef.current = userKeyPrefix;
+
+          const fullName =
+            user.user_metadata?.full_name ||
+            user.email?.split('@')[0] ||
+            'Executive Client';
+          setUserProfile({
+            name: fullName,
+            email: user.email || '',
+            tier: user.user_metadata?.tier_label || 'Private Tier',
+            code: `#${user.id.slice(0, 4).toUpperCase()}`,
+            avatarUrl:
+              user.user_metadata?.avatar_url ||
+              'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&h=256&q=80',
+          });
+
+          // Rehydrate custom user privacy PIN if previously configured
+          const userSavedPin = localStorage.getItem(`${userKeyPrefix}privacy_pin`) || localStorage.getItem('wt_privacy_pin');
+          if (userSavedPin) {
+            setPrivacyPinState(userSavedPin);
+          }
+
+          // Check user-scoped storage key with seamless fallback
+          const loadUserScoped = <T,>(keySuffix: string, setter: (val: T) => void, fallback: T) => {
+            try {
+              const raw = localStorage.getItem(userKeyPrefix + keySuffix);
+              if (raw !== null) {
+                setter(JSON.parse(raw));
+                return;
+              }
+              // Also check unscoped key for migration if user already added items previously
+              const unscoped = localStorage.getItem(`wt_${keySuffix}`);
+              if (unscoped !== null) {
+                const parsed = JSON.parse(unscoped);
+                setter(parsed);
+                localStorage.setItem(userKeyPrefix + keySuffix, unscoped);
+                return;
+              }
+            } catch {}
+            // FOR NEW REAL USERS: EMPTY ZERO-STATE!
+            setter(fallback);
+          };
+
+          loadUserScoped<ExpenseItem[]>('expenses', setExpenses, []);
+          loadUserScoped<PayableItem[]>('payables', setPayables, []);
+          loadUserScoped<BorrowerLoan[]>('borrowers', setBorrowers, []);
+          loadUserScoped<AssetHolding[]>('assets', setAssets, []);
+          loadUserScoped<PeerReceivableItem[]>('peer_receivables', setPeerReceivables, []);
+          loadUserScoped<NotificationItem[]>('notifications', setNotifications, []);
+
+          // Background Supabase DB sync if tables exist in PostgreSQL
+          try {
+            const { data: dbExpenses, error } = await supabase
+              .from('expenses')
+              .select('*')
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false });
+            if (!error && dbExpenses && dbExpenses.length > 0) {
+              const mapped: ExpenseItem[] = dbExpenses.map((d: any) => ({
+                id: d.id,
+                title: d.title,
+                subtitle: d.subtitle,
+                category: d.category,
+                categoryColor: d.category_color,
+                paidWith: d.paid_with,
+                amount: parseFloat(d.amount) || 0,
+                receiptUrl: d.receipt_url,
+                tag: d.tag,
+                statusBadge: d.status_badge,
+                icon: d.icon,
+                dateTime: d.date_time,
+                dateKey: d.date_key,
+              }));
+              setExpenses(mapped);
+              localStorage.setItem(`${userKeyPrefix}expenses`, JSON.stringify(mapped));
+            }
+          } catch {}
+
+          return;
         }
-      } catch (err) {
-        setter(fallback);
+      } catch {}
+
+      // If demo mode preview was chosen:
+      if (isDemoSession) {
+        storagePrefixRef.current = 'wt_demo_';
+        const savedDemoPin = localStorage.getItem('wt_demo_privacy_pin') || localStorage.getItem('wt_privacy_pin');
+        if (savedDemoPin) setPrivacyPinState(savedDemoPin);
+
+        const loadDemo = <T,>(keySuffix: string, setter: (val: T) => void, fallback: T) => {
+          try {
+            const raw = localStorage.getItem(`wt_demo_${keySuffix}`);
+            if (raw !== null) {
+              setter(JSON.parse(raw));
+              return;
+            }
+          } catch {}
+          setter(fallback);
+        };
+
+        loadDemo<ExpenseItem[]>('expenses', setExpenses, INITIAL_EXPENSES);
+        loadDemo<PayableItem[]>('payables', setPayables, INITIAL_PAYABLES);
+        loadDemo<BorrowerLoan[]>('borrowers', setBorrowers, INITIAL_BORROWERS);
+        loadDemo<AssetHolding[]>('assets', setAssets, INITIAL_ASSETS);
+        loadDemo<PeerReceivableItem[]>('peer_receivables', setPeerReceivables, INITIAL_PEER_RECEIVABLES);
+        loadDemo<NotificationItem[]>('notifications', setNotifications, INITIAL_NOTIFICATIONS);
+        setUserProfile(INITIAL_USER);
+        return;
       }
+
+      // Default: clean empty state for any new visitor
+      storagePrefixRef.current = 'wt_';
+      const savedPin = localStorage.getItem('wt_privacy_pin');
+      if (savedPin) setPrivacyPinState(savedPin);
+
+      const loadLocal = <T,>(key: string, setter: (val: T) => void, fallback: T) => {
+        try {
+          const raw = localStorage.getItem(key);
+          if (raw !== null) {
+            setter(JSON.parse(raw));
+            return;
+          }
+        } catch {}
+        setter(fallback);
+      };
+
+      loadLocal<ExpenseItem[]>('wt_expenses', setExpenses, []);
+      loadLocal<PayableItem[]>('wt_payables', setPayables, []);
+      loadLocal<BorrowerLoan[]>('wt_borrowers', setBorrowers, []);
+      loadLocal<AssetHolding[]>('wt_assets', setAssets, []);
+      loadLocal<PeerReceivableItem[]>('wt_peer_receivables', setPeerReceivables, []);
+      loadLocal<NotificationItem[]>('wt_notifications', setNotifications, []);
     };
 
-    loadLocal('wt_expenses', setExpenses, INITIAL_EXPENSES);
-    loadLocal('wt_payables', setPayables, INITIAL_PAYABLES);
-    loadLocal('wt_borrowers', setBorrowers, INITIAL_BORROWERS);
-    loadLocal('wt_assets', setAssets, INITIAL_ASSETS);
-    loadLocal('wt_peer_receivables', setPeerReceivables, INITIAL_PEER_RECEIVABLES);
-    loadLocal('wt_notifications', setNotifications, INITIAL_NOTIFICATIONS);
+    initUserData();
   }, []);
 
   // Global Ctrl+K / Cmd+K search listener
@@ -255,23 +396,60 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('keydown', handleGlobalKeyDown);
   }, []);
 
-  // Save changes to localStorage
+  // Save changes to user-scoped localStorage (prevents loss on refresh)
   const saveLocal = (key: string, data: any) => {
     try {
-      localStorage.setItem(key, JSON.stringify(data));
+      const cleanKey = key.startsWith('wt_') ? key.replace(/^wt_/, '') : key;
+      const userScopedKey = `${storagePrefixRef.current}${cleanKey}`;
+      localStorage.setItem(userScopedKey, JSON.stringify(data));
+      // Also update generic key for preview resilience
+      localStorage.setItem(`wt_${cleanKey}`, JSON.stringify(data));
     } catch (err) {}
   };
 
-  // Privacy Pin Helpers
+  // Privacy Credential Helpers: User's Account Password by default, or Custom PIN if configured
   const setPrivacyPin = (newPin: string) => {
     setPrivacyPinState(newPin);
     try {
-      localStorage.setItem('wt_privacy_pin', newPin);
+      const cleanPin = newPin.trim();
+      const pinKey = `${storagePrefixRef.current}privacy_pin`;
+      localStorage.setItem(pinKey, cleanPin);
+      localStorage.setItem('wt_privacy_pin', cleanPin);
     } catch (e) {}
   };
 
-  const verifyPrivacyPin = (inputPin: string) => {
-    return inputPin === privacyPin || inputPin === '1234' || inputPin === 'password';
+  const verifyPrivacyPin = async (inputPin: string): Promise<boolean> => {
+    const trimmed = inputPin.trim();
+    if (!trimmed) return false;
+
+    // 1. If user configured a custom PIN, verify against it first
+    if (privacyPin && trimmed === privacyPin) {
+      return true;
+    }
+
+    // 2. Demo mode session: accept demo credential 'demo' immediately
+    const isDemo = typeof document !== 'undefined' && document.cookie.includes('sovereign_demo_session=true');
+    if (isDemo && trimmed.toLowerCase() === 'demo') {
+      return true;
+    }
+
+    // 3. Default: Verify against the user's real account password via Supabase Auth
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      const userEmail = user?.email || userProfile.email;
+      if (userEmail) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: userEmail,
+          password: trimmed,
+        });
+        if (!error) {
+          return true;
+        }
+      }
+    } catch {}
+
+    return false;
   };
 
   const openPrivacyModal = () => setIsPrivacyModalOpen(true);
@@ -314,21 +492,49 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   // CRUD Operations: Expenses
   // ---------------------------------------------------------------------------
   const addExpense = (item: Omit<ExpenseItem, 'id'> & { id?: string }) => {
+    const today = new Date();
+    const dateKey = item.dateKey || today.toISOString().slice(0, 10);
+    const dateGroup = item.dateGroup || today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
     const newExpense: ExpenseItem = {
       ...item,
       id: item.id || `exp-${Date.now()}`,
       dateTime: item.dateTime || 'Today, Just now',
-      dateKey: item.dateKey || '2026-10-28',
+      dateKey,
       tag: item.tag || `#${item.category.split(' ')[0]}`,
       statusBadge: item.statusBadge || 'Verified Receipt',
       icon: item.icon || 'receipt_long',
-      dateGroup: item.dateGroup || 'Today, October 28',
+      dateGroup,
     };
     setExpenses((prev) => {
       const updated = [newExpense, ...prev];
       saveLocal('wt_expenses', updated);
       return updated;
     });
+
+    // Background sync to Supabase if tables exist
+    try {
+      const supabase = createClient();
+      supabase.auth.getUser().then(({ data }) => {
+        if (data?.user) {
+          supabase.from('expenses').insert({
+            user_id: data.user.id,
+            title: newExpense.title,
+            subtitle: newExpense.subtitle || null,
+            category: newExpense.category,
+            category_color: newExpense.categoryColor || '#d4af37',
+            paid_with: newExpense.paidWith,
+            amount: newExpense.amount,
+            receipt_url: newExpense.receiptUrl || null,
+            tag: newExpense.tag || null,
+            status_badge: newExpense.statusBadge || 'Verified Receipt',
+            icon: newExpense.icon || 'receipt_long',
+            date_time: newExpense.dateTime,
+            date_key: newExpense.dateKey,
+          }).then(() => {});
+        }
+      }).catch(() => {});
+    } catch {}
   };
 
   const deleteExpense = (id: string) => {
@@ -337,6 +543,11 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       saveLocal('wt_expenses', updated);
       return updated;
     });
+
+    try {
+      const supabase = createClient();
+      supabase.from('expenses').delete().eq('id', id).then(() => {});
+    } catch {}
   };
 
   const importExpenses = (items: ExpenseItem[]) => {
@@ -386,6 +597,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     });
 
     // 2. Automatically log an outflow expense so the balance updates everywhere
+    const today = new Date();
     addExpense({
       title: `${payable.creditorName} (Settlement)`,
       subtitle: payable.invoiceNote || 'Vendor liability settled',
@@ -393,8 +605,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       paidWith: payable.disbursementRoute || 'Direct Wire (HDFC)',
       amount: payable.amount,
       dateTime: 'Today, Just now',
-      dateKey: '2026-10-28',
-      dateGroup: 'Today, October 28',
+      dateKey: today.toISOString().slice(0, 10),
+      dateGroup: today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
     });
 
     // 3. Add success notification
@@ -784,18 +996,21 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         .filter((r) => r.status === 'received' && (r.dateKey === dateKey || (dateKey === '2026-10-28' && r.settledDate === 'Today')))
         .reduce((sum, r) => sum + r.amount, 0);
 
-      const baselineInflows: Record<string, number> = {
-        '2026-10-28': 5200.0,
-        '2026-10-27': 3800.0,
-        '2026-10-25': 4500.0,
-        '2026-10-23': 3200.0,
-      };
+      const isZeroUser = expenses.length === 0;
+      const baselineInflows: Record<string, number> = isZeroUser
+        ? {}
+        : {
+            '2026-10-28': 5200.0,
+            '2026-10-27': 3800.0,
+            '2026-10-25': 4500.0,
+            '2026-10-23': 3200.0,
+          };
 
-      const baseInflow = baselineInflows[dateKey] ?? 3500.0;
+      const baseInflow = isZeroUser ? 0 : (baselineInflows[dateKey] ?? 3500.0);
       const actualInflow = baseInflow + settledReturns;
 
-      const yesterdayOutflow = dateKey === '2026-10-28' ? 1890.0 : 2850.0;
-      const yesterdayInflow = dateKey === '2026-10-28' ? 3800.0 : 3000.0;
+      const yesterdayOutflow = isZeroUser ? 0 : (dateKey === '2026-10-28' ? 1890.0 : 2850.0);
+      const yesterdayInflow = isZeroUser ? 0 : (dateKey === '2026-10-28' ? 3800.0 : 3000.0);
 
       const outflowDelta = actualOutflow - yesterdayOutflow;
       const outflowPercent = yesterdayOutflow > 0 ? Math.round((outflowDelta / yesterdayOutflow) * 100) : 0;
@@ -851,6 +1066,12 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('wt_peer_receivables');
     localStorage.removeItem('wt_notifications');
   };
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).__clearAllData = clearAllData;
+    }
+  }, []);
 
   const resetDefaultData = () => {
     setExpenses(INITIAL_EXPENSES);

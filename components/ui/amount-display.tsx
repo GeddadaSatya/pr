@@ -45,15 +45,15 @@ export function AmountDisplay({
     base: { integer: 'text-base', decimal: 'text-xs' },
     lg: { integer: 'text-lg', decimal: 'text-xs' },
     xl: { integer: 'text-xl', decimal: 'text-xs' },
-    '2xl': { integer: 'text-xl md:text-2xl', decimal: 'text-xs' },
-    '3xl': { integer: 'font-headline-lg-mobile md:font-headline-lg text-2xl md:text-3xl', decimal: 'text-xs' },
+    '2xl': { integer: 'font-headline-lg-mobile md:font-headline-lg text-2xl md:text-3xl', decimal: 'text-xs' },
+    '3xl': { integer: 'font-headline-lg-mobile md:font-headline-lg text-3xl md:text-4xl', decimal: 'text-sm' },
   };
 
   const currentSize = sizeClasses[size] || sizeClasses.base;
   const weightClass = `font-${weight}`;
 
   return (
-    <div className={`inline-flex items-baseline gap-0.5 ${className}`}>
+    <div className={`inline-flex items-baseline ${className}`}>
       <span className={`font-serif ${currentSize.integer} ${color} ${weightClass} tracking-tight`}>
         {displayPrefix}{integerStr}
       </span>
@@ -63,7 +63,7 @@ export function AmountDisplay({
         </span>
       )}
       {suffix && (
-        <span className="text-xs text-slate-500 font-normal ml-0.5">
+        <span className="text-xs text-slate-500 font-normal ml-1">
           {suffix}
         </span>
       )}

@@ -50,15 +50,15 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile, onBackToLoans 
   const advanceGroups: AdvanceGroupData[] = useMemo(
     () => [
       {
-        advanceId: 'ADV-4091',
-        sanctionedAmount: 25000,
-        statusTag: 'Active',
-        disbursedDate: '05 Jan 2025',
-        agent: 'Arjun Sharma',
-        installmentSummary: '10 Installments of ₹2,500',
-        collectedAmount: 22500,
-        collectedRatio: '9/10',
-        remainingAmount: 2500,
+        advanceId: `ADV-${borrower.badgeNumber || 1}091`,
+        sanctionedAmount: borrower.principalAmount,
+        statusTag: borrower.status === 'paid' ? 'Completed / Closed' : 'Active',
+        disbursedDate: borrower.dateGiven || '05 Jan 2025',
+        agent: 'Field Officer (Witnessed)',
+        installmentSummary: `${borrower.tenureMonths || 12} Installments of ₹${Math.round(borrower.totalReceivable / (borrower.tenureMonths || 12)).toLocaleString('en-IN')}`,
+        collectedAmount: borrower.receivedAmount,
+        collectedRatio: `${borrower.progressPercent}%`,
+        remainingAmount: Math.max(0, borrower.totalReceivable - borrower.receivedAmount),
         installments: [
           {
             installmentNum: 1,
@@ -157,7 +157,7 @@ export function RepaymentsLedgerView({ borrower, onBackToProfile, onBackToLoans 
         sanctionedAmount: 20000,
         statusTag: 'Active',
         disbursedDate: '18 Aug 2024',
-        agent: 'Suresh Varma',
+        agent: 'Direct Sovereign Wire',
         installmentSummary: '8 Installments of ₹2,500',
         collectedAmount: 15000,
         collectedRatio: '6/8',

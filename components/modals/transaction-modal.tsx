@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useFinance } from '@/components/context/finance-context';
+import { uploadReceiptImage } from '@/lib/supabase/storage';
 import { LedgerType } from '@/lib/types';
 
 export function TransactionModal() {
@@ -37,7 +38,7 @@ export function TransactionModal() {
 
   if (!isModalOpen) return null;
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -45,6 +46,14 @@ export function TransactionModal() {
         setReceiptPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+
+      // Upload to Supabase Storage receipts bucket
+      try {
+        const { url } = await uploadReceiptImage(file);
+        if (url) {
+          setReceiptPreview(url);
+        }
+      } catch {}
     }
   };
 
@@ -52,6 +61,10 @@ export function TransactionModal() {
     e.preventDefault();
     const numAmount = parseFloat(amount) || 0;
     if (!title || numAmount <= 0) return;
+
+    const today = new Date();
+    const todayKey = today.toISOString().slice(0, 10);
+    const todayGroup = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
     if (type === 'expense') {
       addExpense({
@@ -62,7 +75,8 @@ export function TransactionModal() {
         amount: numAmount,
         receiptUrl: receiptPreview || undefined,
         dateTime: 'Today, Just now',
-        dateKey: '2026-10-28',
+        dateKey: todayKey,
+        dateGroup: todayGroup,
       });
     } else if (type === 'due') {
       addPayable({

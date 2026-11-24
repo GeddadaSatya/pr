@@ -38,7 +38,6 @@ export function PayablesDuesView() {
     .filter((p) => p.urgencyBadge?.includes('ACH') || p.statusLabel === 'Scheduled ACH')
     .reduce((sum, p) => sum + p.amount, 0);
 
-  const marcusItem = pendingPayables.find((p) => p.creditorName.includes('Marcus'));
 
   const handleExportCSV = () => {
     const headers = ['Vendor / Beneficiary', 'Category', 'Due Date', 'Disbursement Route', 'Status', 'Amount'];
@@ -137,7 +136,7 @@ export function PayablesDuesView() {
             </span>
           </div>
           <div className="my-1.5">
-            <div className="flex items-baseline gap-1">
+            <div className="flex items-baseline">
               <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                 {privacyMode ? '••••••' : `₹${Math.floor(totalOutstanding).toLocaleString('en-IN')}`}
               </span>
@@ -163,7 +162,7 @@ export function PayablesDuesView() {
             </span>
           </div>
           <div className="my-1.5">
-            <div className="flex items-baseline gap-1">
+            <div className="flex items-baseline">
               <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-red-600 font-semibold tracking-tight">
                 {privacyMode ? '••••••' : `₹${Math.floor(dueWithin7Days).toLocaleString('en-IN')}`}
               </span>
@@ -172,10 +171,17 @@ export function PayablesDuesView() {
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs text-red-700 font-medium">
-            <span className="material-symbols-outlined text-sm text-red-500 shrink-0">schedule</span>
-            <span className="truncate">Marcus Vance (Oct 28) requires settlement</span>
-          </div>
+          {pendingPayables.length > 0 ? (
+            <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs text-red-700 font-medium">
+              <span className="material-symbols-outlined text-sm text-red-500 shrink-0">schedule</span>
+              <span className="truncate">{pendingPayables[0].creditorName} ({pendingPayables[0].dueDate}) requires settlement</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs text-emerald-700 font-medium">
+              <span className="material-symbols-outlined text-sm text-emerald-500 shrink-0">check_circle</span>
+              <span className="truncate">All dues cleared</span>
+            </div>
+          )}
         </div>
 
         {/* Card 3: AUTO-SCHEDULED ACH */}
@@ -189,7 +195,7 @@ export function PayablesDuesView() {
             </span>
           </div>
           <div className="my-1.5">
-            <div className="flex items-baseline gap-1">
+            <div className="flex items-baseline">
               <span className="font-headline-lg-mobile md:font-headline-lg font-serif text-slate-900 font-semibold tracking-tight">
                 {privacyMode ? '••••••' : `₹${Math.floor(autoScheduledAch).toLocaleString('en-IN')}`}
               </span>
@@ -198,10 +204,20 @@ export function PayablesDuesView() {
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs text-emerald-800 font-medium">
-            <span className="material-symbols-outlined text-sm text-emerald-600 shrink-0">check_circle</span>
-            <span className="truncate">Elena Rostova syndicate release on Nov 02</span>
-          </div>
+          {pendingPayables.some((p) => p.urgencyBadge?.includes('ACH') || p.statusLabel === 'Scheduled ACH') ? (
+            <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs text-emerald-800 font-medium">
+              <span className="material-symbols-outlined text-sm text-emerald-600 shrink-0">check_circle</span>
+              <span className="truncate">
+                {pendingPayables.find((p) => p.urgencyBadge?.includes('ACH') || p.statusLabel === 'Scheduled ACH')?.creditorName} syndicate release on{' '}
+                {pendingPayables.find((p) => p.urgencyBadge?.includes('ACH') || p.statusLabel === 'Scheduled ACH')?.dueDate}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 text-xs text-slate-500 font-medium">
+              <span className="material-symbols-outlined text-sm text-slate-400 shrink-0">check_circle</span>
+              <span className="truncate">No recurring ACH debits scheduled</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -307,15 +323,7 @@ export function PayablesDuesView() {
         {/* Card Footer */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-3 border-t border-slate-100 text-xs">
           <span className="text-slate-500 italic">Pay on time to keep debt clear</span>
-          {marcusItem ? (
-            <button
-              type="button"
-              onClick={() => setSettleModalItem(marcusItem)}
-              className="px-3.5 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer"
-            >
-              Record Payout (Marcus)
-            </button>
-          ) : pendingPayables.length > 0 ? (
+          {pendingPayables.length > 0 ? (
             <button
               type="button"
               onClick={() => setSettleModalItem(pendingPayables[0])}

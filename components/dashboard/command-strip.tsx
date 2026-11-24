@@ -1,11 +1,29 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
+import { getRandomGreeting } from '@/lib/greetings';
 
 export function CommandStrip() {
   const { userProfile, openModal } = useFinance();
+  const firstName = userProfile.name.split(' ')[0] || 'Executive';
+  const todayDateText = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+
+  // Initial greeting defaults to clean deterministic greeting to prevent any SSR hydration mismatch
+  const [greeting, setGreeting] = useState(() => ({
+    greeting: `Welcome back, ${firstName} 👋`,
+    subtitle: 'Track Today. Stay Ahead Tomorrow.',
+  }));
+
+  // On client load, pick a fresh dynamic greeting from the 120+ greetings & 100+ mottos pool
+  useEffect(() => {
+    setGreeting(getRandomGreeting(firstName));
+  }, [firstName]);
+
+  const handleShuffleGreeting = () => {
+    setGreeting(getRandomGreeting(firstName));
+  };
 
   return (
     <div className="flex flex-col w-full">
@@ -15,11 +33,20 @@ export function CommandStrip() {
         <div className="flex flex-col gap-1 pt-1">
           <div className="flex items-center justify-between">
             <h1 className="font-headline-lg-mobile text-2xl text-slate-900 font-semibold tracking-tight">
-              Good morning, {userProfile.name.split(' ')[0]}
+              {greeting.greeting}
             </h1>
+            <button
+              type="button"
+              onClick={handleShuffleGreeting}
+              className="w-7 h-7 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-[#b48e28] flex items-center justify-center transition-colors cursor-pointer shrink-0"
+              title="Shuffle greeting"
+              aria-label="New greeting"
+            >
+              <span className="material-symbols-outlined text-base">refresh</span>
+            </button>
           </div>
           <p className="font-body-sm text-xs text-slate-500">
-            Thursday, Oct 1 • Track Today. Stay Ahead Tomorrow.
+            {todayDateText} • {greeting.subtitle}
           </p>
         </div>
 
@@ -76,10 +103,19 @@ export function CommandStrip() {
           <div className="flex flex-col gap-0.5">
             <div className="flex items-center gap-2">
               <h2 className="font-headline-md text-slate-900 font-bold tracking-tight">
-                Good morning, {userProfile.name.split(' ')[0]} 👋
+                {greeting.greeting}
               </h2>
+              <button
+                type="button"
+                onClick={handleShuffleGreeting}
+                className="w-7 h-7 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-[#b48e28] flex items-center justify-center transition-colors cursor-pointer"
+                title="Shuffle greeting & motto"
+                aria-label="New greeting"
+              >
+                <span className="material-symbols-outlined text-base">refresh</span>
+              </button>
             </div>
-            <p className="text-xs text-slate-500">Track Today. Stay Ahead Tomorrow.</p>
+            <p className="text-xs text-slate-500">{greeting.subtitle}</p>
           </div>
         </div>
 
