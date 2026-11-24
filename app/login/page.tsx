@@ -433,7 +433,7 @@ export function UnifiedAuthContainer({ defaultMode = 'login' }: { defaultMode?: 
   };
 
   return (
-    <div className="font-sans antialiased text-slate-800 bg-[#fbfaf6] min-h-screen flex flex-col justify-between selection:bg-amber-100 selection:text-amber-900">
+    <div className="font-sans antialiased text-slate-800 bg-[#fbfaf6] min-h-screen md:min-h-[125vh] flex flex-col justify-between selection:bg-amber-100 selection:text-amber-900">
       {/* Main Container */}
       <div className="flex-1 w-full flex items-center justify-center p-4 sm:p-6 lg:p-12 relative overflow-hidden ambient-glow">
         {/* Center Layout Wrapper: Perfectly matched height and aligned baselines */}
@@ -1091,7 +1091,7 @@ export function UnifiedAuthContainer({ defaultMode = 'login' }: { defaultMode?: 
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#fbfaf6] flex items-center justify-center">
+      <div className="min-h-screen md:min-h-[125vh] bg-[#fbfaf6] flex items-center justify-center">
         <div className="w-6 h-6 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
       </div>
     }>
