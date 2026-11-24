@@ -4,11 +4,13 @@ import React, { useState, useRef } from 'react';
 import { useFinance } from '@/components/context/finance-context';
 import { formatCurrency } from '@/lib/utils';
 import { ExpenseItem } from '@/lib/types';
+import { EditExpenseModal } from '@/components/modals/edit-entry-modal';
 
 export function ExpenseTable() {
   const { expenses, privacyMode, openModal, importExpenses } = useFinance();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [editingExpense, setEditingExpense] = useState<ExpenseItem | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filteredExpenses = expenses.filter((item) => {
@@ -239,22 +241,33 @@ export function ExpenseTable() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col items-end shrink-0 pl-2">
-                    {privacyMode ? (
-                      <span className="font-serif font-bold text-sm text-slate-900">••••••</span>
-                    ) : (
-                      <div className="inline-flex items-baseline justify-end">
-                        <span className="font-serif font-bold text-sm text-red-700 tracking-tight">
-                          -₹{Math.floor(exp.amount).toLocaleString('en-IN')}
-                        </span>
-                        <span className="font-label-numeric text-[11px] text-red-500 font-medium">
-                          .{(exp.amount % 1).toFixed(2).split('.')[1] || '00'}
-                        </span>
-                      </div>
-                    )}
-                    <span className="font-label-numeric text-[11px] text-slate-400">
-                      {exp.dateTime}
-                    </span>
+                  <div className="flex items-center gap-2 shrink-0 pl-2">
+                    <div className="flex flex-col items-end">
+                      {privacyMode ? (
+                        <span className="font-serif font-bold text-sm text-slate-900">••••••</span>
+                      ) : (
+                        <div className="inline-flex items-baseline justify-end">
+                          <span className="font-serif font-bold text-sm text-red-700 tracking-tight">
+                            -₹{Math.floor(exp.amount).toLocaleString('en-IN')}
+                          </span>
+                          <span className="font-label-numeric text-[11px] text-red-500 font-medium">
+                            .{(exp.amount % 1).toFixed(2).split('.')[1] || '00'}
+                          </span>
+                        </div>
+                      )}
+                      <span className="font-label-numeric text-[11px] text-slate-400">
+                        {exp.dateTime}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setEditingExpense(exp)}
+                      className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                      title={`Edit ${exp.title}`}
+                      aria-label={`Edit ${exp.title}`}
+                    >
+                      <span className="material-symbols-outlined text-sm">edit</span>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -444,6 +457,7 @@ export function ExpenseTable() {
                     <th className="py-2.5 px-4">Paid With</th>
                     <th className="py-2.5 px-4">Date &amp; Time</th>
                     <th className="py-2.5 px-4 text-right">Amount</th>
+                    <th className="py-2.5 px-4 text-center">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -518,6 +532,18 @@ export function ExpenseTable() {
                           </div>
                         )}
                       </td>
+
+                      <td className="py-3 px-4 text-center">
+                        <button
+                          type="button"
+                          onClick={() => setEditingExpense(exp)}
+                          className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 inline-flex items-center justify-center transition-colors cursor-pointer"
+                          title={`Edit ${exp.title}`}
+                          aria-label={`Edit ${exp.title}`}
+                        >
+                          <span className="material-symbols-outlined text-sm">edit</span>
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -532,6 +558,12 @@ export function ExpenseTable() {
           </>
         )}
       </div>
+
+      {/* Edit Expense Modal */}
+      <EditExpenseModal
+        expense={editingExpense}
+        onClose={() => setEditingExpense(null)}
+      />
     </div>
   );
 }

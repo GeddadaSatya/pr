@@ -5,6 +5,7 @@ import { useFinance } from '@/components/context/finance-context';
 import { AssetHolding } from '@/lib/types';
 import { AmountDisplay } from '@/components/ui/amount-display';
 import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
+import { EditAssetModal } from '@/components/modals/edit-entry-modal';
 
 const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   'Liquid Cash & Banking': { bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-200' },
@@ -20,7 +21,6 @@ export function AssetsHoldingsView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingAsset, setEditingAsset] = useState<AssetHolding | null>(null);
-  const [newValuationInput, setNewValuationInput] = useState('');
 
   // Form state
   const [name, setName] = useState('');
@@ -73,17 +73,6 @@ export function AssetsHoldingsView() {
     setAccountRef('');
     setNotes('');
     setIsAddModalOpen(false);
-  };
-
-  const handleUpdateValuation = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editingAsset) return;
-    const val = parseFloat(newValuationInput);
-    if (isNaN(val) || val <= 0) return;
-
-    updateAssetValuation(editingAsset.id, val);
-    setEditingAsset(null);
-    setNewValuationInput('');
   };
 
   return (
@@ -369,13 +358,12 @@ export function AssetsHoldingsView() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      setEditingAsset(asset);
-                      setNewValuationInput(String(asset.valuation));
-                    }}
-                    className="text-xs font-semibold text-[#9a761e] hover:text-[#78570f] cursor-pointer"
+                    onClick={() => setEditingAsset(asset)}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-[#9a761e] hover:text-[#78570f] cursor-pointer"
+                    title={`Edit ${asset.name} details & valuation`}
                   >
-                    Update Value
+                    <span className="material-symbols-outlined text-sm">edit</span>
+                    <span>Edit Asset</span>
                   </button>
                   <span className="text-slate-300">•</span>
                   <button
@@ -537,51 +525,11 @@ export function AssetsHoldingsView() {
         </div>
       )}
 
-      {/* Update Valuation Modal */}
-      {editingAsset && (
-        <div className="fixed inset-0 z-60 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xl max-w-sm w-full relative">
-            <h3 className="font-serif text-base font-bold text-slate-900 mb-1">
-              Update Valuation for {editingAsset.name}
-            </h3>
-            <p className="text-xs text-slate-500 mb-3">
-              Enter current verified market valuation or audited statement balance.
-            </p>
-
-            <form onSubmit={handleUpdateValuation} className="flex flex-col gap-3">
-              <div>
-                <label className="text-[11px] text-slate-600 uppercase font-semibold block mb-1">
-                  New Valuation (₹)
-                </label>
-                <input
-                  type="number"
-                  required
-                  autoFocus
-                  value={newValuationInput}
-                  onChange={(e) => setNewValuationInput(e.target.value)}
-                  className="h-10 w-full px-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-bold text-slate-900 focus:outline-none focus:ring-1 focus:ring-[#d4af37] focus:bg-white"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setEditingAsset(null)}
-                  className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-1.5 rounded-lg bg-[#eed885] hover:bg-[#dec468] text-slate-950 font-bold text-xs shadow-2xs cursor-pointer"
-                >
-                  Save Valuation
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Full Asset Edit Modal */}
+      <EditAssetModal
+        asset={editingAsset}
+        onClose={() => setEditingAsset(null)}
+      />
     </div>
   );
 }

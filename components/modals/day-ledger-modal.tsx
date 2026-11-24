@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NotebookEntry, DayLedgerData, DAY_LEDGER_CONFIGS, INITIAL_NOTEBOOK_ENTRIES } from '@/lib/notebook-data';
 import { useFinance } from '@/components/context/finance-context';
+import { ExpenseItem } from '@/lib/types';
+import { EditExpenseModal } from '@/components/modals/edit-entry-modal';
 
 interface DayLedgerModalProps {
   isOpen: boolean;
@@ -21,6 +23,7 @@ export function DayLedgerModal({
   const [currentDateKey, setCurrentDateKey] = useState(selectedDateKey);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [editingExpense, setEditingExpense] = useState<ExpenseItem | null>(null);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
@@ -473,20 +476,43 @@ export function DayLedgerModal({
                     </div>
                   </div>
 
-                  {/* Right Side: Amount */}
-                  <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
-                    {privacyMode ? (
-                      <span className="text-base font-bold text-slate-900 tracking-tight font-serif">••••••</span>
-                    ) : (
-                      <div className="flex items-baseline">
-                        <span className="text-base font-bold text-slate-900 tracking-tight font-serif">
-                          -₹{Math.floor(item.amount).toLocaleString('en-IN')}
-                        </span>
-                        <span className="font-label-numeric text-xs text-slate-500 font-medium">
-                          .{(item.amount % 1).toFixed(2).split('.')[1] || '00'}
-                        </span>
-                      </div>
-                    )}
+                  {/* Right Side: Amount & Edit Action */}
+                  <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100 gap-2">
+                    <div className="flex items-center gap-2">
+                      {privacyMode ? (
+                        <span className="text-base font-bold text-slate-900 tracking-tight font-serif">••••••</span>
+                      ) : (
+                        <div className="flex items-baseline">
+                          <span className="text-base font-bold text-slate-900 tracking-tight font-serif">
+                            -₹{Math.floor(item.amount).toLocaleString('en-IN')}
+                          </span>
+                          <span className="font-label-numeric text-xs text-slate-500 font-medium">
+                            .{(item.amount % 1).toFixed(2).split('.')[1] || '00'}
+                          </span>
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const target = expenses.find((e) => e.id === item.id) || {
+                            id: item.id,
+                            title: item.title,
+                            subtitle: item.subtitle,
+                            amount: item.amount,
+                            category: item.category,
+                            paidWith: item.paidWith || 'UPI Transfer',
+                            dateTime: item.dateTime || 'Today, Just now',
+                            dateKey: currentDateKey,
+                          };
+                          setEditingExpense(target as ExpenseItem);
+                        }}
+                        className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                        title={`Edit ${item.title}`}
+                        aria-label={`Edit ${item.title}`}
+                      >
+                        <span className="material-symbols-outlined text-sm">edit</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))
@@ -525,6 +551,11 @@ export function DayLedgerModal({
         </div>
       </div>
 
+      {/* Edit Expense Modal */}
+      <EditExpenseModal
+        expense={editingExpense}
+        onClose={() => setEditingExpense(null)}
+      />
     </div>
   );
 }

@@ -105,11 +105,13 @@ interface FinanceContextType {
 
   // CRUD Operations: Expenses
   addExpense: (expense: Omit<ExpenseItem, 'id'> & { id?: string }) => void;
+  updateExpense: (id: string, updates: Partial<ExpenseItem>) => void;
   deleteExpense: (id: string) => void;
   importExpenses: (items: ExpenseItem[]) => void;
 
   // CRUD Operations: Payables
   addPayable: (payable: Omit<PayableItem, 'id' | 'status'> & { id?: string }) => void;
+  updatePayable: (id: string, updates: Partial<PayableItem>) => void;
   settlePayable: (id: string) => void;
   recordPayout: (id: string) => void;
   deletePayable: (id: string) => void;
@@ -125,11 +127,13 @@ interface FinanceContextType {
 
   // CRUD Operations: Assets & Holdings
   addAsset: (asset: Omit<AssetHolding, 'id'> & { id?: string }) => void;
+  updateAsset: (id: string, updates: Partial<AssetHolding>) => void;
   updateAssetValuation: (id: string, newValuation: number) => void;
   deleteAsset: (id: string) => void;
 
   // CRUD Operations: Peer Receivables
   addPeerReceivable: (receivable: Omit<PeerReceivableItem, 'id' | 'status'>) => void;
+  updatePeerReceivable: (id: string, updates: Partial<PeerReceivableItem>) => void;
   markReceivableReceived: (id: string) => void;
 
   // Notifications
@@ -566,6 +570,33 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   };
 
+  const updateExpense = (id: string, updates: Partial<ExpenseItem>) => {
+    setExpenses((prev) => {
+      const updated = prev.map((e) => (e.id === id ? { ...e, ...updates } : e));
+      saveLocal('wt_expenses', updated);
+      return updated;
+    });
+
+    try {
+      const supabase = createClient();
+      const payload: Record<string, any> = {};
+      if (updates.title !== undefined) payload.title = updates.title;
+      if (updates.subtitle !== undefined) payload.subtitle = updates.subtitle;
+      if (updates.category !== undefined) payload.category = updates.category;
+      if (updates.categoryColor !== undefined) payload.category_color = updates.categoryColor;
+      if (updates.paidWith !== undefined) payload.paid_with = updates.paidWith;
+      if (updates.amount !== undefined) payload.amount = updates.amount;
+      if (updates.receiptUrl !== undefined) payload.receipt_url = updates.receiptUrl;
+      if (updates.tag !== undefined) payload.tag = updates.tag;
+      if (updates.dateTime !== undefined) payload.date_time = updates.dateTime;
+      if (updates.dateKey !== undefined) payload.date_key = updates.dateKey;
+
+      if (Object.keys(payload).length > 0) {
+        supabase.from('expenses').update(payload).eq('id', id).then(() => {});
+      }
+    } catch {}
+  };
+
   const deleteExpense = (id: string) => {
     setExpenses((prev) => {
       const updated = prev.filter((e) => e.id !== id);
@@ -603,6 +634,29 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       saveLocal('wt_payables', updated);
       return updated;
     });
+  };
+
+  const updatePayable = (id: string, updates: Partial<PayableItem>) => {
+    setPayables((prev) => {
+      const updated = prev.map((p) => (p.id === id ? { ...p, ...updates } : p));
+      saveLocal('wt_payables', updated);
+      return updated;
+    });
+
+    try {
+      const supabase = createClient();
+      const payload: Record<string, any> = {};
+      if (updates.creditorName !== undefined) payload.creditor_name = updates.creditorName;
+      if (updates.amount !== undefined) payload.amount = updates.amount;
+      if (updates.dueDate !== undefined) payload.due_date = updates.dueDate;
+      if (updates.invoiceNote !== undefined) payload.note = updates.invoiceNote;
+      if (updates.category !== undefined) payload.category = updates.category;
+      if (updates.status !== undefined) payload.status = updates.status;
+
+      if (Object.keys(payload).length > 0) {
+        supabase.from('payables').update(payload).eq('id', id).then(() => {});
+      }
+    } catch {}
   };
 
   const settlePayable = (id: string) => {
@@ -886,6 +940,25 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const updateAsset = (id: string, updates: Partial<AssetHolding>) => {
+    setAssets((prev) => {
+      const updated = prev.map((a) => {
+        if (a.id === id) {
+          const merged = { ...a, ...updates };
+          const monthlyYield = (merged.valuation * (merged.annualYieldRate / 100)) / 12;
+          return {
+            ...merged,
+            monthlyYield,
+            lastValuationDate: updates.lastValuationDate || new Date().toISOString().slice(0, 10),
+          };
+        }
+        return a;
+      });
+      saveLocal('wt_assets', updated);
+      return updated;
+    });
+  };
+
   const updateAssetValuation = (id: string, newValuation: number) => {
     setAssets((prev) => {
       const updated = prev.map((a) => {
@@ -938,6 +1011,14 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       dateTime: 'Today, Just now',
       dateKey: '2026-10-28',
       dateGroup: 'Today, October 28',
+    });
+  };
+
+  const updatePeerReceivable = (id: string, updates: Partial<PeerReceivableItem>) => {
+    setPeerReceivables((prev) => {
+      const updated = prev.map((r) => (r.id === id ? { ...r, ...updates } : r));
+      saveLocal('wt_peer_receivables', updated);
+      return updated;
     });
   };
 
@@ -1168,10 +1249,12 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         toggleSidebar,
 
         addExpense,
+        updateExpense,
         deleteExpense,
         importExpenses,
 
         addPayable,
+        updatePayable,
         settlePayable,
         recordPayout: settlePayable,
         deletePayable,
@@ -1185,10 +1268,12 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         toggleBorrowerPaid,
 
         addAsset,
+        updateAsset,
         updateAssetValuation,
         deleteAsset,
 
         addPeerReceivable,
+        updatePeerReceivable,
         markReceivableReceived,
 
         markNotificationRead,

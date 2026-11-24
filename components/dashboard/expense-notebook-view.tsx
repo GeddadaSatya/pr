@@ -10,6 +10,8 @@ import {
   DateFilterValue,
   matchesDateFilter,
 } from '@/components/ui/date-filter-dropdown';
+import { EditExpenseModal } from '@/components/modals/edit-entry-modal';
+import { ExpenseItem } from '@/lib/types';
 
 interface ExpenseNotebookViewProps {
   onOpenDayLedger: (dateKey: string) => void;
@@ -32,6 +34,7 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
   const [dateFilter, setDateFilter] = useState<DateFilterValue>({ type: 'all' });
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
   const [notification, setNotification] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [editingExpense, setEditingExpense] = useState<ExpenseItem | null>(null);
 
   // Search and Category filters
   const [topSearch, setTopSearch] = useState('');
@@ -627,21 +630,21 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse table-fixed min-w-[760px]">
               <colgroup>
-                <col className="w-[32%]" />
-                <col className="w-[20%]" />
+                <col className="w-[30%]" />
+                <col className="w-[19%]" />
                 <col className="w-[18%]" />
                 <col className="w-[13%]" />
                 <col className="w-[12%]" />
-                <col className="w-[5%]" />
+                <col className="w-[8%]" />
               </colgroup>
               <thead>
                 <tr className="text-slate-500 text-[11px] uppercase tracking-wider bg-slate-50 border-b border-slate-200/80 font-bold">
-                  <th className="py-2.5 px-4 w-[32%] text-xs font-semibold text-left">EXPENSE ITEM</th>
-                  <th className="py-2.5 px-4 w-[20%] text-xs font-semibold text-center">CATEGORY</th>
+                  <th className="py-2.5 px-4 w-[30%] text-xs font-semibold text-left">EXPENSE ITEM</th>
+                  <th className="py-2.5 px-4 w-[19%] text-xs font-semibold text-center">CATEGORY</th>
                   <th className="py-2.5 px-4 w-[18%] text-xs font-semibold text-left">PAID WITH</th>
                   <th className="py-2.5 px-4 w-[13%] text-xs font-semibold text-left">DATE &amp; TIME</th>
                   <th className="py-2.5 px-4 w-[12%] text-xs font-semibold text-right">AMOUNT</th>
-                  <th className="py-2.5 px-2 w-[5%] text-xs font-semibold text-center">ACTION</th>
+                  <th className="py-2.5 px-2 w-[8%] text-xs font-semibold text-center">ACTION</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white">
@@ -728,19 +731,30 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
                       </td>
 
                       {/* Action */}
-                      <td className="w-[5%] py-3.5 px-2 text-center">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            deleteExpense(item.id);
-                            setNotification({ message: `Removed ${item.title}`, type: 'success' });
-                            setTimeout(() => setNotification(null), 3000);
-                          }}
-                          className="w-7 h-7 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 inline-flex items-center justify-center transition-colors cursor-pointer"
-                          title="Delete expense"
-                        >
-                          <span className="material-symbols-outlined text-sm">delete_outline</span>
-                        </button>
+                      <td className="w-[8%] py-3.5 px-2 text-center whitespace-nowrap">
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setEditingExpense(item)}
+                            className="w-7 h-7 rounded-lg hover:bg-amber-50 text-slate-400 hover:text-[#b48e28] inline-flex items-center justify-center transition-colors cursor-pointer"
+                            title={`Edit ${item.title}`}
+                            aria-label={`Edit ${item.title}`}
+                          >
+                            <span className="material-symbols-outlined text-sm">edit</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              deleteExpense(item.id);
+                              setNotification({ message: `Removed ${item.title}`, type: 'success' });
+                              setTimeout(() => setNotification(null), 3000);
+                            }}
+                            className="w-7 h-7 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 inline-flex items-center justify-center transition-colors cursor-pointer"
+                            title="Delete expense"
+                          >
+                            <span className="material-symbols-outlined text-sm">delete_outline</span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -826,6 +840,16 @@ export function ExpenseNotebookView({ onOpenDayLedger }: ExpenseNotebookViewProp
           </div>
         </div>
       )}
+
+      {/* Edit Expense Modal */}
+      <EditExpenseModal
+        expense={editingExpense}
+        onClose={() => setEditingExpense(null)}
+        onSaved={(msg) => {
+          setNotification({ message: msg, type: 'success' });
+          setTimeout(() => setNotification(null), 3000);
+        }}
+      />
     </div>
   );
 }

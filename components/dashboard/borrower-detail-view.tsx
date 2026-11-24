@@ -6,6 +6,7 @@ import { BorrowerLoan } from './loans-interest-view';
 import { RepaymentsLedgerView } from './repayments-ledger-view';
 import { AmountDisplay } from '@/components/ui/amount-display';
 import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
+import { EditBorrowerModal } from '@/components/modals/edit-entry-modal';
 
 interface BorrowerDetailViewProps {
   borrower: BorrowerLoan;
@@ -56,6 +57,7 @@ export function BorrowerDetailView({
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadDocTitle, setUploadDocTitle] = useState('');
   const [showLedgerView, setShowLedgerView] = useState(initialShowLedger);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const activeBorrower = borrowers.find((b) => b.id === borrower.id) || borrower;
 
@@ -261,7 +263,7 @@ export function BorrowerDetailView({
         <div className="flex items-center space-x-2.5 flex-wrap">
           <button
             type="button"
-            onClick={() => showToast(`Edit profile dialog opened for ${borrower.name}`)}
+            onClick={() => setIsEditModalOpen(true)}
             className="inline-flex items-center space-x-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 transition shadow-2xs cursor-pointer"
           >
             <svg
@@ -1298,6 +1300,13 @@ export function BorrowerDetailView({
           </div>
         </div>
       )}
+
+      {/* Edit Borrower & Terms Modal */}
+      <EditBorrowerModal
+        borrower={isEditModalOpen ? activeBorrower : null}
+        onClose={() => setIsEditModalOpen(false)}
+        onSaved={showToast}
+      />
     </div>
   );
 }

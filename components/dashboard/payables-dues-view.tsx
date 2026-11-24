@@ -5,6 +5,7 @@ import { useFinance } from '@/components/context/finance-context';
 import { PayableItem } from '@/lib/types';
 import { AmountDisplay } from '@/components/ui/amount-display';
 import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
+import { EditPayableModal } from '@/components/modals/edit-entry-modal';
 import {
   DateFilterDropdown,
   DateFilterValue,
@@ -17,6 +18,7 @@ export function PayablesDuesView() {
   const [dateFilter, setDateFilter] = useState<DateFilterValue>({ type: 'all' });
   const [pageSize, setPageSize] = useState('10');
   const [settleModalItem, setSettleModalItem] = useState<PayableItem | null>(null);
+  const [editingPayable, setEditingPayable] = useState<PayableItem | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -377,13 +379,13 @@ export function PayablesDuesView() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse table-fixed min-w-[840px]">
               <colgroup>
-                <col className="w-[22%]" />
+                <col className="w-[20%]" />
                 <col className="w-[16%]" />
                 <col className="w-[14%]" />
-                <col className="w-[18%]" />
-                <col className="w-[12%]" />
+                <col className="w-[16%]" />
+                <col className="w-[11%]" />
                 <col className="w-[10%]" />
-                <col className="w-[8%]" />
+                <col className="w-[13%]" />
               </colgroup>
               <thead>
                 <tr className="text-slate-400 text-[11px] uppercase tracking-wider bg-slate-50 border-b border-slate-200/80 font-bold">
@@ -484,34 +486,45 @@ export function PayablesDuesView() {
                         </td>
 
                         {/* Action */}
-                        <td className="py-3.5 px-4 text-center">
-                          {isPaid ? (
-                            <span className="inline-flex items-center justify-center w-[96px] h-7 text-xs font-semibold text-emerald-600 bg-emerald-50 rounded-lg border border-emerald-200/60">Paid</span>
-                          ) : item.actionLabel === 'Settle Now' || isUrgent ? (
+                        <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                          <div className="inline-flex items-center gap-1.5 justify-center">
                             <button
                               type="button"
-                              onClick={() => setSettleModalItem(item)}
-                              className="w-[96px] h-7 rounded-lg bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs shadow-2xs transition-colors cursor-pointer inline-flex items-center justify-center"
+                              onClick={() => setEditingPayable(item)}
+                              className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                              title={`Edit bill for ${item.creditorName}`}
+                              aria-label={`Edit ${item.creditorName}`}
                             >
-                              Settle Now
+                              <span className="material-symbols-outlined text-sm">edit</span>
                             </button>
-                          ) : item.actionLabel === 'Review ACH' ? (
-                            <button
-                              type="button"
-                              onClick={() => setSettleModalItem(item)}
-                              className="w-[96px] h-7 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer inline-flex items-center justify-center"
-                            >
-                              Review ACH
-                            </button>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => setSettleModalItem(item)}
-                              className="w-[96px] h-7 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer inline-flex items-center justify-center"
-                            >
-                              {item.actionLabel || 'Manage'}
-                            </button>
-                          )}
+                            {isPaid ? (
+                              <span className="inline-flex items-center justify-center w-[84px] h-7 text-xs font-semibold text-emerald-600 bg-emerald-50 rounded-lg border border-emerald-200/60">Paid</span>
+                            ) : item.actionLabel === 'Settle Now' || isUrgent ? (
+                              <button
+                                type="button"
+                                onClick={() => setSettleModalItem(item)}
+                                className="w-[84px] h-7 rounded-lg bg-[#d4af37] hover:bg-[#b48e28] text-slate-950 font-bold text-xs shadow-2xs transition-colors cursor-pointer inline-flex items-center justify-center"
+                              >
+                                Settle Now
+                              </button>
+                            ) : item.actionLabel === 'Review ACH' ? (
+                              <button
+                                type="button"
+                                onClick={() => setSettleModalItem(item)}
+                                className="w-[84px] h-7 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer inline-flex items-center justify-center"
+                              >
+                                Review ACH
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => setSettleModalItem(item)}
+                                className="w-[84px] h-7 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-colors cursor-pointer inline-flex items-center justify-center"
+                              >
+                                {item.actionLabel || 'Manage'}
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -623,17 +636,31 @@ export function PayablesDuesView() {
 
             {/* Modal Actions */}
             <div className="flex items-center justify-between gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => {
-                  deletePayable(settleModalItem.id);
-                  setSettleModalItem(null);
-                  showToast(`Removed payable for ${settleModalItem.creditorName}`);
-                }}
-                className="h-10 px-3 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
-              >
-                Delete Bill
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    deletePayable(settleModalItem.id);
+                    setSettleModalItem(null);
+                    showToast(`Removed payable for ${settleModalItem.creditorName}`);
+                  }}
+                  className="h-10 px-3 text-red-600 hover:bg-red-50 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+                >
+                  Delete Bill
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const target = settleModalItem;
+                    setSettleModalItem(null);
+                    setEditingPayable(target);
+                  }}
+                  className="h-10 px-3 text-slate-700 hover:bg-slate-100 text-xs font-semibold rounded-xl transition-colors cursor-pointer flex items-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-sm">edit</span>
+                  <span>Edit Bill</span>
+                </button>
+              </div>
 
               <div className="flex items-center gap-2">
                 <button
@@ -656,6 +683,13 @@ export function PayablesDuesView() {
           </div>
         </div>
       )}
+
+      {/* Edit Payable Modal */}
+      <EditPayableModal
+        payable={editingPayable}
+        onClose={() => setEditingPayable(null)}
+        onSaved={showToast}
+      />
 
       {/* Toast Feedback */}
       {toastMessage && (

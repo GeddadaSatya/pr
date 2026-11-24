@@ -5,6 +5,7 @@ import { useFinance } from '@/components/context/finance-context';
 import { BorrowerDetailView } from './borrower-detail-view';
 import { AmountDisplay } from '@/components/ui/amount-display';
 import { AppBreadcrumb } from '@/components/ui/app-breadcrumb';
+import { EditBorrowerModal } from '@/components/modals/edit-entry-modal';
 import {
   DateFilterDropdown,
   DateFilterValue,
@@ -59,6 +60,7 @@ export function LoansInterestView() {
 
   // Selected Borrower for Dossier / Customer Profile View
   const [selectedBorrower, setSelectedBorrower] = useState<BorrowerLoan | null>(null);
+  const [editingBorrower, setEditingBorrower] = useState<BorrowerLoan | null>(null);
   const [showLedgerDirectly, setShowLedgerDirectly] = useState(false);
 
   // View Mode: 'cards' or 'table'
@@ -338,7 +340,18 @@ export function LoansInterestView() {
           <span className="material-symbols-outlined text-base">visibility</span>
         </button>
 
-        {/* 2. Conditional Action Button */}
+        {/* 2. Edit Loan & Terms Button */}
+        <button
+          type="button"
+          onClick={() => setEditingBorrower(b)}
+          className="w-8 h-8 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200/60 text-amber-800 flex items-center justify-center transition shadow-2xs cursor-pointer shrink-0"
+          title={`Edit terms and details for ${b.name}`}
+          aria-label={`Edit ${b.name}`}
+        >
+          <span className="material-symbols-outlined text-base">edit</span>
+        </button>
+
+        {/* 3. Conditional Action Button */}
         {isPaid ? (
           // Payments completed -> Show "View Payments"
           <button
@@ -1694,6 +1707,13 @@ export function LoansInterestView() {
           </div>
         </div>
       )}
+
+      {/* Edit Borrower & Terms Modal */}
+      <EditBorrowerModal
+        borrower={editingBorrower}
+        onClose={() => setEditingBorrower(null)}
+        onSaved={showToast}
+      />
     </div>
   );
 }
