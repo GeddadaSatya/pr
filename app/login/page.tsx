@@ -474,6 +474,30 @@ export function UnifiedAuthContainer({ defaultMode = 'login' }: { defaultMode?: 
               <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-lg font-sans">
                 Your all-in-one personal notebook for daily expenses, upcoming bills &amp; payables, and money lent with interest. Built for absolute clarity in Indian Rupees (₹).
               </p>
+
+              {/* Live Ledger Verification Card (Shown on Login and Register to fill vertical gap) */}
+              {(mode === 'login' || mode === 'register') && (
+                <div className="mt-5 p-3.5 sm:p-4 rounded-xl bg-white/90 border border-[#ede7d8] shadow-xs backdrop-blur-xs flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-[#fdf9e7] border border-[#fae3bf] flex items-center justify-center text-[#b48e28] shrink-0">
+                      <svg aria-hidden="true" className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-800 flex items-center gap-2">
+                        <span>Verified Sovereign Ledger</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">Bank-Grade Privacy</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-0.5">Automated Indian Rupee (₹) ledger balance &amp; interest projection</p>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-xs font-mono font-bold text-emerald-600 block">+ ₹45,000.00</span>
+                    <span className="text-[10px] text-slate-400 font-medium">Reconciled</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Three Bottom Pillars / Feature Cards: Perfectly aligned to the bottom boundary */}
