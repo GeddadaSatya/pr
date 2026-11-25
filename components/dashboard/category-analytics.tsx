@@ -49,7 +49,7 @@ export function CategoryAnalytics() {
           dashoffset,
         };
       });
-  }, [expenses]);
+  }, [filteredExpenses]);
 
   const topCategoryName = dynamicCategories[0]?.name || 'Travel';
   const topCategoryPercent = dynamicCategories[0]?.percent || 30;
@@ -416,53 +416,69 @@ export function CategoryAnalytics() {
 
               {/* Right Scrollable Category Grid */}
               <div className="flex-1 w-full lg:pl-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-1">
-                  {dynamicCategories.map((cat) => (
-                    <div
-                      key={cat.name}
-                      className="flex flex-col justify-between p-2.5 rounded-lg bg-white border border-slate-200/80 shadow-xs hover:bg-slate-50 transition-colors"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span
-                            className="w-2.5 h-2.5 rounded-full shrink-0"
-                            style={{ backgroundColor: cat.color }}
-                          ></span>
-                          <span className="text-xs font-semibold text-slate-800 truncate">
-                            {cat.name}
-                          </span>
-                        </div>
-                        <span
-                          className="text-xs font-bold shrink-0"
-                          style={{ color: cat.color === '#0f172a' ? '#334155' : cat.color }}
-                        >
-                          {cat.percent}%
-                        </span>
-                      </div>
-                      <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden my-1.5">
-                        <div
-                          className="h-full rounded-full"
-                          style={{ width: `${cat.percent}%`, backgroundColor: cat.color }}
-                        ></div>
-                      </div>
-                      <div className="flex items-center justify-between text-[11px]">
-                        <span className="text-slate-400">Ledger Sum</span>
-                        {privacyMode ? (
-                          <span className="text-slate-900 font-bold font-serif text-xs">••••</span>
-                        ) : (
-                          <div className="flex items-baseline">
-                            <span className="text-slate-900 font-bold font-serif text-xs">
-                              ₹{Math.floor(cat.amount).toLocaleString('en-IN')}
-                            </span>
-                            <span className="font-label-numeric text-[10px] text-slate-400 font-medium">
-                              .{(cat.amount % 1).toFixed(2).split('.')[1] || '00'}
+                {dynamicCategories.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center p-8 text-center text-slate-400 bg-white rounded-lg border border-slate-200/80">
+                    <span className="material-symbols-outlined text-3xl mb-1 text-slate-300">category</span>
+                    <span className="text-xs font-semibold text-slate-600">No categories found</span>
+                    <span className="text-[11px] text-slate-400">No expenses recorded for this selected time filter.</span>
+                  </div>
+                ) : (
+                  <div
+                    className={
+                      dynamicCategories.length === 1
+                        ? 'flex justify-center items-center max-h-72 overflow-y-auto pr-1'
+                        : 'grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-72 overflow-y-auto pr-1'
+                    }
+                  >
+                    {dynamicCategories.map((cat) => (
+                      <div
+                        key={cat.name}
+                        className={`flex flex-col justify-between p-2.5 rounded-lg bg-white border border-slate-200/80 shadow-xs hover:bg-slate-50 transition-colors ${
+                          dynamicCategories.length === 1 ? 'w-full max-w-sm' : ''
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span
+                              className="w-2.5 h-2.5 rounded-full shrink-0"
+                              style={{ backgroundColor: cat.color }}
+                            ></span>
+                            <span className="text-xs font-semibold text-slate-800 truncate">
+                              {cat.name}
                             </span>
                           </div>
-                        )}
+                          <span
+                            className="text-xs font-bold shrink-0"
+                            style={{ color: cat.color === '#0f172a' ? '#334155' : cat.color }}
+                          >
+                            {cat.percent}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden my-1.5">
+                          <div
+                            className="h-full rounded-full"
+                            style={{ width: `${cat.percent}%`, backgroundColor: cat.color }}
+                          ></div>
+                        </div>
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="text-slate-400">Ledger Sum</span>
+                          {privacyMode ? (
+                            <span className="text-slate-900 font-bold font-serif text-xs">••••</span>
+                          ) : (
+                            <div className="flex items-baseline">
+                              <span className="text-slate-900 font-bold font-serif text-xs">
+                                ₹{Math.floor(cat.amount).toLocaleString('en-IN')}
+                              </span>
+                              <span className="font-label-numeric text-[10px] text-slate-400 font-medium">
+                                .{(cat.amount % 1).toFixed(2).split('.')[1] || '00'}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </>

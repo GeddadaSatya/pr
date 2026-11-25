@@ -62,6 +62,7 @@ interface FinanceContextType {
   notifications: NotificationItem[];
   userProfile: UserProfile;
   unreadNotificationsCount: number;
+  isDemoSession: boolean;
   signOut: () => Promise<void>;
 
   // Active navigation
@@ -197,6 +198,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
   const [isNotificationsDrawerOpen, setIsNotificationsDrawerOpen] = useState<boolean>(false);
+  const [isDemoSessionState, setIsDemoSessionState] = useState<boolean>(false);
 
   // Layout & Navigation State
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
@@ -338,6 +340,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
 
       // If demo mode preview was chosen:
       if (isDemoSession) {
+        setIsDemoSessionState(true);
         storagePrefixRef.current = 'wt_demo_';
         const savedDemoPin = localStorage.getItem('wt_demo_privacy_pin') || localStorage.getItem('wt_privacy_pin');
         if (savedDemoPin) setPrivacyPinState(savedDemoPin);
@@ -1107,7 +1110,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         .filter((r) => r.status === 'received' && (r.dateKey === dateKey || (dateKey === '2026-10-28' && r.settledDate === 'Today')))
         .reduce((sum, r) => sum + r.amount, 0);
 
-      const isZeroUser = expenses.length === 0;
+      const isZeroUser = !isDemoSessionState || expenses.length === 0;
       const baselineInflows: Record<string, number> = isZeroUser
         ? {}
         : {
@@ -1117,7 +1120,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
             '2026-10-23': 3200.0,
           };
 
-      const baseInflow = isZeroUser ? 0 : (baselineInflows[dateKey] ?? 3500.0);
+      const baseInflow = isZeroUser ? 0 : (baselineInflows[dateKey] ?? 0);
       const actualInflow = baseInflow + settledReturns;
 
       const yesterdayOutflow = isZeroUser ? 0 : (dateKey === '2026-10-28' ? 1890.0 : 2850.0);
@@ -1157,7 +1160,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         netVelocity,
       };
     },
-    [expenses, peerReceivables]
+    [expenses, peerReceivables, isDemoSessionState]
   );
 
   // ---------------------------------------------------------------------------
@@ -1227,6 +1230,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         notifications,
         userProfile,
         unreadNotificationsCount,
+        isDemoSession: isDemoSessionState,
         signOut,
 
         activeTab,

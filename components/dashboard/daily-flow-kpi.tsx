@@ -9,7 +9,7 @@ interface DailyFlowKpiProps {
 }
 
 export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
-  const { expenses, privacyMode, peerReceivables, markReceivableReceived, openModal } = useFinance();
+  const { expenses, privacyMode, peerReceivables, markReceivableReceived, openModal, isDemoSession } = useFinance();
   const [isPendingExpanded, setIsPendingExpanded] = useState(false);
 
   // Dynamic calculations based on active expenses
@@ -17,13 +17,13 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
     (e) =>
       (e.dateTime || '').toLowerCase().includes('today') ||
       (e.dateTime || '').toLowerCase().includes('just now') ||
-      e.dateKey === '2026-10-28'
+      (isDemoSession && e.dateKey === '2026-10-28')
   );
   const todayOutflow = todayExpenses.reduce((sum, e) => sum + e.amount, 0);
 
   const yesterdayExpenses = expenses.filter((e) =>
     (e.dateTime || '').toLowerCase().includes('yesterday') ||
-    e.dateKey === '2026-10-27'
+    (isDemoSession && e.dateKey === '2026-10-27')
   );
   const yesterdayOutflow = yesterdayExpenses.reduce((sum, e) => sum + e.amount, 0);
 
@@ -36,11 +36,11 @@ export function DailyFlowKpi({ onOpenDayLedger }: DailyFlowKpiProps = {}) {
     .filter((r) => r.status === 'received' && r.settledDate === 'Today')
     .reduce((sum, r) => sum + r.amount, 0);
 
-  // Inflow baseline (mocked credits + investment yield collected + settled friend returns)
-  const isZeroData = expenses.length === 0;
-  const baseTodayInflow = isZeroData ? 0 : 5200.0;
+  // Inflow baseline: only demo sessions load synthetic mock income yields; real accounts reflect actual inflows
+  const isZeroData = !isDemoSession || expenses.length === 0;
+  const baseTodayInflow = isDemoSession ? 5200.0 : 0;
   const todayInflow = baseTodayInflow + settledTodayInflow;
-  const yesterdayInflow = isZeroData ? 0 : 3800.0;
+  const yesterdayInflow = isDemoSession ? 3800.0 : 0;
 
   // Delta calculations
   const outflowDiff = todayOutflow - yesterdayOutflow;
