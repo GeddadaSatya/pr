@@ -435,21 +435,25 @@ export function UnifiedAuthContainer({ defaultMode = 'login' }: { defaultMode?: 
     window.location.href = '/';
   };
 
+  const isScaledScreen = mode === 'login' || mode === 'register';
+
   return (
-    <div className="font-sans antialiased text-slate-800 bg-[#fbfaf6] min-h-screen flex flex-col justify-between selection:bg-amber-100 selection:text-amber-900 auth-viewport-scaled">
-      <style>{`
-        @media (min-width: 1024px) {
-          .auth-viewport-scaled {
-            zoom: 1.25;
-            -moz-transform: scale(1.25);
-            -moz-transform-origin: top center;
+    <div className={`font-sans antialiased text-slate-800 bg-[#fbfaf6] min-h-screen flex flex-col justify-between selection:bg-amber-100 selection:text-amber-900 ${isScaledScreen ? 'auth-viewport-scaled' : ''}`}>
+      {isScaledScreen && (
+        <style>{`
+          @media (min-width: 1024px) {
+            .auth-viewport-scaled {
+              zoom: 1.25;
+              -moz-transform: scale(1.25);
+              -moz-transform-origin: top center;
+            }
           }
-        }
-      `}</style>
+        `}</style>
+      )}
       {/* Main Container */}
-      <div className="flex-1 w-full flex items-center justify-center p-4 sm:p-6 lg:p-10 xl:p-12 relative overflow-hidden ambient-glow">
+      <div className="flex-1 w-full flex items-center justify-center p-4 sm:p-6 lg:p-12 relative overflow-hidden ambient-glow">
         {/* Center Layout Wrapper: Perfectly matched height and aligned baselines */}
-        <main className="w-full max-w-[1360px] xl:max-w-[1440px] grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-stretch">
+        <main className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-stretch">
           
           {/* Left Branding Section (Col-span 7): Aligned top-to-bottom with right card */}
           <section className="lg:col-span-7 flex flex-col justify-between" data-purpose="branding-panel">
@@ -470,61 +474,6 @@ export function UnifiedAuthContainer({ defaultMode = 'login' }: { defaultMode?: 
               <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-lg font-sans">
                 Your all-in-one personal notebook for daily expenses, upcoming bills &amp; payables, and money lent with interest. Built for absolute clarity in Indian Rupees (₹).
               </p>
-
-              {/* Sovereign Integrity & Live Ledger Trust Showcase (Fills the highlighted empty space) */}
-              <div className="mt-6 mb-2 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#fdfbf6] via-white to-[#fbf6ea] border border-[#f5e3ba] shadow-xs">
-                <div className="flex items-center justify-between pb-3 border-b border-[#faecd5] mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-xs font-bold text-slate-900 tracking-tight">Sovereign Financial Integrity</span>
-                  </div>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#b48e28] bg-[#fef8e7] px-2.5 py-0.5 rounded-full border border-[#f5e1ad]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#b48e28]" />
-                    <span>v2.4.1 Production Suite</span>
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {/* Micro Pillar 1 */}
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                      <svg aria-hidden="true" className="w-4 h-4 text-[#b48e28] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 8h6m-5 4h4m-4 4h3m-5 4h8a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span>INR Native (₹)</span>
-                    </div>
-                    <p className="text-[11px] text-slate-600 leading-snug">
-                      Lakhs &amp; Crores financial calculations with zero rounding loss.
-                    </p>
-                  </div>
-
-                  {/* Micro Pillar 2 */}
-                  <div className="space-y-1 sm:border-l sm:border-slate-200/70 sm:pl-3">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                      <svg aria-hidden="true" className="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      <span>Zero-Leakage</span>
-                    </div>
-                    <p className="text-[11px] text-slate-600 leading-snug">
-                      Device-encrypted vault with customizable quick PIN unlock.
-                    </p>
-                  </div>
-
-                  {/* Micro Pillar 3 */}
-                  <div className="space-y-1 sm:border-l sm:border-slate-200/70 sm:pl-3">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
-                      <svg aria-hidden="true" className="w-4 h-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                      <span>Instant Sync &amp; PDF</span>
-                    </div>
-                    <p className="text-[11px] text-slate-600 leading-snug">
-                      Real-time offline caching, cloud sync, and 1-click audit folios.
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Three Bottom Pillars / Feature Cards: Perfectly aligned to the bottom boundary */}
